@@ -1,0 +1,828 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Painel Administrativo</title>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..700&display=swap" rel="stylesheet">
+<style>
+	* { box-sizing: border-box; }
+	html, body { margin: 0; min-height: 100%; }
+	body { font-family: 'DM Sans', system-ui, sans-serif; color: #1c1917; background: #fefaf5; }
+	.material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; font-size: 20px; line-height: 1; vertical-align: middle; }
+
+	/* ══════════════ admin-layout.component.ts (rafael-lab) ══════════════ */
+	:root {
+		--snav-bg: #6b1d2a;
+		--snav-bg-dark: #4a1019;
+		--snav-text: rgba(253, 246, 236, 0.82);
+		--snav-text-full: #fdf6ec;
+		--snav-active: #d4943f;
+		--snav-active-bg: rgba(212, 148, 63, 0.18);
+		--snav-hover-bg: rgba(253, 246, 236, 0.07);
+		--snav-divider: rgba(253, 246, 236, 0.14);
+		--zf-border: #e7ddd1;
+		--zf-surface: #fefaf5;
+		--zf-surface-card: #fff;
+		--zf-charcoal: #1c1917;
+		--zf-warm-gray: #78716c;
+		--zf-shadow-sm: 0 1px 2px rgba(28, 25, 23, 0.04);
+	}
+	.layout-container { position: relative; display: flex; min-height: 100vh; }
+	.sidenav {
+		width: 260px; flex-shrink: 0; background: var(--snav-bg); color: var(--snav-text);
+		display: flex; flex-direction: column;
+	}
+	.sidenav-brand {
+		display: flex; align-items: center; gap: 8px;
+		padding: 22px 12px 18px 20px; border-bottom: 1px solid var(--snav-divider); flex-shrink: 0;
+	}
+	.brand-name { font-family: 'DM Serif Display', Georgia, serif; font-size: 1.625rem; color: var(--snav-text-full); letter-spacing: -0.02em; line-height: 1; }
+	.brand-badge {
+		font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+		color: var(--snav-active); background: rgba(212, 148, 63, 0.16); padding: 2px 7px;
+		border-radius: 4px; border: 1px solid rgba(212, 148, 63, 0.3);
+	}
+	.collapse-button { flex-shrink: 0; margin-left: auto; color: var(--snav-text); background: none; border: none; cursor: pointer; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+	.collapse-button:hover { color: var(--snav-text-full); background: var(--snav-hover-bg); }
+
+	.nav-list { padding: 10px 0; flex: 1; list-style: none; margin: 0; }
+	.nav-item {
+		display: flex; align-items: center; gap: 16px; margin: 2px 10px; padding: 0 16px;
+		border-radius: 10px; min-height: 44px; color: var(--snav-text); text-decoration: none; font-size: 0.875rem;
+	}
+	.nav-item:hover { background: var(--snav-hover-bg); color: var(--snav-text-full); }
+	.nav-item.active { background-color: var(--snav-active-bg); color: var(--snav-active); font-weight: 500; }
+	.nav-item .material-symbols-outlined { font-size: 20px; }
+	.nav-external { color: rgba(253, 246, 236, 0.55); }
+	.nav-external .material-symbols-outlined { color: rgba(253, 246, 236, 0.45); }
+	.nav-external:hover { color: var(--snav-text-full); }
+	.nav-divider { margin: 8px 14px; border: none; border-top: 1px solid var(--snav-divider); }
+
+	.content { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+	.toolbar {
+		position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 4px;
+		height: 64px; padding: 0 16px; background: var(--zf-surface-card);
+		border-bottom: 1px solid var(--zf-border); box-shadow: var(--zf-shadow-sm);
+	}
+	.menu-button { margin-right: 4px; background: none; border: none; cursor: pointer; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--zf-warm-gray); }
+	.menu-button:hover { background: rgba(28,25,23,0.05); }
+	.toolbar-title { font-size: 0.9375rem; font-weight: 600; color: var(--zf-charcoal); letter-spacing: -0.01em; }
+	.spacer { flex: 1 1 auto; }
+	.admin-name { font-size: 0.8125rem; font-weight: 500; color: var(--zf-warm-gray); max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+	.logout-btn { background: none; border: none; cursor: pointer; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--zf-warm-gray); }
+	.logout-btn:hover { background: rgba(28,25,23,0.05); }
+
+	.main-content { flex: 1; padding: 24px; background-color: var(--zf-surface); }
+
+	/* ══════════════ order-list.component.ts :host tokens ══════════════ */
+	.op-root {
+		--op-paper: #fefaf5; --op-card: #ffffff; --op-ink: #1c1917; --op-ink-soft: #44403c;
+		--op-muted: #78716c; --op-muted-soft: #a8a29e; --op-rule: #e7ddd1; --op-rule-strong: #d6c9b6;
+		--op-burgundy: #6b1d2a; --op-burgundy-dark: #4a1019; --op-copper: #d4943f; --op-copper-soft: #f3e4d0; --op-cream: #fdf6ec;
+		--tone-amber: #ba7517; --tone-amber-bg: #fdf2dc;
+		--tone-yellow: #d4b106; --tone-yellow-bg: #fbf0c9;
+		--tone-green: #639922; --tone-green-bg: #e5f1d7;
+		--tone-blue: #378add; --tone-blue-bg: #dceaf5;
+		--tone-purple: #534ab7; --tone-purple-bg: #e5e3f6;
+		--tone-copper: #d85a30; --tone-copper-bg: #f8e1ca;
+		--tone-plum: #d4537e; --tone-plum-bg: #ecd9ee;
+		--tone-sage: #1d9e75; --tone-sage-bg: #d6e7d3;
+		--tone-ruby: #e24b4a; --tone-ruby-bg: #f4d6d8;
+		--op-shadow-sm: 0 1px 2px rgba(28, 25, 23, 0.04);
+		--op-shadow: 0 1px 0 rgba(28, 25, 23, 0.04), 0 8px 24px -12px rgba(74, 16, 25, 0.12);
+		--op-shadow-lift: 0 1px 0 rgba(28, 25, 23, 0.05), 0 14px 36px -16px rgba(74, 16, 25, 0.22);
+		--op-radius: 14px; --op-radius-sm: 8px; --op-radius-pill: 999px;
+		display: block; font-family: 'DM Sans', system-ui, sans-serif; color: var(--op-ink);
+		max-width: 1380px; margin: 0 auto;
+	}
+	.op-shell { display: flex; flex-direction: column; gap: 28px; }
+	.op-shell--kanban { gap: 10px; }
+
+	/* ── Masthead ── */
+	.op-masthead {
+		display: grid; grid-template-columns: 1fr auto; grid-template-rows: auto auto;
+		align-items: end; gap: 6px 24px; padding-bottom: 24px;
+		border-bottom: 1px solid var(--op-rule-strong); position: relative;
+	}
+	.op-masthead::before { content: ''; position: absolute; left: 0; bottom: -1px; width: 80px; height: 3px; background: var(--op-burgundy); }
+	.op-masthead__meta { grid-column: 1; grid-row: 1; display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+	.op-eyebrow { font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--op-burgundy); }
+	.op-issue { font-size: 0.75rem; color: var(--op-muted); letter-spacing: 0.04em; font-style: italic; }
+	.op-headline {
+		grid-column: 1; grid-row: 2; margin: 0; font-family: 'DM Serif Display', Georgia, serif;
+		font-weight: 400; font-size: clamp(2.5rem, 5vw, 3.75rem); line-height: 0.98; letter-spacing: -0.02em;
+		display: flex; align-items: baseline; gap: 0.4em; flex-wrap: wrap;
+	}
+	.op-headline__main { color: var(--op-ink); }
+	.op-headline__accent { font-style: italic; color: var(--op-burgundy); font-size: 0.78em; }
+	.op-masthead__actions { grid-column: 2; grid-row: 1 / span 2; align-self: end; }
+	.op-masthead--kanban { gap: 0 16px; padding-bottom: 4px; border-bottom-width: 1px; }
+	.op-masthead--kanban .op-masthead__meta { gap: 6px; opacity: 0.4; font-size: 0.5625rem; letter-spacing: 0.06em; }
+	.op-masthead--kanban .op-headline { font-family: inherit; font-weight: 700; font-size: 1rem; letter-spacing: -0.01em; }
+	.op-masthead--kanban .op-headline__accent { font-size: 1em; }
+	.op-masthead--kanban .op-btn { padding: 5px 10px; font-size: 0.75rem; }
+
+	/* ── Buttons ── */
+	.op-btn {
+		display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: var(--op-radius-sm);
+		font-family: inherit; font-size: 0.875rem; font-weight: 500; letter-spacing: 0.01em; cursor: pointer;
+		border: 1px solid transparent; text-decoration: none;
+	}
+	.op-btn__icon { font-size: 1rem; line-height: 1; }
+	.op-btn--ghost { background: var(--op-card); color: var(--op-ink-soft); border-color: var(--op-rule-strong); }
+	.op-btn--ghost:hover { background: var(--op-cream); color: var(--op-burgundy); border-color: var(--op-burgundy); }
+
+	/* ── KPI panel (compacto — usado na aba Quadro) ── */
+	.op-kpis { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
+	.op-kpi {
+		position: relative; background: var(--op-card); border: 1px solid var(--op-rule); border-radius: var(--op-radius);
+		padding: 18px 20px 16px; display: flex; flex-direction: column; gap: 6px; min-height: 120px;
+		box-shadow: var(--op-shadow-sm); overflow: hidden;
+	}
+	.op-kpi::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: var(--op-rule); }
+	.op-kpi--primary::before { background: linear-gradient(90deg, var(--op-burgundy), var(--op-copper)); }
+	.op-kpi--alert::before { background: var(--tone-amber); }
+	.op-kpi--urgent { border-color: var(--tone-amber); background: linear-gradient(180deg, #fffaf0 0%, var(--op-card) 60%); }
+	.op-kpi--urgent::before { background: linear-gradient(90deg, var(--tone-amber), var(--tone-ruby)); }
+	.op-kpi__label { font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--op-muted); }
+	.op-kpi__value { font-family: 'DM Serif Display', Georgia, serif; font-size: 2.625rem; line-height: 1; color: var(--op-ink); letter-spacing: -0.02em; }
+	.op-kpi__value--money { font-size: 2rem; display: inline-flex; align-items: baseline; gap: 4px; }
+	.op-kpi__currency { font-family: 'DM Sans', sans-serif; font-size: 0.8125rem; font-weight: 600; color: var(--op-muted); }
+	.op-kpi__delta { margin-top: auto; font-size: 0.75rem; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; color: var(--op-ink-soft); }
+	.op-kpi__delta-ref { color: var(--op-muted); font-weight: 400; font-style: italic; }
+	.op-kpi__delta--up { color: var(--tone-sage); }
+	.op-kpi__delta--up::before { content: '▲'; font-size: 0.65rem; }
+	.op-kpi__delta--warn { color: var(--tone-amber); font-weight: 600; }
+	.op-pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--tone-amber); position: relative; display: inline-block; flex-shrink: 0; }
+	.op-kpi--split { flex-direction: column; justify-content: space-between; gap: 10px; padding: 16px 20px; }
+	.op-kpi__split-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+	.op-kpi__split-value { font-family: 'DM Serif Display', Georgia, serif; font-size: 1.75rem; line-height: 1; color: var(--op-ink); letter-spacing: -0.02em; }
+	.op-kpi__split-divider { height: 1px; background: var(--op-rule); }
+
+	.op-kpis--compact { gap: 6px; }
+	.op-kpis--compact .op-kpi { min-height: 0; flex-direction: row; align-items: baseline; gap: 6px; padding: 5px 10px; }
+	.op-kpis--compact .op-kpi::before { display: none; }
+	.op-kpis--compact .op-kpi__label { font-size: 0.5625rem; white-space: nowrap; }
+	.op-kpis--compact .op-kpi__value { font-size: 0.9375rem; }
+	.op-kpis--compact .op-kpi__value--money { font-size: 0.875rem; }
+	.op-kpis--compact .op-kpi__currency { font-size: 0.6875rem; }
+	.op-kpis--compact .op-kpi__delta { display: none; }
+	.op-kpis--compact .op-kpi--split { flex-direction: row; align-items: center; padding: 5px 10px; gap: 10px; }
+	.op-kpis--compact .op-kpi__split-row { flex-direction: row; align-items: baseline; gap: 4px; }
+	.op-kpis--compact .op-kpi__split-divider { width: 1px; height: 12px; }
+	.op-kpis--compact .op-kpi__split-value { font-size: 0.875rem; }
+
+	/* ── Tabs (Lista / Quadro) ── */
+	.op-tabs { display: inline-flex; gap: 4px; padding: 4px; background: var(--op-cream); border: 1px solid var(--op-rule); border-radius: var(--op-radius-sm); align-self: flex-start; }
+	.op-tab {
+		display: inline-flex; align-items: center; gap: 8px; padding: 8px 18px; border: none; background: transparent;
+		border-radius: 6px; font-family: inherit; font-size: 0.875rem; font-weight: 600; color: var(--op-muted); cursor: pointer;
+	}
+	.op-tab__icon { font-size: 0.95rem; line-height: 1; }
+	.op-tab:hover { color: var(--op-burgundy); }
+	.op-tab--active { background: var(--op-card); color: var(--op-burgundy); box-shadow: var(--op-shadow-sm); }
+
+	/* ── Kanban toolbar ── */
+	.op-kanban { display: flex; flex-direction: column; gap: 18px; }
+	.op-kanban__toolbar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; background: var(--op-card); border: 1px solid var(--op-rule); border-radius: var(--op-radius); padding: 16px 20px; box-shadow: var(--op-shadow-sm); }
+	.op-filters__group-label { font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--op-muted); margin-right: 4px; }
+	.op-quick { padding: 6px 14px; border-radius: var(--op-radius-pill); background: var(--op-cream); border: 1px solid var(--op-rule); font-family: inherit; font-size: 0.8125rem; font-weight: 500; color: var(--op-ink-soft); cursor: pointer; white-space: nowrap; }
+	.op-quick:hover { border-color: var(--op-burgundy); color: var(--op-burgundy); }
+	.op-quick--active { background: var(--op-burgundy); color: var(--op-cream); border-color: var(--op-burgundy); box-shadow: 0 2px 8px -2px rgba(107, 29, 42, 0.4); }
+	.op-quick__badge { margin-left: 6px; padding: 1px 7px; border-radius: var(--op-radius-pill); background: var(--tone-ruby); color: #fff; font-size: 0.6875rem; font-weight: 600; }
+	.op-kanban__summary { margin-left: auto; font-size: 0.8125rem; color: var(--op-muted); }
+	.op-kanban__summary strong { font-family: 'DM Serif Display', Georgia, serif; font-weight: 400; font-size: 1.25rem; color: var(--op-burgundy); margin-right: 4px; }
+	.op-kanban__toolbar-spacer { flex-basis: 100%; height: 0; }
+	.op-density { display: inline-flex; border: 1px solid var(--op-rule); border-radius: var(--op-radius-pill); overflow: hidden; }
+	.op-density__btn { padding: 6px 14px; background: var(--op-cream); border: none; font-family: inherit; font-size: 0.8125rem; font-weight: 500; color: var(--op-ink-soft); cursor: pointer; }
+	.op-density__btn + .op-density__btn { border-left: 1px solid var(--op-rule); }
+	.op-density__btn--active { background: var(--op-burgundy); color: var(--op-cream); }
+
+	/* ── Kanban board / columns / cards ── */
+	.op-kanban__board { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 8px; }
+	.op-kanban__col {
+		flex: 0 0 272px; display: flex; flex-direction: column; min-height: 160px; max-height: 70vh;
+		background: var(--op-card); border: 1px solid var(--op-rule); border-radius: var(--op-radius);
+		box-shadow: var(--op-shadow-sm); overflow: hidden;
+	}
+	.op-kanban__col-topbar { flex: 0 0 3px; background: var(--dot-color, var(--op-rule)); }
+	.op-kanban__col[data-tone='amber'] { --dot-color: var(--tone-amber); }
+	.op-kanban__col[data-tone='yellow'] { --dot-color: var(--tone-yellow); }
+	.op-kanban__col[data-tone='green'] { --dot-color: var(--tone-green); }
+	.op-kanban__col[data-tone='blue'] { --dot-color: var(--tone-blue); }
+	.op-kanban__col[data-tone='purple'] { --dot-color: var(--tone-purple); }
+	.op-kanban__col[data-tone='copper'] { --dot-color: var(--tone-copper); }
+	.op-kanban__col[data-tone='plum'] { --dot-color: var(--tone-plum); }
+	.op-kanban__col[data-tone='sage'] { --dot-color: var(--tone-sage); }
+	.op-kanban__col[data-tone='ruby'] { --dot-color: var(--tone-ruby); }
+	.op-kanban__col-head { display: flex; align-items: center; gap: 8px; padding: 12px 14px; border-bottom: 1px solid var(--op-rule); background: linear-gradient(180deg, var(--op-cream) 0%, transparent 100%); }
+	.op-kanban__col-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--dot-color, var(--op-muted)); flex-shrink: 0; }
+	.op-kanban__col-title { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--op-ink-soft); }
+	.op-kanban__col-count { margin-left: auto; min-width: 24px; height: 22px; padding: 0 7px; display: inline-flex; align-items: center; justify-content: center; border-radius: var(--op-radius-pill); background: var(--op-cream); border: 1px solid var(--op-rule); font-size: 0.75rem; font-weight: 600; color: var(--op-ink-soft); }
+	.op-kanban__col-eye { margin-left: 4px; border: none; background: transparent; cursor: pointer; font-size: 0.875rem; line-height: 1; padding: 2px 4px; border-radius: var(--op-radius-sm); opacity: 0.55; }
+	.op-kanban__col-eye:hover { opacity: 1; background: var(--op-cream); }
+	.op-kanban__col-body { display: flex; flex-direction: column; gap: 10px; padding: 12px; overflow-y: auto; }
+	.op-kanban__card {
+		box-sizing: border-box; display: flex; flex-direction: column; gap: 8px; padding: 12px 14px;
+		border: 1px solid var(--op-rule); border-left: 3px solid var(--dot-color, var(--op-rule-strong));
+		border-radius: var(--op-radius-sm); background: var(--op-card); cursor: pointer; width: 100%; text-align: left; font: inherit; color: inherit;
+	}
+	.op-kanban__card[data-status='pendente'] { --dot-color: var(--tone-amber); }
+	.op-kanban__card[data-status='cadastro_financeiro'] { --dot-color: var(--tone-yellow); }
+	.op-kanban__card[data-status='confirmado'] { --dot-color: var(--tone-green); }
+	.op-kanban__card[data-status='em_separacao'] { --dot-color: var(--tone-blue); }
+	.op-kanban__card[data-status='faturamento'] { --dot-color: var(--tone-purple); }
+	.op-kanban__card[data-status='aguardando_pagamento'] { --dot-color: var(--tone-copper); }
+	.op-kanban__card[data-status='em_rota'] { --dot-color: var(--tone-plum); }
+	.op-kanban__card[data-status='entregue'] { --dot-color: var(--tone-sage); }
+	.op-kanban__card[data-status='cancelado'] { --dot-color: var(--tone-ruby); }
+	.op-kanban__card:hover { box-shadow: var(--op-shadow-lift); border-color: var(--dot-color, var(--op-rule-strong)); }
+	.op-kanban__card-top { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+	.op-numero { font-weight: 700; }
+	.op-kanban__card .op-numero { font-size: 1.25rem; }
+	.op-kanban__card-time { font-size: 0.6875rem; color: var(--op-muted); font-style: italic; white-space: nowrap; }
+	.op-kanban__card-badge { display: inline-block; align-self: flex-start; margin: 2px 0; padding: 2px 8px; border-radius: var(--op-radius-pill); background: var(--tone-ruby-bg); color: var(--tone-ruby); font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.02em; }
+	.op-kanban__card-cliente { font-weight: 600; font-size: 0.875rem; color: var(--op-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+	.op-kanban__card-foot { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+	.op-valor { font-weight: 700; color: var(--op-burgundy); }
+	.op-valor__cur { font-size: 0.6875rem; margin-right: 2px; }
+	.op-kanban__card .op-valor__num { font-size: 1.125rem; }
+	.op-kanban__card-itens { font-size: 0.6875rem; color: var(--op-muted); letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; }
+	.op-kanban__empty { margin: 8px 0; text-align: center; font-size: 0.8125rem; color: var(--op-muted-soft); font-style: italic; }
+
+	/* ── Interatividade — não faz parte do visual aprovado, apenas comportamento ── */
+	.op-root [hidden] { display: none !important; }
+
+	/* Densidade Compacto */
+	.op-kanban__board--compact { gap: 10px; }
+	.op-kanban__board--compact .op-kanban__col-head { padding: 8px 10px; }
+	.op-kanban__board--compact .op-kanban__col-body { gap: 6px; padding: 8px; }
+	.op-kanban__board--compact .op-kanban__card { padding: 8px 10px; gap: 4px; }
+	.op-kanban__board--compact .op-kanban__card .op-numero { font-size: 1.05rem; }
+	.op-kanban__board--compact .op-kanban__card .op-valor__num { font-size: 0.9375rem; }
+
+	/* Modo Operacional */
+	.layout-container.sidenav-hidden .sidenav { display: none; }
+	.layout-container.is-operacional .sidenav { display: none; }
+	.layout-container.is-operacional .toolbar { height: 44px; }
+	.layout-container.is-operacional .toolbar-title,
+	.layout-container.is-operacional .admin-name { display: none; }
+	.layout-container.is-operacional .main-content { padding: 12px 16px; }
+	.layout-container.is-operacional .op-masthead--kanban,
+	.layout-container.is-operacional .op-kpis { display: none; }
+	.layout-container.is-operacional .op-root { max-width: none; }
+
+	/* Painel de colunas ocultas */
+	.op-columns-panel { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 10px 14px; background: var(--op-cream); border: 1px solid var(--op-rule); border-radius: var(--op-radius-sm); }
+	.op-col-chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: var(--op-radius-pill); background: var(--op-card); border: 1px solid var(--op-rule-strong); font-family: inherit; font-size: 0.75rem; font-weight: 500; color: var(--op-ink-soft); cursor: pointer; }
+	.op-col-chip:hover { border-color: var(--op-burgundy); color: var(--op-burgundy); }
+	.op-col-chip .material-symbols-outlined { font-size: 1rem; }
+	.op-kanban__col[hidden] { display: none; }
+
+	/* Visualização em Lista */
+	.op-list { background: var(--op-card); border: 1px solid var(--op-rule); border-radius: var(--op-radius); box-shadow: var(--op-shadow-sm); overflow: hidden; }
+	.op-list__table { width: 100%; border-collapse: collapse; font-size: 0.8125rem; }
+	.op-list__table th { text-align: left; padding: 10px 14px; font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--op-muted); border-bottom: 1px solid var(--op-rule); background: var(--op-cream); }
+	.op-list__table td { padding: 10px 14px; border-bottom: 1px solid var(--op-rule); }
+	.op-list__table tbody tr:last-child td { border-bottom: none; }
+	.op-list__table tbody tr:hover { background: var(--op-cream); }
+	.op-list__status { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; }
+	.op-list__dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+	/* Modal de pedido */
+	.op-modal-overlay { position: fixed; inset: 0; background: rgba(28, 25, 23, 0.45); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+	.op-modal { background: var(--op-card); border-radius: var(--op-radius); box-shadow: var(--op-shadow-lift); width: 100%; max-width: 380px; overflow: hidden; }
+	.op-modal__header { display: flex; align-items: center; justify-content: space-between; padding: 16px 18px; border-bottom: 1px solid var(--op-rule); }
+	.op-modal__header h2 { margin: 0; font-family: 'DM Serif Display', Georgia, serif; font-weight: 400; font-size: 1.25rem; color: var(--op-ink); }
+	.op-modal__close { background: none; border: none; cursor: pointer; color: var(--op-muted); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+	.op-modal__close:hover { background: var(--op-cream); color: var(--op-burgundy); }
+	.op-modal__body { padding: 18px; display: flex; flex-direction: column; gap: 10px; }
+	.op-modal__row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; font-size: 0.875rem; }
+	.op-modal__row span:first-child { color: var(--op-muted); }
+	.op-modal__row span:last-child { font-weight: 600; color: var(--op-ink); }
+	.op-modal__footer { padding: 14px 18px; border-top: 1px solid var(--op-rule); display: flex; justify-content: flex-end; }
+</style>
+</head>
+<body>
+<div class="layout-container" id="layoutContainer">
+	<nav class="sidenav">
+		<div class="sidenav-brand">
+			<span class="brand-name">ZFood</span>
+			<span class="brand-badge">Admin</span>
+			<button class="collapse-button" id="sidenavCollapseBtn" aria-label="Fechar menu"><span class="material-symbols-outlined">chevron_left</span></button>
+		</div>
+		<ul class="nav-list">
+			<li><a class="nav-item nav-external" href="01-catalogo.html"><span class="material-symbols-outlined">storefront</span><span>Ver Catálogo</span></a></li>
+			<hr class="nav-divider" />
+			<li><a class="nav-item" href="04-dashboard-admin.html"><span class="material-symbols-outlined">dashboard</span><span>Dashboard</span></a></li>
+			<li><a class="nav-item active" href="05-kanban.html"><span class="material-symbols-outlined">receipt_long</span><span>Pedidos</span></a></li>
+			<li><a class="nav-item" href="06-cadastro-financeiro.html"><span class="material-symbols-outlined">account_balance</span><span>Cadastros Financeiros</span></a></li>
+			<li><a class="nav-item" href="#"><span class="material-symbols-outlined">people</span><span>Usuários</span></a></li>
+			<li><a class="nav-item" href="#"><span class="material-symbols-outlined">inventory_2</span><span>Produtos</span></a></li>
+			<li><a class="nav-item" href="#"><span class="material-symbols-outlined">category</span><span>Categorias</span></a></li>
+			<li><a class="nav-item" href="#"><span class="material-symbols-outlined">sync</span><span>Sincronização</span></a></li>
+			<li><a class="nav-item" href="#"><span class="material-symbols-outlined">settings</span><span>Configurações</span></a></li>
+		</ul>
+	</nav>
+
+	<div class="content">
+		<header class="toolbar">
+			<button class="menu-button" id="toolbarMenuBtn" aria-label="Abrir menu"><span class="material-symbols-outlined">menu</span></button>
+			<span class="toolbar-title">Painel Administrativo</span>
+			<span class="spacer"></span>
+			<span class="admin-name">Administrador ZFOODs</span>
+			<button class="logout-btn" aria-label="Sair"><span class="material-symbols-outlined">logout</span></button>
+		</header>
+
+		<main class="main-content">
+			<section class="op-root op-shell op-shell--kanban" aria-label="Operações de pedidos">
+				<header class="op-masthead op-masthead--kanban">
+					<div class="op-masthead__meta">
+						<span class="op-eyebrow">Operações · 21 de julho de 2026</span>
+						<span class="op-issue">Edição diária · Nº 202</span>
+					</div>
+					<h1 class="op-headline"><span class="op-headline__main">Pedidos</span><span class="op-headline__accent">em curso</span></h1>
+					<div class="op-masthead__actions">
+						<button type="button" class="op-btn op-btn--ghost" aria-label="Atualizar painel">
+							<span class="op-btn__icon" aria-hidden="true">↻</span><span>Atualizar</span>
+						</button>
+					</div>
+				</header>
+
+				<section class="op-kpis op-kpis--compact" aria-label="Indicadores estratégicos">
+					<article class="op-kpi op-kpi--primary">
+						<span class="op-kpi__label">Pedidos hoje</span>
+						<span class="op-kpi__value">3</span>
+						<span class="op-kpi__delta op-kpi__delta--up">12% <span class="op-kpi__delta-ref">vs ontem</span></span>
+					</article>
+					<article class="op-kpi">
+						<span class="op-kpi__label">Faturamento</span>
+						<span class="op-kpi__value op-kpi__value--money"><span class="op-kpi__currency">R$</span>900,00</span>
+						<span class="op-kpi__delta op-kpi__delta--up">8% <span class="op-kpi__delta-ref">vs ontem</span></span>
+					</article>
+					<article class="op-kpi">
+						<span class="op-kpi__label">Ticket médio</span>
+						<span class="op-kpi__value op-kpi__value--money"><span class="op-kpi__currency">R$</span>383,26</span>
+						<span class="op-kpi__delta">17 pedidos</span>
+					</article>
+					<article class="op-kpi op-kpi--alert op-kpi--urgent">
+						<span class="op-kpi__label">Aguardando ação</span>
+						<span class="op-kpi__value">10</span>
+						<span class="op-kpi__delta op-kpi__delta--warn"><span class="op-pulse"></span> Requer atenção</span>
+					</article>
+					<article class="op-kpi op-kpi--split">
+						<div class="op-kpi__split-row"><span class="op-kpi__label">Em rota</span><span class="op-kpi__split-value">1</span></div>
+						<div class="op-kpi__split-divider"></div>
+						<div class="op-kpi__split-row"><span class="op-kpi__label">Entregues hoje</span><span class="op-kpi__split-value">1</span></div>
+					</article>
+				</section>
+
+				<nav class="op-tabs" role="tablist" aria-label="Modos de visualização">
+					<button type="button" role="tab" class="op-tab" id="tabLista" aria-selected="false">
+						<span class="material-symbols-outlined op-tab__icon" aria-hidden="true">view_list</span>Lista
+					</button>
+					<button type="button" role="tab" class="op-tab op-tab--active" id="tabQuadro" aria-selected="true">
+						<span class="material-symbols-outlined op-tab__icon" aria-hidden="true">view_kanban</span>Quadro
+					</button>
+				</nav>
+
+				<section class="op-kanban" id="viewQuadro" aria-label="Quadro de pedidos por etapa">
+					<div class="op-kanban__toolbar" role="group" aria-label="Período do quadro">
+						<span class="op-filters__group-label">Período</span>
+						<button type="button" class="op-quick" data-period="7" aria-pressed="false">7 dias</button>
+						<button type="button" class="op-quick op-quick--active" data-period="30" aria-pressed="true">30 dias</button>
+						<button type="button" class="op-quick" data-period="90" aria-pressed="false">90 dias</button>
+						<span class="op-kanban__summary" aria-live="polite"><strong>17</strong> pedidos</span>
+						<button type="button" class="op-quick" id="btnColunas" aria-pressed="false">Colunas<span class="op-quick__badge" id="opColBadge" hidden>0</span></button>
+						<span class="op-kanban__toolbar-spacer"></span>
+						<div class="op-density" role="group" aria-label="Densidade das colunas do quadro">
+							<button type="button" class="op-density__btn op-density__btn--active" data-density="conforto" aria-pressed="true">Conforto</button>
+							<button type="button" class="op-density__btn" data-density="compacto" aria-pressed="false">Compacto</button>
+						</div>
+						<button type="button" class="op-quick" id="btnModoOperacional" aria-pressed="false" title="Recolhe o menu, o cabeçalho e os indicadores para maximizar o quadro">
+							<span aria-hidden="true">⛶</span> Modo Operacional
+						</button>
+					</div>
+
+					<div class="op-columns-panel" id="opColumnsPanel" hidden></div>
+
+					<div class="op-kanban__board" id="opBoard">
+						<section class="op-kanban__col" data-tone="amber" data-col="pendente">
+							<div class="op-kanban__col-topbar"></div>
+							<header class="op-kanban__col-head">
+								<span class="op-kanban__col-dot"></span>
+								<span class="op-kanban__col-title">Pendente</span>
+								<span class="op-kanban__col-count">10</span>
+								<button type="button" class="op-kanban__col-eye" data-hide-col="pendente" aria-label="Ocultar coluna Pendente"><span aria-hidden="true">👁️</span></button>
+							</header>
+							<div class="op-kanban__col-body" data-status="pendente">
+								<button type="button" class="op-kanban__card" data-status="pendente">
+									<span class="op-kanban__card-top"><span class="op-numero">18</span><span class="op-kanban__card-time">1d atrás</span></span>
+									<span class="op-kanban__card-cliente">Cliente Teste Limite Credito</span>
+									<span class="op-kanban__card-foot"><span class="op-valor"><span class="op-valor__cur">R$</span><span class="op-valor__num">1.798,00</span></span><span class="op-kanban__card-itens">1 item</span></span>
+								</button>
+								<button type="button" class="op-kanban__card" data-status="pendente">
+									<span class="op-kanban__card-top"><span class="op-numero">15</span><span class="op-kanban__card-time">2d atrás</span></span>
+									<span class="op-kanban__card-cliente">Cliente Teste Limite Credito</span>
+									<span class="op-kanban__card-foot"><span class="op-valor"><span class="op-valor__cur">R$</span><span class="op-valor__num">449,50</span></span><span class="op-kanban__card-itens">1 item</span></span>
+								</button>
+								<button type="button" class="op-kanban__card" data-status="pendente">
+									<span class="op-kanban__card-top"><span class="op-numero">11</span><span class="op-kanban__card-time">5d atrás</span></span>
+									<span class="op-kanban__card-cliente">Cliente Teste Limite Credito</span>
+									<span class="op-kanban__card-foot"><span class="op-valor"><span class="op-valor__cur">R$</span><span class="op-valor__num">809,10</span></span><span class="op-kanban__card-itens">1 item</span></span>
+								</button>
+							</div>
+						</section>
+
+						<section class="op-kanban__col" data-tone="yellow" data-col="cadastro_financeiro">
+							<div class="op-kanban__col-topbar"></div>
+							<header class="op-kanban__col-head">
+								<span class="op-kanban__col-dot"></span>
+								<span class="op-kanban__col-title">Cadastro Financeiro</span>
+								<span class="op-kanban__col-count">1</span>
+								<button type="button" class="op-kanban__col-eye" data-hide-col="cadastro_financeiro" aria-label="Ocultar coluna Cadastro Financeiro"><span aria-hidden="true">👁️</span></button>
+							</header>
+							<div class="op-kanban__col-body" data-status="cadastro_financeiro">
+								<a href="06-cadastro-financeiro.html" style="text-decoration:none; color:inherit;">
+									<button type="button" class="op-kanban__card" data-status="cadastro_financeiro" style="pointer-events:none;">
+										<span class="op-kanban__card-top"><span class="op-numero">20</span><span class="op-kanban__card-time">hoje</span></span>
+										<span class="op-kanban__card-cliente">Hamburgueria Bairro Novo</span>
+										<span class="op-kanban__card-foot"><span class="op-valor"><span class="op-valor__cur">R$</span><span class="op-valor__num">179,80</span></span><span class="op-kanban__card-itens">1 item</span></span>
+									</button>
+								</a>
+							</div>
+						</section>
+
+						<section class="op-kanban__col" data-tone="green" data-col="confirmado">
+							<div class="op-kanban__col-topbar"></div>
+							<header class="op-kanban__col-head">
+								<span class="op-kanban__col-dot"></span>
+								<span class="op-kanban__col-title">Pedido Confirmado</span>
+								<span class="op-kanban__col-count">1</span>
+								<button type="button" class="op-kanban__col-eye" data-hide-col="confirmado" aria-label="Ocultar coluna Pedido Confirmado"><span aria-hidden="true">👁️</span></button>
+							</header>
+							<div class="op-kanban__col-body" data-status="confirmado">
+								<button type="button" class="op-kanban__card" data-status="confirmado">
+									<span class="op-kanban__card-top"><span class="op-numero">19</span><span class="op-kanban__card-time">hoje</span></span>
+									<span class="op-kanban__card-cliente">Cliente Teste Limite Credito</span>
+									<span class="op-kanban__card-foot"><span class="op-valor"><span class="op-valor__cur">R$</span><span class="op-valor__num">899,00</span></span><span class="op-kanban__card-itens">1 item</span></span>
+								</button>
+							</div>
+						</section>
+
+						<section class="op-kanban__col" data-tone="blue" data-col="em_separacao">
+							<div class="op-kanban__col-topbar"></div>
+							<header class="op-kanban__col-head">
+								<span class="op-kanban__col-dot"></span>
+								<span class="op-kanban__col-title">Em Separação</span>
+								<span class="op-kanban__col-count">1</span>
+								<button type="button" class="op-kanban__col-eye" data-hide-col="em_separacao" aria-label="Ocultar coluna Em Separação"><span aria-hidden="true">👁️</span></button>
+							</header>
+							<div class="op-kanban__col-body" data-status="em_separacao">
+								<a href="07-camara-fria.html" style="text-decoration:none; color:inherit;">
+									<button type="button" class="op-kanban__card" data-status="em_separacao" style="pointer-events:none;">
+										<span class="op-kanban__card-top"><span class="op-numero">16</span><span class="op-kanban__card-time">2d atrás</span></span>
+										<span class="op-kanban__card-cliente">Cliente Teste Limite Credito</span>
+										<span class="op-kanban__card-foot"><span class="op-valor"><span class="op-valor__cur">R$</span><span class="op-valor__num">539,40</span></span><span class="op-kanban__card-itens">3 itens</span></span>
+									</button>
+								</a>
+							</div>
+						</section>
+
+						<section class="op-kanban__col" data-tone="purple" data-col="faturamento">
+							<div class="op-kanban__col-topbar"></div>
+							<header class="op-kanban__col-head">
+								<span class="op-kanban__col-dot"></span>
+								<span class="op-kanban__col-title">Faturamento</span>
+								<span class="op-kanban__col-count">1</span>
+								<button type="button" class="op-kanban__col-eye" data-hide-col="faturamento" aria-label="Ocultar coluna Faturamento"><span aria-hidden="true">👁️</span></button>
+							</header>
+							<div class="op-kanban__col-body" data-status="faturamento">
+								<a href="08-faturamento.html" style="text-decoration:none; color:inherit;">
+									<button type="button" class="op-kanban__card" data-status="faturamento" style="pointer-events:none;">
+										<span class="op-kanban__card-top"><span class="op-numero">14</span><span class="op-kanban__card-time">5d atrás</span></span>
+										<span class="op-kanban__card-cliente">Cliente Teste Limite Credito</span>
+										<span class="op-kanban__card-foot"><span class="op-valor"><span class="op-valor__cur">R$</span><span class="op-valor__num">900,00</span></span><span class="op-kanban__card-itens">26 itens</span></span>
+									</button>
+								</a>
+							</div>
+						</section>
+
+						<section class="op-kanban__col" data-tone="copper" data-col="aguardando_pagamento">
+							<div class="op-kanban__col-topbar"></div>
+							<header class="op-kanban__col-head">
+								<span class="op-kanban__col-dot"></span>
+								<span class="op-kanban__col-title">Aguardando Pagamento</span>
+								<span class="op-kanban__col-count">1</span>
+								<button type="button" class="op-kanban__col-eye" data-hide-col="aguardando_pagamento" aria-label="Ocultar coluna Aguardando Pagamento"><span aria-hidden="true">👁️</span></button>
+							</header>
+							<div class="op-kanban__col-body" data-status="aguardando_pagamento">
+								<button type="button" class="op-kanban__card" data-status="aguardando_pagamento">
+									<span class="op-kanban__card-top"><span class="op-numero">13</span><span class="op-kanban__card-time">5d atrás</span></span>
+									<span class="op-kanban__card-cliente">Cliente Teste Limite Credito</span>
+									<span class="op-kanban__card-foot"><span class="op-valor"><span class="op-valor__cur">R$</span><span class="op-valor__num">167,70</span></span><span class="op-kanban__card-itens">15 itens</span></span>
+								</button>
+							</div>
+						</section>
+
+						<section class="op-kanban__col" data-tone="plum" data-col="em_rota">
+							<div class="op-kanban__col-topbar"></div>
+							<header class="op-kanban__col-head">
+								<span class="op-kanban__col-dot"></span>
+								<span class="op-kanban__col-title">Em Rota</span>
+								<span class="op-kanban__col-count">1</span>
+								<button type="button" class="op-kanban__col-eye" data-hide-col="em_rota" aria-label="Ocultar coluna Em Rota"><span aria-hidden="true">👁️</span></button>
+							</header>
+							<div class="op-kanban__col-body" data-status="em_rota">
+								<button type="button" class="op-kanban__card" data-status="em_rota">
+									<span class="op-kanban__card-top"><span class="op-numero">12</span><span class="op-kanban__card-time">5d atrás</span></span>
+									<span class="op-kanban__card-cliente">Cliente Teste Limite Credito</span>
+									<span class="op-kanban__card-foot"><span class="op-valor"><span class="op-valor__cur">R$</span><span class="op-valor__num">450,00</span></span><span class="op-kanban__card-itens">1 item</span></span>
+								</button>
+							</div>
+						</section>
+
+						<section class="op-kanban__col" data-tone="sage" data-col="entregue">
+							<div class="op-kanban__col-topbar"></div>
+							<header class="op-kanban__col-head">
+								<span class="op-kanban__col-dot"></span>
+								<span class="op-kanban__col-title">Entregue</span>
+								<span class="op-kanban__col-count">1</span>
+								<button type="button" class="op-kanban__col-eye" data-hide-col="entregue" aria-label="Ocultar coluna Entregue"><span aria-hidden="true">👁️</span></button>
+							</header>
+							<div class="op-kanban__col-body" data-status="entregue">
+								<button type="button" class="op-kanban__card" data-status="entregue">
+									<span class="op-kanban__card-top"><span class="op-numero">5</span><span class="op-kanban__card-time">5d atrás</span></span>
+									<span class="op-kanban__card-cliente">Cliente Teste Limite Credito</span>
+									<span class="op-kanban__card-foot"><span class="op-valor"><span class="op-valor__cur">R$</span><span class="op-valor__num">559,35</span></span><span class="op-kanban__card-itens">3 itens</span></span>
+								</button>
+							</div>
+						</section>
+
+						<section class="op-kanban__col" data-tone="ruby" data-col="cancelado">
+							<div class="op-kanban__col-topbar"></div>
+							<header class="op-kanban__col-head">
+								<span class="op-kanban__col-dot"></span>
+								<span class="op-kanban__col-title">Cancelado</span>
+								<span class="op-kanban__col-count">1</span>
+								<button type="button" class="op-kanban__col-eye" data-hide-col="cancelado" aria-label="Ocultar coluna Cancelado"><span aria-hidden="true">👁️</span></button>
+							</header>
+							<div class="op-kanban__col-body" data-status="cancelado">
+								<button type="button" class="op-kanban__card" data-status="cancelado">
+									<span class="op-kanban__card-top"><span class="op-numero">17</span><span class="op-kanban__card-time">2d atrás</span></span>
+									<span class="op-kanban__card-cliente">Cliente Teste Limite Credito</span>
+									<span class="op-kanban__card-foot"><span class="op-valor"><span class="op-valor__cur">R$</span><span class="op-valor__num">719,20</span></span><span class="op-kanban__card-itens">1 item</span></span>
+								</button>
+							</div>
+						</section>
+					</div>
+				</section>
+
+					<section class="op-list" id="viewLista" aria-label="Lista de pedidos" hidden>
+						<table class="op-list__table">
+							<thead>
+								<tr><th>Nº</th><th>Cliente</th><th>Status</th><th>Valor</th><th>Itens</th></tr>
+							</thead>
+							<tbody id="opListBody"></tbody>
+						</table>
+					</section>
+
+					<div class="op-modal-overlay" id="opCardModalOverlay" hidden>
+						<div class="op-modal" role="dialog" aria-modal="true" aria-labelledby="opModalTitle">
+							<div class="op-modal__header">
+								<h2 id="opModalTitle">Pedido</h2>
+								<button type="button" class="op-modal__close" id="opModalClose" aria-label="Fechar"><span class="material-symbols-outlined">close</span></button>
+							</div>
+							<div class="op-modal__body" id="opModalBody"></div>
+							<div class="op-modal__footer">
+								<button type="button" class="op-btn op-btn--ghost" id="opModalCloseBtn">Fechar</button>
+							</div>
+						</div>
+					</div>
+			</section>
+		</main>
+	</div>
+</div>
+<script>
+(function () {
+	'use strict';
+
+	var STATUS_LABELS = {
+		pendente: 'Pendente',
+		cadastro_financeiro: 'Cadastro Financeiro',
+		confirmado: 'Pedido Confirmado',
+		em_separacao: 'Em Separação',
+		faturamento: 'Faturamento',
+		aguardando_pagamento: 'Aguardando Pagamento',
+		em_rota: 'Em Rota',
+		entregue: 'Entregue',
+		cancelado: 'Cancelado'
+	};
+
+	var layoutContainer = document.getElementById('layoutContainer');
+	var sidenavHidden = false;
+
+	function setSidenavHidden(hidden) {
+		sidenavHidden = hidden;
+		layoutContainer.classList.toggle('sidenav-hidden', hidden);
+	}
+
+	document.getElementById('sidenavCollapseBtn').addEventListener('click', function () {
+		setSidenavHidden(true);
+	});
+	document.getElementById('toolbarMenuBtn').addEventListener('click', function () {
+		setSidenavHidden(false);
+	});
+
+	/* ── Modo Operacional ── */
+	var operationalMode = false;
+	var sidenavHiddenBeforeOperational = false;
+	var btnOperacional = document.getElementById('btnModoOperacional');
+	btnOperacional.addEventListener('click', function () {
+		operationalMode = !operationalMode;
+		layoutContainer.classList.toggle('is-operacional', operationalMode);
+		btnOperacional.classList.toggle('op-quick--active', operationalMode);
+		btnOperacional.setAttribute('aria-pressed', String(operationalMode));
+		if (operationalMode) {
+			sidenavHiddenBeforeOperational = sidenavHidden;
+			setSidenavHidden(true);
+		} else {
+			setSidenavHidden(sidenavHiddenBeforeOperational);
+		}
+	});
+
+	/* ── Tabs Lista / Quadro ── */
+	var tabLista = document.getElementById('tabLista');
+	var tabQuadro = document.getElementById('tabQuadro');
+	var viewQuadro = document.getElementById('viewQuadro');
+	var viewLista = document.getElementById('viewLista');
+
+	function renderListView() {
+		var tbody = document.getElementById('opListBody');
+		tbody.innerHTML = '';
+		document.querySelectorAll('.op-kanban__card').forEach(function (card) {
+			var status = card.getAttribute('data-status');
+			var col = card.closest('.op-kanban__col');
+			var tone = col ? col.getAttribute('data-tone') : '';
+			var numero = (card.querySelector('.op-numero') || {}).textContent || '';
+			var cliente = (card.querySelector('.op-kanban__card-cliente') || {}).textContent || '';
+			var valor = (card.querySelector('.op-valor__num') || {}).textContent || '';
+			var itens = (card.querySelector('.op-kanban__card-itens') || {}).textContent || '';
+			var label = STATUS_LABELS[status] || status;
+			var tr = document.createElement('tr');
+			tr.innerHTML =
+				'<td>' + numero.trim() + '</td>' +
+				'<td>' + cliente.trim() + '</td>' +
+				'<td><span class="op-list__status"><span class="op-list__dot" style="background:var(--tone-' + tone + ')"></span>' + label + '</span></td>' +
+				'<td>R$ ' + valor.trim() + '</td>' +
+				'<td>' + itens.trim() + '</td>';
+			tbody.appendChild(tr);
+		});
+	}
+
+	function setView(view) {
+		var isLista = view === 'lista';
+		tabLista.classList.toggle('op-tab--active', isLista);
+		tabLista.setAttribute('aria-selected', String(isLista));
+		tabQuadro.classList.toggle('op-tab--active', !isLista);
+		tabQuadro.setAttribute('aria-selected', String(!isLista));
+		viewLista.hidden = !isLista;
+		viewQuadro.hidden = isLista;
+		if (isLista) renderListView();
+	}
+	tabLista.addEventListener('click', function () { setView('lista'); });
+	tabQuadro.addEventListener('click', function () { setView('quadro'); });
+
+	/* ── Filtros de período ── */
+	var periodBtns = document.querySelectorAll('[data-period]');
+	periodBtns.forEach(function (btn) {
+		btn.addEventListener('click', function () {
+			periodBtns.forEach(function (b) {
+				var active = b === btn;
+				b.classList.toggle('op-quick--active', active);
+				b.setAttribute('aria-pressed', String(active));
+			});
+		});
+	});
+
+	/* ── Densidade ── */
+	var densityBtns = document.querySelectorAll('[data-density]');
+	var board = document.getElementById('opBoard');
+	densityBtns.forEach(function (btn) {
+		btn.addEventListener('click', function () {
+			var density = btn.getAttribute('data-density');
+			densityBtns.forEach(function (b) {
+				var active = b === btn;
+				b.classList.toggle('op-density__btn--active', active);
+				b.setAttribute('aria-pressed', String(active));
+			});
+			board.classList.toggle('op-kanban__board--compact', density === 'compacto');
+		});
+	});
+
+	/* ── Ocultar / reexibir colunas ── */
+	var hiddenCols = [];
+	var colTitles = {};
+	document.querySelectorAll('.op-kanban__col[data-col]').forEach(function (col) {
+		var key = col.getAttribute('data-col');
+		var titleEl = col.querySelector('.op-kanban__col-title');
+		colTitles[key] = titleEl ? titleEl.textContent.trim() : key;
+	});
+
+	function renderColumnsPanel() {
+		var panel = document.getElementById('opColumnsPanel');
+		var badge = document.getElementById('opColBadge');
+		panel.innerHTML = '';
+		if (hiddenCols.length === 0) {
+			var empty = document.createElement('span');
+			empty.className = 'op-kanban__empty';
+			empty.textContent = 'Nenhuma coluna oculta.';
+			panel.appendChild(empty);
+		} else {
+			hiddenCols.forEach(function (key) {
+				var chip = document.createElement('button');
+				chip.type = 'button';
+				chip.className = 'op-col-chip';
+				chip.innerHTML = '<span class="material-symbols-outlined" aria-hidden="true">visibility</span><span>' + colTitles[key] + '</span>';
+				chip.addEventListener('click', function () { showColumn(key); });
+				panel.appendChild(chip);
+			});
+		}
+		badge.hidden = hiddenCols.length === 0;
+		badge.textContent = String(hiddenCols.length);
+	}
+
+	function hideColumn(key) {
+		var col = document.querySelector('.op-kanban__col[data-col="' + key + '"]');
+		if (col) col.hidden = true;
+		if (hiddenCols.indexOf(key) === -1) hiddenCols.push(key);
+		renderColumnsPanel();
+		document.getElementById('opColumnsPanel').hidden = false;
+	}
+
+	function showColumn(key) {
+		var col = document.querySelector('.op-kanban__col[data-col="' + key + '"]');
+		if (col) col.hidden = false;
+		hiddenCols = hiddenCols.filter(function (k) { return k !== key; });
+		renderColumnsPanel();
+	}
+
+	document.querySelectorAll('[data-hide-col]').forEach(function (btn) {
+		btn.addEventListener('click', function (e) {
+			e.stopPropagation();
+			hideColumn(btn.getAttribute('data-hide-col'));
+		});
+	});
+
+	document.getElementById('btnColunas').addEventListener('click', function () {
+		var panel = document.getElementById('opColumnsPanel');
+		panel.hidden = !panel.hidden;
+	});
+
+	renderColumnsPanel();
+
+	/* ── Modal de pedido ── */
+	var modalOverlay = document.getElementById('opCardModalOverlay');
+	var modalBody = document.getElementById('opModalBody');
+	var modalTitle = document.getElementById('opModalTitle');
+
+	function openCardModal(card) {
+		var status = card.getAttribute('data-status');
+		var col = card.closest('.op-kanban__col');
+		var tone = col ? col.getAttribute('data-tone') : '';
+		var numero = (card.querySelector('.op-numero') || {}).textContent || '';
+		var cliente = (card.querySelector('.op-kanban__card-cliente') || {}).textContent || '';
+		var valor = (card.querySelector('.op-valor__num') || {}).textContent || '';
+		var itens = (card.querySelector('.op-kanban__card-itens') || {}).textContent || '';
+		var tempo = (card.querySelector('.op-kanban__card-time') || {}).textContent || '';
+		modalTitle.textContent = 'Pedido nº ' + numero.trim();
+		modalBody.innerHTML =
+			'<div class="op-modal__row"><span>Cliente</span><span>' + cliente.trim() + '</span></div>' +
+			'<div class="op-modal__row"><span>Status</span><span style="color:var(--tone-' + tone + ')">' + (STATUS_LABELS[status] || status) + '</span></div>' +
+			'<div class="op-modal__row"><span>Valor</span><span>R$ ' + valor.trim() + '</span></div>' +
+			'<div class="op-modal__row"><span>Itens</span><span>' + itens.trim() + '</span></div>' +
+			'<div class="op-modal__row"><span>Atualizado</span><span>' + tempo.trim() + '</span></div>';
+		modalOverlay.hidden = false;
+	}
+
+	function closeCardModal() {
+		modalOverlay.hidden = true;
+	}
+
+	document.querySelectorAll('.op-kanban__card').forEach(function (card) {
+		card.addEventListener('click', function () { openCardModal(card); });
+	});
+	document.getElementById('opModalClose').addEventListener('click', closeCardModal);
+	document.getElementById('opModalCloseBtn').addEventListener('click', closeCardModal);
+	modalOverlay.addEventListener('click', function (e) {
+		if (e.target === modalOverlay) closeCardModal();
+	});
+	document.addEventListener('keydown', function (e) {
+		if (e.key === 'Escape') closeCardModal();
+	});
+})();
+</script>
+</body>
+</html>

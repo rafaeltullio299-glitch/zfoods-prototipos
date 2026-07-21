@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Faturamento — Handoff ZFoods</title>
+<link rel="stylesheet" href="assets/style.css" />
+<style>
+	.op-detail { max-width: 900px; margin: 0 auto; padding: 24px 20px 60px; }
+	.op-detail__title { margin: 4px 0 4px; font-size: 1.4rem; }
+	.op-card { background: #fff; border: 1px solid var(--zf-border); border-radius: var(--zf-radius-md); padding: 18px 20px; margin-bottom: 18px; }
+	.op-card__eyebrow { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--zf-info); font-weight: 700; }
+	.op-card__title { margin: 4px 0 14px; font-size: 1.1rem; }
+
+	.op-sentus__checklist { list-style: none; margin: 0 0 18px; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+	.op-sentus__check { display: grid; grid-template-columns: 24px 1fr auto; gap: 10px; align-items: center; padding: 8px 10px; border-radius: var(--zf-radius-sm); background: var(--zf-cream); font-size: 0.84rem; }
+	.op-sentus__check-icon { font-weight: 700; color: var(--zf-success); text-align: center; }
+	.op-sentus__check--fail .op-sentus__check-icon { color: var(--zf-danger); }
+	.op-sentus__check--fail { background: var(--zf-danger-bg); }
+	.op-sentus__check-label { font-weight: 600; }
+	.op-sentus__check-detail { color: var(--zf-warm-gray); font-size: 0.78rem; }
+
+	.op-sentus__status { display: flex; flex-direction: column; gap: 4px; padding: 14px; background: var(--zf-cream); border-radius: var(--zf-radius-sm); margin-bottom: 16px; }
+	.op-sentus__status-label { font-size: 0.72rem; text-transform: uppercase; color: var(--zf-warm-gray); }
+	.op-sentus__status-value { font-weight: 700; font-size: 0.95rem; }
+	.op-sentus__status-value[data-sentus-status="nao_enviado"] { color: var(--zf-warm-gray); }
+	.op-sentus__status-value[data-sentus-status="enviado"] { color: var(--zf-success); }
+	.op-sentus__status-ref { font-size: 0.78rem; color: var(--zf-warm-gray); }
+
+	.op-actions__commit { display: flex; flex-direction: column; gap: 10px; }
+	.op-btn--primary { background: var(--zf-burgundy); color: #fff; border: none; border-radius: 999px; padding: 12px 22px; font-weight: 700; cursor: pointer; }
+	.op-btn--ghost { background: none; border: 1px solid var(--zf-border); border-radius: 999px; padding: 11px 22px; font-weight: 600; cursor: pointer; }
+	.op-sentus__dev-note { font-size: 0.74rem; color: var(--zf-warm-gray-light); margin: 14px 0 0; font-style: italic; }
+</style>
+</head>
+<body data-current="faturamento">
+<div class="proto-page">
+	<header class="proto-banner">
+		<span class="proto-banner__tag">Handoff · Faturamento</span>
+		<a href="index.html">← Voltar ao índice</a>
+	</header>
+	<main class="proto-main">
+		<div class="container" style="padding-top:16px;">
+			<div class="future-note">Recriado a partir da seção "Faturamento e integração com Sentus" de <code>order-detail.component.ts</code> — worktree <code>rafael-lab</code>. Checklist, rótulos de status Sentus e nota de desenvolvimento copiados literalmente do componente real.</div>
+		</div>
+
+		<div class="op-detail">
+			<a href="05-kanban.html" style="font-size:0.8rem; color:var(--zf-warm-gray); text-decoration:none;">← Voltar ao Quadro</a>
+			<h1 class="op-detail__title zf-serif">Pedido #14 <span class="badge badge-copper">Faturamento</span></h1>
+			<p class="muted small" style="margin-bottom: 20px;">Cliente Teste Limite Credito · R$ 900,00 · 26 itens</p>
+
+			<section class="op-card">
+				<span class="op-card__eyebrow">Faturamento</span>
+				<h3 class="op-card__title">Faturamento e integração com Sentus</h3>
+
+				<ul class="op-sentus__checklist">
+					<li class="op-sentus__check"><span class="op-sentus__check-icon">✓</span><span class="op-sentus__check-label">Cliente</span><span class="op-sentus__check-detail">Cliente Teste Limite Credito</span></li>
+					<li class="op-sentus__check"><span class="op-sentus__check-icon">✓</span><span class="op-sentus__check-label">Código do cliente no Sentus</span><span class="op-sentus__check-detail">888001</span></li>
+					<li class="op-sentus__check"><span class="op-sentus__check-icon">✓</span><span class="op-sentus__check-label">Itens do pedido</span><span class="op-sentus__check-detail">26 itens</span></li>
+					<li class="op-sentus__check"><span class="op-sentus__check-icon">✓</span><span class="op-sentus__check-label">Quantidades</span><span class="op-sentus__check-detail">26 peças/unidades no total</span></li>
+					<li class="op-sentus__check"><span class="op-sentus__check-icon">✓</span><span class="op-sentus__check-label">Pesos reais</span><span class="op-sentus__check-detail">26 de 26 informados</span></li>
+					<li class="op-sentus__check"><span class="op-sentus__check-icon">✓</span><span class="op-sentus__check-label">Preços</span><span class="op-sentus__check-detail">Todos válidos</span></li>
+					<li class="op-sentus__check"><span class="op-sentus__check-icon">✓</span><span class="op-sentus__check-label">Valor total</span><span class="op-sentus__check-detail">R$ 900,00</span></li>
+					<li class="op-sentus__check"><span class="op-sentus__check-icon">✓</span><span class="op-sentus__check-label">Forma de pagamento</span><span class="op-sentus__check-detail">Pix</span></li>
+					<li class="op-sentus__check"><span class="op-sentus__check-icon">✓</span><span class="op-sentus__check-label">Data de entrega</span><span class="op-sentus__check-detail">21 de julho de 2026</span></li>
+				</ul>
+
+				<div class="op-sentus__status">
+					<span class="op-sentus__status-label">Status da integração</span>
+					<span class="op-sentus__status-value" data-sentus-status="nao_enviado">Não enviado</span>
+				</div>
+
+				<div class="op-actions__commit">
+					<button class="op-btn--primary" data-toast="Envio ao Sentus simulado — nenhuma chamada real é feita">Enviar pedido para o Sentus</button>
+					<button class="op-btn--ghost" data-open-modal="modal-nf">Confirmar nota fiscal emitida</button>
+				</div>
+
+				<p class="op-sentus__dev-note">Modo desenvolvimento — o envio acima é uma simulação local; nenhuma chamada real é feita ao Sentus.</p>
+			</section>
+		</div>
+	</main>
+</div>
+
+<div class="modal-overlay" id="modal-nf">
+	<div class="modal">
+		<div class="modal__header"><h3 style="margin:0;">Confirmar nota fiscal emitida</h3><button class="btn-icon-only btn-ghost" data-close-modal="modal-nf">✕</button></div>
+		<div class="modal__body" style="display:flex; flex-direction:column; gap:12px;">
+			<div class="field"><label>Número da NF</label><input type="text" placeholder="Ex.: 000123" /></div>
+			<div class="field"><label>Série</label><input type="text" placeholder="Ex.: 1" /></div>
+			<div class="field"><label>Chave de acesso (opcional)</label><input type="text" placeholder="44 dígitos" /></div>
+			<div class="field"><label>Valor faturado</label><input type="text" placeholder="R$ 900,00" /></div>
+		</div>
+		<div class="modal__footer">
+			<button class="btn btn-ghost" data-close-modal="modal-nf">Cancelar</button>
+			<button class="btn btn-primary" data-close-modal="modal-nf" data-toast="Nota fiscal registrada (simulado)">Confirmar</button>
+		</div>
+	</div>
+</div>
+<script src="assets/app.js"></script>
+</body>
+</html>

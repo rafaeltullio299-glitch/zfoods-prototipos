@@ -1,0 +1,1548 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Painel Administrativo</title>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..700&display=swap" rel="stylesheet">
+<style>
+	* { box-sizing: border-box; }
+	html, body { margin: 0; min-height: 100%; }
+	body { font-family: 'DM Sans', 'Source Sans 3', sans-serif; color: #1c1917; background: #fefaf5; }
+	.material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; font-size: 20px; line-height: 1; vertical-align: middle; }
+
+	/* ══════════════ material-theme.scss + admin-layout.component.ts :host ══════════════ */
+	:root {
+		--zf-burgundy: #6b1d2a; --zf-burgundy-dark: #4a1019; --zf-cream: #fdf6ec; --zf-copper: #b8722d;
+		--zf-charcoal: #1c1917; --zf-warm-gray: #78716c; --zf-warm-gray-light: #a8a29e; --zf-border: #e7ddd1;
+		--zf-surface: #fefaf5; --zf-surface-card: #ffffff;
+		--zf-shadow-sm: 0 1px 3px rgb(28 25 23 / 0.06), 0 1px 2px rgb(28 25 23 / 0.04);
+		--zf-radius-md: 10px;
+
+		--snav-bg: #6b1d2a; --snav-bg-dark: #4a1019; --snav-text: rgba(253, 246, 236, 0.82);
+		--snav-text-full: #fdf6ec; --snav-active: #d4943f; --snav-active-bg: rgba(212, 148, 63, 0.18);
+		--snav-hover-bg: rgba(253, 246, 236, 0.07); --snav-divider: rgba(253, 246, 236, 0.14);
+	}
+
+	/* ── Container / Sidenav / Toolbar (admin-layout.component.ts) ── */
+	.layout-container { position: relative; display: flex; min-height: 100vh; }
+	.sidenav { width: 260px; flex-shrink: 0; background: var(--snav-bg); color: var(--snav-text); display: flex; flex-direction: column; }
+	.sidenav-brand { display: flex; align-items: center; gap: 8px; padding: 22px 12px 18px 20px; border-bottom: 1px solid var(--snav-divider); flex-shrink: 0; }
+	.brand-name { font-family: 'DM Serif Display', Georgia, serif; font-size: 1.625rem; color: var(--snav-text-full); letter-spacing: -0.02em; line-height: 1; }
+	.brand-badge { font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--snav-active); background: rgba(212, 148, 63, 0.16); padding: 2px 7px; border-radius: 4px; border: 1px solid rgba(212, 148, 63, 0.3); }
+	.collapse-button { flex-shrink: 0; margin-left: auto; color: var(--snav-text); background: none; border: none; cursor: pointer; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+	.collapse-button:hover { color: var(--snav-text-full); background: var(--snav-hover-bg); }
+	.nav-list { padding: 10px 0; flex: 1; list-style: none; margin: 0; }
+	.nav-item { display: flex; align-items: center; gap: 16px; margin: 2px 10px; padding: 0 16px; border-radius: var(--zf-radius-md); min-height: 44px; color: var(--snav-text); text-decoration: none; font-size: 0.875rem; }
+	.nav-item:hover { background: var(--snav-hover-bg); color: var(--snav-text-full); }
+	.nav-item.active { background-color: var(--snav-active-bg); color: var(--snav-active); font-weight: 500; }
+	.nav-item .material-symbols-outlined { font-size: 20px; }
+	.nav-external { color: rgba(253, 246, 236, 0.55); }
+	.nav-external .material-symbols-outlined { color: rgba(253, 246, 236, 0.45); }
+	.nav-external:hover { color: var(--snav-text-full); }
+	.nav-divider { margin: 8px 14px; border: none; border-top: 1px solid var(--snav-divider); }
+	.content { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+	.toolbar { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 4px; height: 64px; padding: 0 16px; background: var(--zf-surface-card); border-bottom: 1px solid var(--zf-border); box-shadow: var(--zf-shadow-sm); }
+	.menu-button { margin-right: 4px; background: none; border: none; cursor: pointer; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--zf-warm-gray); }
+	.menu-button:hover { background: rgba(28,25,23,0.05); }
+	.toolbar-title { font-size: 0.9375rem; font-weight: 600; color: var(--zf-charcoal); letter-spacing: -0.01em; }
+	.spacer { flex: 1 1 auto; }
+	.admin-name { font-size: 0.8125rem; font-weight: 500; color: var(--zf-warm-gray); max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+	.logout-btn { background: none; border: none; cursor: pointer; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--zf-warm-gray); }
+	.logout-btn:hover { background: rgba(28,25,23,0.05); }
+	.main-content { flex: 1; padding: 24px; box-sizing: border-box; background-color: var(--zf-surface); }
+
+	/* ══════════════ order-detail.component.ts :host tokens ══════════════ */
+	.op-root {
+		--op-paper: #fefaf5; --op-card: #ffffff; --op-ink: #1c1917; --op-ink-soft: #44403c;
+		--op-muted: #78716c; --op-muted-soft: #a8a29e; --op-rule: #e7ddd1; --op-rule-strong: #d6c9b6;
+		--op-burgundy: #6b1d2a; --op-burgundy-dark: #4a1019; --op-copper: #d4943f; --op-copper-soft: #f3e4d0; --op-cream: #fdf6ec;
+		--tone-amber: #ba7517; --tone-amber-bg: #fdf2dc;
+		--tone-yellow: #d4b106; --tone-yellow-bg: #fbf0c9;
+		--tone-green: #639922; --tone-green-bg: #e5f1d7;
+		--tone-blue: #378add; --tone-blue-bg: #dceaf5;
+		--tone-purple: #534ab7; --tone-purple-bg: #e5e3f6;
+		--tone-copper: #d85a30; --tone-copper-bg: #f8e1ca;
+		--tone-plum: #d4537e; --tone-plum-bg: #ecd9ee;
+		--tone-sage: #1d9e75; --tone-sage-bg: #d6e7d3;
+		--tone-ruby: #e24b4a; --tone-ruby-bg: #f4d6d8;
+		--op-shadow-sm: 0 1px 2px rgba(28, 25, 23, 0.04);
+		--op-radius: 14px; --op-radius-sm: 8px; --op-radius-pill: 999px;
+		display: block; font-family: 'DM Sans', system-ui, sans-serif; color: var(--op-ink);
+		max-width: 1200px; margin: 0 auto;
+	}
+	.op-detail { display: flex; flex-direction: column; gap: 24px; }
+	.op-eyebrow { font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--op-burgundy); }
+
+	/* ── Hero ── */
+	.op-hero { background: var(--op-card); border: 1px solid var(--op-rule); border-radius: 18px; padding: 28px 32px 24px; position: relative; overflow: hidden; box-shadow: 0 1px 0 rgba(28,25,23,0.04), 0 24px 60px -28px rgba(74,16,25,0.18); }
+	.op-hero::before { content: ''; position: absolute; inset: 0 0 auto 0; height: 5px; background: linear-gradient(90deg, var(--op-burgundy), var(--op-copper) 40%, var(--op-burgundy)); }
+	.op-hero__top { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; }
+	.op-back { display: inline-flex; align-items: center; gap: 6px; font-size: 0.8125rem; color: var(--op-muted); text-decoration: none; font-weight: 500; }
+	.op-back:hover { color: var(--op-burgundy); }
+	.op-print-btn { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; background: var(--op-card); color: var(--op-ink-soft); border: 1px solid var(--op-rule-strong); border-radius: var(--op-radius-sm); font-family: inherit; font-size: 0.8125rem; font-weight: 500; letter-spacing: 0.02em; cursor: pointer; }
+	.op-print-btn:hover { background: var(--op-cream); color: var(--op-burgundy); border-color: var(--op-burgundy); }
+
+	.op-highlights { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 22px; }
+	@media (max-width: 960px) { .op-highlights { grid-template-columns: repeat(2, 1fr); } }
+	.op-highlight-card { display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; background: var(--op-cream); border: 1px solid var(--op-rule); border-radius: var(--op-radius-sm); }
+	.op-highlight-card__eyebrow { font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--op-burgundy); }
+	.op-highlight-card__value { font-family: 'DM Serif Display', Georgia, serif; font-weight: 400; font-size: 1.1rem; line-height: 1.2; color: var(--op-ink); }
+	.op-highlight-card__value--num { font-feature-settings: 'tnum' 1; }
+	.op-highlight-card__note { font-size: 0.8125rem; color: var(--op-muted); }
+	.op-highlight-card__meta { font-size: 0.75rem; color: var(--op-muted-soft); margin-top: auto; padding-top: 4px; }
+	.op-highlight-card__address { font-style: normal; font-size: 0.8125rem; line-height: 1.5; color: var(--op-ink-soft); }
+
+	.op-hero__grid { display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: end; padding-bottom: 22px; border-bottom: 1px solid var(--op-rule); margin-bottom: 24px; }
+	@media (max-width: 720px) { .op-hero__grid { grid-template-columns: 1fr; } }
+	.op-hero__main { display: flex; flex-direction: column; gap: 8px; }
+	.op-hero__eyebrow { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+	.op-hero__sep { color: var(--op-muted-soft); }
+	.op-hero__date { font-size: 0.75rem; color: var(--op-muted); font-style: italic; }
+	.op-hero__title { margin: 0; font-family: 'DM Serif Display', Georgia, serif; font-weight: 400; line-height: 0.96; display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; }
+	.op-hero__label { font-size: clamp(1.5rem, 3vw, 2.25rem); color: var(--op-ink-soft); letter-spacing: -0.02em; }
+	.op-hero__num { font-size: clamp(3.5rem, 8vw, 6rem); color: var(--op-burgundy); letter-spacing: -0.04em; font-feature-settings: 'tnum' 1; font-style: italic; }
+	.op-hero__sub { margin: 0; font-size: 0.9375rem; color: var(--op-muted); }
+	.op-hero__sub em { font-style: italic; color: var(--op-ink-soft); }
+	.op-mode-chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: var(--op-radius-pill); font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; border: 1px solid currentColor; background: var(--mode-bg, transparent); color: var(--mode-color, var(--op-muted)); }
+	.op-mode-chip[data-mode='entrega'] { --mode-color: #b16518; --mode-bg: rgba(212, 148, 63, 0.12); }
+	.op-mode-chip[data-mode='retirada'] { --mode-color: #3e6b3a; --mode-bg: rgba(62, 107, 58, 0.12); }
+
+	.op-hero__status { background: var(--tone-bg, var(--op-cream)); border: 1px solid var(--tone-color, var(--op-rule)); border-radius: var(--op-radius); padding: 16px 20px; display: flex; flex-direction: column; gap: 6px; min-width: 220px; }
+	.op-hero__status[data-tone='amber'] { --tone-bg: var(--tone-amber-bg); --tone-color: var(--tone-amber); }
+	.op-hero__status[data-tone='yellow'] { --tone-bg: var(--tone-yellow-bg); --tone-color: var(--tone-yellow); }
+	.op-hero__status[data-tone='green'] { --tone-bg: var(--tone-green-bg); --tone-color: var(--tone-green); }
+	.op-hero__status[data-tone='blue'] { --tone-bg: var(--tone-blue-bg); --tone-color: var(--tone-blue); }
+	.op-hero__status[data-tone='purple'] { --tone-bg: var(--tone-purple-bg); --tone-color: var(--tone-purple); }
+	.op-hero__status[data-tone='copper'] { --tone-bg: var(--tone-copper-bg); --tone-color: var(--tone-copper); }
+	.op-hero__status[data-tone='plum'] { --tone-bg: var(--tone-plum-bg); --tone-color: var(--tone-plum); }
+	.op-hero__status-label { font-size: 0.6875rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--tone-color, var(--op-muted)); font-weight: 600; opacity: 0.8; }
+	.op-hero__status-value { font-family: 'DM Serif Display', Georgia, serif; font-size: 1.625rem; line-height: 1; color: var(--tone-color, var(--op-ink)); display: inline-flex; align-items: center; gap: 10px; }
+	.op-hero__status-icon { font-size: 1.5rem; font-family: system-ui; }
+	.op-hero__status-meta { font-size: 0.8125rem; color: var(--op-ink-soft); }
+	.op-hero__status-meta strong { color: var(--op-ink); font-weight: 600; }
+
+	/* ── Flow ── */
+	.op-flow { display: flex; align-items: center; gap: 4px; padding: 4px 0; flex-wrap: nowrap; overflow-x: auto; }
+	.op-flow__step { display: flex; flex-direction: column; align-items: center; gap: 6px; flex-shrink: 0; min-width: 80px; }
+	.op-flow__node { width: 36px; height: 36px; border-radius: 50%; background: var(--op-card); border: 2px solid var(--op-rule); display: flex; align-items: center; justify-content: center; font-size: 1rem; color: var(--op-muted-soft); }
+	.op-flow__step--done .op-flow__node { background: var(--tone-color, var(--op-burgundy)); border-color: var(--tone-color, var(--op-burgundy)); color: var(--op-cream); }
+	.op-flow__step--current .op-flow__node { background: var(--tone-color, var(--op-burgundy)); border-color: var(--tone-color, var(--op-burgundy)); color: var(--op-cream); box-shadow: 0 0 0 6px rgba(107, 29, 42, 0.12); transform: scale(1.08); }
+	.op-flow__step[data-tone='amber'] { --tone-color: var(--tone-amber); }
+	.op-flow__step[data-tone='yellow'] { --tone-color: var(--tone-yellow); }
+	.op-flow__step[data-tone='green'] { --tone-color: var(--tone-green); }
+	.op-flow__step[data-tone='blue'] { --tone-color: var(--tone-blue); }
+	.op-flow__step[data-tone='purple'] { --tone-color: var(--tone-purple); }
+	.op-flow__step[data-tone='copper'] { --tone-color: var(--tone-copper); }
+	.op-flow__step[data-tone='plum'] { --tone-color: var(--tone-plum); }
+	.op-flow__step[data-tone='sage'] { --tone-color: var(--tone-sage); }
+	.op-flow__label { font-size: 0.75rem; color: var(--op-muted); text-align: center; white-space: nowrap; font-weight: 500; }
+	.op-flow__step--done .op-flow__label, .op-flow__step--current .op-flow__label { color: var(--op-ink); font-weight: 600; }
+	.op-flow__line { flex: 1; height: 2px; background: var(--op-rule); margin-bottom: 22px; min-width: 30px; }
+	.op-flow__line--done { background: var(--op-copper); }
+
+	/* ── Card genérico (Observações) ── */
+	.op-col { display: flex; flex-direction: column; gap: 16px; }
+	.op-summary-cards { max-width: 640px; }
+	.op-card { background: var(--op-card); border: 1px solid var(--op-rule); border-radius: var(--op-radius); padding: 22px 24px; display: flex; flex-direction: column; gap: 14px; }
+	.op-card__eyebrow { font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--op-burgundy); }
+	.op-card__title { margin: 0; font-family: 'DM Serif Display', Georgia, serif; font-weight: 400; font-size: 1.375rem; line-height: 1.15; letter-spacing: -0.01em; color: var(--op-ink); }
+
+	/* ── Avançar pedido (real, order-detail.component.ts linhas 443-527) ── */
+	.op-actions { background: var(--op-card); border: 1px solid var(--op-rule); border-radius: var(--op-radius); padding: 20px 24px 24px; display: flex; flex-direction: column; gap: 16px; }
+	.op-actions__head { display: flex; flex-direction: column; gap: 4px; }
+	.op-actions__title { margin: 0; font-family: 'DM Serif Display', Georgia, serif; font-weight: 400; font-size: 1.625rem; color: var(--op-ink); letter-spacing: -0.01em; }
+	.op-actions__buttons { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
+	.op-action { display: flex; align-items: center; gap: 12px; padding: 14px 16px; background: var(--op-card); border: 1px solid var(--op-rule-strong); border-radius: var(--op-radius-sm); cursor: pointer; font-family: inherit; text-align: left; width: 100%; }
+	.op-action:disabled { opacity: 0.5; cursor: not-allowed; }
+	.op-action__icon { width: 36px; height: 36px; border-radius: 50%; background: var(--tone-bg, var(--op-cream)); color: var(--tone-color, var(--op-ink)); display: flex; align-items: center; justify-content: center; font-size: 1.125rem; flex-shrink: 0; }
+	.op-action[data-tone='purple'] { --tone-bg: var(--tone-purple-bg); --tone-color: var(--tone-purple); }
+	.op-action[data-tone='ruby'] { --tone-bg: var(--tone-ruby-bg); --tone-color: var(--tone-ruby); }
+	.op-action__label { display: flex; flex-direction: column; gap: 2px; }
+	.op-action__title { font-weight: 600; color: var(--op-ink); font-size: 0.9375rem; }
+	.op-action__hint { font-size: 0.75rem; color: var(--op-muted); }
+	.op-action--blocked { --tone-bg: var(--tone-ruby-bg); --tone-color: var(--tone-ruby); border-color: var(--tone-ruby); background: var(--tone-ruby-bg); opacity: 1; }
+	.op-action--blocked .op-action__title { color: var(--tone-ruby); }
+	.op-action--ready { --tone-bg: var(--tone-sage-bg); --tone-color: var(--tone-sage); border-color: var(--tone-sage); }
+	.op-action--ready .op-action__title { color: var(--tone-sage); }
+	.op-actions__blocked-msg { margin: 4px 0 0; font-size: 0.8125rem; color: var(--tone-ruby); font-style: italic; }
+	.op-actions__ok-msg { margin: 4px 0 0; font-size: 0.8125rem; color: var(--tone-sage); font-style: italic; font-weight: 600; }
+
+	/* ══════════════ CÂMARA FRIA — tabela operacional de itens (order-detail.component.ts) ══════════════ */
+	.op-camara { background: var(--op-card); border: 1px solid var(--op-rule); border-radius: var(--op-radius); padding: 22px 24px; display: flex; flex-direction: column; gap: 14px; }
+	.op-camara__head { display: flex; flex-direction: column; gap: 4px; }
+	.op-camara__hint { margin: 0; font-size: 0.8125rem; color: var(--op-muted); }
+	.op-camara__table-wrap { overflow-x: auto; }
+	.op-camara__table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+	.op-camara__table th { text-align: left; font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--op-muted); padding: 8px 12px; border-bottom: 2px solid var(--op-rule-strong); white-space: nowrap; }
+	.op-camara__table td { padding: 10px 12px; border-bottom: 1px solid var(--op-rule); vertical-align: middle; }
+	.op-camara__row--pendente { background: rgba(226, 75, 74, 0.07); }
+	.op-camara__row--pendente td:first-child { box-shadow: inset 3px 0 0 var(--tone-ruby); }
+	.op-camara__row--conferido { background: rgba(29, 158, 117, 0.07); }
+	.op-camara__row--conferido td:first-child { box-shadow: inset 3px 0 0 var(--tone-sage); }
+	.op-camara__code { font-feature-settings: 'tnum' 1; color: var(--op-ink-soft); white-space: nowrap; }
+	.op-camara__nome { display: block; font-weight: 500; color: var(--op-ink); }
+	.op-camara__variante { display: block; font-size: 0.75rem; color: var(--op-muted); }
+	.op-camara__input { width: 90px; padding: 6px 8px; border: 1px solid var(--op-rule-strong); border-radius: var(--op-radius-sm); font-family: inherit; font-size: 0.875rem; }
+	.op-camara__input:focus-visible { outline: none; border-color: var(--op-burgundy); box-shadow: 0 0 0 3px rgba(107, 29, 42, 0.15); }
+	.op-camara__status { display: inline-block; padding: 3px 10px; border-radius: var(--op-radius-pill); font-size: 0.75rem; font-weight: 600; white-space: nowrap; }
+	.op-camara__status--pendente { background: var(--tone-ruby-bg); color: var(--tone-ruby); }
+	.op-camara__status--ok { background: var(--tone-sage-bg); color: var(--tone-sage); }
+	.op-camara__meta { display: block; font-size: 0.6875rem; color: var(--op-muted); margin-top: 2px; }
+	.op-camara__confirm { padding: 6px 14px; border-radius: var(--op-radius-sm); background: var(--op-burgundy); color: var(--op-cream); border: 1px solid var(--op-burgundy); font-family: inherit; font-size: 0.8125rem; font-weight: 500; cursor: pointer; white-space: nowrap; }
+	.op-camara__confirm:hover:not(:disabled) { background: var(--op-burgundy-dark); }
+	.op-camara__confirm--undo { background: transparent; color: var(--op-ink-soft); border-color: var(--op-rule-strong); }
+	.op-camara__confirm--undo:hover:not(:disabled) { background: var(--op-cream); color: var(--tone-ruby); border-color: var(--tone-ruby); }
+	.op-camara__confirm:disabled { opacity: 0.5; cursor: not-allowed; }
+	.op-camara__actions { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+	.op-camara__remove { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; padding: 0; border-radius: var(--op-radius-sm); background: transparent; border: 1px solid var(--op-rule-strong); color: var(--op-muted); cursor: pointer; font-size: 0.875rem; line-height: 1; }
+	.op-camara__remove:hover:not(:disabled) { background: var(--tone-ruby-bg); border-color: var(--tone-ruby); color: var(--tone-ruby); }
+	.op-camara__qty { display: inline-flex; align-items: center; gap: 4px; }
+	.op-camara__qty-btn { width: 24px; height: 24px; padding: 0; border-radius: var(--op-radius-sm); border: 1px solid var(--op-rule-strong); background: var(--op-card); color: var(--op-ink-soft); cursor: pointer; font-size: 0.9375rem; line-height: 1; }
+	.op-camara__qty-btn:hover:not(:disabled) { background: var(--op-cream); border-color: var(--op-burgundy); color: var(--op-burgundy); }
+	.op-camara__qty-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+	.op-camara__qty-input { width: 48px; padding: 4px 4px; text-align: center; border: 1px solid var(--op-rule-strong); border-radius: var(--op-radius-sm); font-family: inherit; font-size: 0.875rem; }
+	.op-camara__qty-label { display: block; margin-top: 2px; font-size: 0.6875rem; color: var(--op-muted); text-transform: lowercase; }
+	.op-camara__add-btn { align-self: flex-start; margin-top: 4px; padding: 8px 14px; border-radius: var(--op-radius-sm); background: transparent; border: 1px dashed var(--op-rule-strong); color: var(--op-ink-soft); font-family: inherit; font-size: 0.8125rem; font-weight: 500; cursor: pointer; }
+	.op-camara__add-btn:hover { background: var(--op-cream); border-color: var(--op-burgundy); color: var(--op-burgundy); }
+
+	.op-camara__row--draft { background: var(--op-cream); }
+	.op-camara__draft { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 14px; padding: 6px 0; }
+	.op-camara__draft-search { position: relative; flex: 1 1 260px; min-width: 220px; }
+	.op-camara__draft-input { width: 100%; padding: 8px 12px; border: 1px solid var(--op-rule-strong); border-radius: var(--op-radius-sm); font-family: inherit; font-size: 0.875rem; }
+	.op-camara__draft-input:focus-visible { outline: none; border-color: var(--op-burgundy); box-shadow: 0 0 0 3px rgba(107, 29, 42, 0.15); }
+	.op-camara__draft-options { position: relative; z-index: 5; margin: 6px 0 0; padding: 4px; list-style: none; background: var(--op-card); border: 1px solid var(--op-rule-strong); border-radius: var(--op-radius-sm); box-shadow: var(--op-shadow-sm); max-height: 240px; overflow-y: auto; }
+	.op-camara__draft-options li { margin: 0; }
+	.op-camara__draft-options button { display: flex; align-items: baseline; gap: 8px; width: 100%; padding: 8px 10px; border: none; background: transparent; text-align: left; font-family: inherit; font-size: 0.8125rem; color: var(--op-ink); cursor: pointer; border-radius: 6px; }
+	.op-camara__draft-options button:hover { background: var(--op-cream); }
+	.op-camara__draft-option-ref { font-feature-settings: 'tnum' 1; color: var(--op-muted); flex-shrink: 0; }
+	.op-camara__draft-empty { position: relative; margin: 6px 0 0; padding: 8px 10px; font-size: 0.8125rem; color: var(--op-muted); background: var(--op-card); border: 1px solid var(--op-rule-strong); border-radius: var(--op-radius-sm); }
+	.op-camara__draft-selected { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-top: 10px; }
+	.op-camara__draft-selected-nome { font-weight: 500; font-size: 0.875rem; color: var(--op-ink); }
+	.op-camara__draft-qty { display: flex; align-items: center; gap: 8px; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--op-muted); }
+	.op-camara__footer { display: flex; flex-wrap: wrap; align-items: baseline; gap: 18px; padding-top: 12px; font-size: 0.8125rem; color: var(--op-ink-soft); }
+	.op-camara__footer strong { color: var(--op-ink); font-feature-settings: 'tnum' 1; }
+	.op-camara__diff--neg strong { color: var(--tone-ruby); }
+	.op-camara__footer-total { margin-left: auto; font-size: 0.9375rem; color: var(--op-burgundy); }
+
+	/* ── Etiquetas térmicas (Fase 5.1) ── */
+	.op-etiquetas { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; padding-top: 14px; border-top: 1px dashed var(--op-rule); }
+	.op-etiquetas__status { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+	.op-etiquetas__badge { display: inline-block; padding: 4px 12px; border-radius: var(--op-radius-pill); font-size: 0.75rem; font-weight: 700; }
+	.op-etiquetas__badge--nunca { background: var(--tone-amber-bg); color: var(--tone-amber); }
+	.op-etiquetas__badge--ok { background: var(--tone-sage-bg); color: var(--tone-sage); }
+	.op-etiquetas__meta { font-size: 0.8125rem; color: var(--op-muted); }
+	.op-etiquetas__actions { display: flex; flex-wrap: wrap; gap: 10px; }
+	.op-etiquetas__bloqueio { margin: 0; font-size: 0.8125rem; color: var(--tone-ruby); }
+	.op-btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: var(--op-radius-sm); font-family: inherit; font-size: 0.875rem; font-weight: 500; cursor: pointer; border: 1px solid transparent; text-decoration: none; }
+	.op-btn--primary { background: var(--op-burgundy); color: var(--op-cream); }
+	.op-btn--ghost { background: var(--op-card); color: var(--op-ink-soft); border-color: var(--op-rule-strong); }
+	.op-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+	/* ── Pré-visualização real da etiqueta (etiqueta-preview-dialog.component.ts, escala reduzida 0.6x) ── */
+	.cf-preview-block { margin-top: 6px; }
+	.cf-preview-label { margin: 0 0 8px; font-size: 0.75rem; color: var(--op-muted); font-style: italic; }
+	.epd-page { width: 360px; height: 240px; background: #fff; border: 1px solid #1c1917; box-shadow: 0 2px 8px rgba(0,0,0,0.15); padding: 5px 7px; display: flex; flex-direction: column; justify-content: space-between; gap: 3px; font-family: 'DM Sans', Arial, sans-serif; color: #000; box-sizing: border-box; overflow: hidden; }
+	.epd-page__header { display: flex; align-items: center; justify-content: space-between; border-bottom: 1.5px solid #000; padding-bottom: 3px; flex-shrink: 0; }
+	.epd-page__pedido { font-size: 0.69rem; font-weight: 800; }
+	.epd-page__volume { font-size: 0.63rem; font-weight: 700; }
+	.epd-page__qr { display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; border: 1px dashed #000; font-size: 0.5rem; color: #666; flex-shrink: 0; }
+	.epd-page__entrega { margin: 0; font-size: 0.45rem; font-weight: 600; flex-shrink: 0; }
+	.epd-page__cliente { display: flex; flex-direction: column; gap: 1px; flex-shrink: 0; }
+	.epd-page__cliente-nome { display: flex; flex-direction: column; line-height: 0.98; }
+	.epd-page__cliente[data-font='grande'] .epd-page__cliente-linha { font-size: 1.65rem; font-weight: 800; letter-spacing: -0.01em; }
+	.epd-page__cliente[data-font='media'] .epd-page__cliente-linha { font-size: 1.26rem; font-weight: 800; letter-spacing: -0.01em; }
+	.epd-page__cliente[data-font='minima'] .epd-page__cliente-linha { font-size: 0.93rem; font-weight: 800; }
+	.epd-page__cliente-codigo { font-size: 0.42rem; color: #333; }
+	.epd-page__cidade { margin: 0; font-size: 1.05rem; font-weight: 800; flex-shrink: 0; }
+	.epd-page__logistica { display: flex; gap: 10px; font-size: 0.42rem; border-top: 1px solid #000; border-bottom: 1px solid #000; padding: 2px 0; flex-shrink: 0; }
+	.epd-page__itens { flex: 1; width: 100%; border-collapse: collapse; font-size: 0.42rem; overflow: hidden; }
+	.epd-page__itens th { text-align: left; border-bottom: 1px solid #000; padding: 1px 3px; font-size: 0.4rem; }
+	.epd-page__itens td { padding: 1px 3px; vertical-align: top; }
+	.epd-page__footer { border-top: 1.5px solid #000; padding-top: 2px; font-size: 0.4rem; flex-shrink: 0; }
+	.epd-page__footer p { margin: 0 0 1px; }
+	.epd-page__peso-geral { font-weight: 800; }
+
+	/* ── Pré-visualização real do diálogo de reimpressão (reimprimir-etiqueta-dialog.component.ts) ── */
+	.red-preview { max-width: 380px; border: 1px solid var(--op-rule-strong); border-radius: var(--op-radius-sm); padding: 16px; background: var(--op-cream); }
+	.red-preview h4 { margin: 0 0 10px; font-size: 1rem; font-weight: 600; color: var(--op-ink); }
+	.red-content { display: flex; flex-direction: column; gap: 12px; color: #44403c; }
+	.red-content p { margin: 0; font-size: 0.8125rem; line-height: 1.5; }
+	.red-field { display: flex; flex-direction: column; gap: 6px; }
+	.red-label { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #78716c; }
+	.red-select, .red-input { padding: 9px 12px; border: 1px solid #d6c9b6; border-radius: 8px; font-family: inherit; font-size: 0.875rem; color: #1c1917; background: #fff; width: 100%; }
+	.red-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 4px; }
+
+	/* ── Complementos deste protótipo (captions por botão) ── */
+	.cf-hint { display: block; margin-top: 6px; font-size: 0.75rem; font-style: italic; color: var(--op-muted, #78716c); }
+	.cf-hint strong { font-style: normal; color: var(--op-ink-soft, #44403c); }
+	.cf-note { margin: 6px 0 0; font-size: 0.8125rem; color: var(--op-ink-soft, #44403c); }
+	.cf-note strong { color: var(--tone-ruby, #e24b4a); }
+
+	/* ── Documentação (fora da tela operacional) ── */
+	.cf-docs { margin-top: 8px; border: 1px solid var(--op-rule, #e7ddd1); border-radius: var(--op-radius, 14px); background: var(--op-card, #fff); }
+	.cf-docs summary { cursor: pointer; padding: 16px 20px; font-family: 'DM Serif Display', Georgia, serif; font-size: 1.125rem; color: var(--op-ink, #1c1917); list-style: none; display: flex; align-items: center; gap: 8px; }
+	.cf-docs summary::-webkit-details-marker { display: none; }
+	.cf-docs summary::before { content: '▸'; color: var(--op-burgundy, #6b1d2a); transition: transform 140ms ease; }
+	.cf-docs[open] summary::before { transform: rotate(90deg); }
+	.cf-docs__body { padding: 0 20px 20px; display: flex; flex-direction: column; gap: 18px; font-size: 0.875rem; color: var(--op-ink-soft, #44403c); line-height: 1.6; }
+	.cf-docs__body h4 { margin: 0 0 6px; font-size: 0.8125rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--op-burgundy, #6b1d2a); }
+	.cf-docs__body ul { margin: 0; padding-left: 20px; }
+	.cf-docs__body li { margin-bottom: 4px; }
+	.cf-tag { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 0.6875rem; font-weight: 700; margin-right: 6px; }
+	.cf-tag--real { background: var(--tone-sage-bg, #d6e7d3); color: var(--tone-sage, #1d9e75); }
+	.cf-tag--mock { background: var(--tone-amber-bg, #fdf2dc); color: var(--tone-amber, #ba7517); }
+	.cf-tag--planned { background: var(--tone-ruby-bg, #f4d6d8); color: var(--tone-ruby, #e24b4a); }
+	.cf-flow { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; font-size: 0.875rem; }
+	.cf-flow__step { padding: 8px 14px; border: 1px solid var(--op-rule-strong, #d6c9b6); border-radius: var(--op-radius-sm, 8px); background: var(--op-cream, #fdf6ec); font-weight: 600; color: var(--op-ink, #1c1917); }
+	.cf-flow__arrow { padding-left: 20px; color: var(--op-muted, #78716c); }
+
+	/* ── Ferramentas de demonstração (exclusivas do protótipo) ── */
+	.cf-tools-warning { margin: 0 0 4px; padding: 10px 14px; border-radius: var(--op-radius-sm, 8px); background: var(--tone-ruby-bg, #f4d6d8); color: var(--tone-ruby, #e24b4a); font-size: 0.8125rem; font-weight: 600; }
+	.cf-tools-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+	.cf-tools-select { padding: 9px 12px; border: 1px solid var(--op-rule-strong, #d6c9b6); border-radius: 8px; font-family: inherit; font-size: 0.875rem; color: var(--op-ink, #1c1917); background: #fff; }
+
+	/* ── Modais do protótipo (funcionalidade real simulada em JS local) ── */
+	.cf-overlay { position: fixed; inset: 0; background: rgba(28, 25, 23, 0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+	.cf-overlay[hidden] { display: none; }
+	.cf-modal { background: #fff; border-radius: var(--op-radius, 14px); box-shadow: 0 20px 50px -12px rgba(28,25,23,0.4); width: 100%; max-width: 420px; max-height: 86vh; overflow-y: auto; padding: 22px 24px; }
+	.cf-modal h2 { margin: 0 0 4px; font-family: 'DM Serif Display', Georgia, serif; font-weight: 400; font-size: 1.25rem; color: var(--op-ink, #1c1917); }
+	.cf-modal--wide { max-width: 780px; }
+	.cf-modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; flex-wrap: wrap; }
+	.cf-modal-pages { display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 12px 0; background: #e7e2d8; border-radius: var(--op-radius-sm, 8px); }
+	.cf-modal-hint { margin: 10px 0 0; font-size: 0.8125rem; color: var(--op-muted, #78716c); }
+	.cf-toast-stack { position: fixed; right: 20px; bottom: 20px; z-index: 2000; display: flex; flex-direction: column; gap: 8px; }
+	.cf-toast { background: var(--op-burgundy, #6b1d2a); color: #fff; padding: 10px 16px; border-radius: 8px; font-size: 0.8125rem; box-shadow: 0 8px 24px -8px rgba(0,0,0,0.4); opacity: 0; transform: translateY(8px); transition: all 200ms ease; max-width: 320px; }
+	.cf-toast.is-visible { opacity: 1; transform: translateY(0); }
+	.cf-toast--success { background: var(--tone-sage, #1d9e75); }
+
+	@media print {
+		body.cf-printing * { visibility: hidden !important; }
+		body.cf-printing #etiquetaModalPages,
+		body.cf-printing #etiquetaModalPages * { visibility: visible !important; }
+		body.cf-printing #etiquetaModalPages { position: fixed; inset: 0; margin: 0; background: #fff; }
+	}
+</style>
+</head>
+<body>
+<div class="layout-container">
+	<nav class="sidenav">
+		<div class="sidenav-brand">
+			<span class="brand-name">ZFood</span>
+			<span class="brand-badge">Admin</span>
+			<button class="collapse-button" aria-label="Fechar menu"><span class="material-symbols-outlined">chevron_left</span></button>
+		</div>
+		<ul class="nav-list">
+			<li><a class="nav-item nav-external" href="01-catalogo.html"><span class="material-symbols-outlined">storefront</span><span>Ver Catálogo</span></a></li>
+			<hr class="nav-divider" />
+			<li><a class="nav-item" href="04-dashboard-admin.html"><span class="material-symbols-outlined">dashboard</span><span>Dashboard</span></a></li>
+			<li><a class="nav-item active" href="05-kanban.html"><span class="material-symbols-outlined">receipt_long</span><span>Pedidos</span></a></li>
+			<li><a class="nav-item" href="06-cadastro-financeiro.html"><span class="material-symbols-outlined">account_balance</span><span>Cadastros Financeiros</span></a></li>
+			<li><a class="nav-item" href="#"><span class="material-symbols-outlined">people</span><span>Usuários</span></a></li>
+			<li><a class="nav-item" href="#"><span class="material-symbols-outlined">inventory_2</span><span>Produtos</span></a></li>
+			<li><a class="nav-item" href="#"><span class="material-symbols-outlined">category</span><span>Categorias</span></a></li>
+			<li><a class="nav-item" href="#"><span class="material-symbols-outlined">sync</span><span>Sincronização</span></a></li>
+			<li><a class="nav-item" href="#"><span class="material-symbols-outlined">settings</span><span>Configurações</span></a></li>
+		</ul>
+	</nav>
+
+	<div class="content">
+		<header class="toolbar">
+			<button class="menu-button" aria-label="Abrir menu"><span class="material-symbols-outlined">menu</span></button>
+			<span class="toolbar-title">Painel Administrativo</span>
+			<span class="spacer"></span>
+			<span class="admin-name">Administrador ZFOODs</span>
+			<button class="logout-btn" aria-label="Sair"><span class="material-symbols-outlined">logout</span></button>
+		</header>
+
+		<main class="main-content">
+			<div class="op-root op-detail">
+
+				<header class="op-hero" id="opHero" data-status="em_separacao">
+					<div class="op-hero__top">
+						<a class="op-back" href="05-kanban.html"><span aria-hidden="true">←</span><span>Pedidos</span></a>
+						<button type="button" class="op-print-btn"><span aria-hidden="true">⎙</span><span>Imprimir</span></button>
+					</div>
+
+					<div class="op-highlights">
+						<article class="op-highlight-card">
+							<span class="op-highlight-card__eyebrow">Pedido</span>
+							<strong class="op-highlight-card__value">Ref. Catálogo Nº 16</strong>
+							<span class="op-highlight-card__note">Nº Sentus: aguardando integração</span>
+							<span class="op-highlight-card__meta">Pedido em 17/07/2026</span>
+						</article>
+						<article class="op-highlight-card">
+							<span class="op-highlight-card__eyebrow">Cliente</span>
+							<strong class="op-highlight-card__value op-highlight-card__value--num">33871</strong>
+							<strong class="op-highlight-card__value">Cliente Teste Limite Credito</strong>
+							<span class="op-highlight-card__note">Contato: Marcos Villela</span>
+							<span class="op-highlight-card__meta">(51) 3555-2200 · financeiro@limitecredito.com.br</span>
+						</article>
+						<article class="op-highlight-card">
+							<span class="op-highlight-card__eyebrow">Dia da entrega</span>
+							<strong class="op-highlight-card__weekday" style="font-size:0.8125rem;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:var(--op-ink-soft);">Sexta-feira</strong>
+							<strong class="op-highlight-card__value" style="font-size:1.375rem;color:var(--op-burgundy);">24 de julho</strong>
+							<address class="op-highlight-card__address">Av. Industrial, 1450<br />Distrito Sul — Canoas/RS<br />CEP 92000-000</address>
+						</article>
+						<article class="op-highlight-card">
+							<span class="op-highlight-card__eyebrow">Forma de pagamento</span>
+							<strong class="op-highlight-card__value">Cartão</strong>
+							<span class="op-highlight-card__note">Cartão de crédito/débito</span>
+						</article>
+					</div>
+
+					<div class="op-hero__grid">
+						<div class="op-hero__main">
+							<div class="op-hero__eyebrow">
+								<span class="op-eyebrow">Ticket de Operação</span>
+								<span class="op-hero__sep">·</span>
+								<span class="op-hero__date">17 de julho de 2026</span>
+								<span class="op-hero__sep">·</span>
+								<span class="op-mode-chip" data-mode="entrega"><span aria-hidden="true">⇨</span> Entrega</span>
+							</div>
+							<h1 class="op-hero__title"><span class="op-hero__label">Pedido</span><span class="op-hero__num">№16</span></h1>
+							<p class="op-hero__sub">Aberto às 11:05 · <em>2d atrás</em></p>
+						</div>
+						<aside class="op-hero__status" id="opHeroStatus" data-tone="blue">
+							<span class="op-hero__status-label">Status atual</span>
+							<span class="op-hero__status-value"><span class="op-hero__status-icon" id="opHeroStatusIcon" aria-hidden="true">⚒</span> <span id="opHeroStatusLabel">Em Separação</span></span>
+							<span class="op-hero__status-meta"><strong id="opHeroItensCount">3</strong> itens · <strong>R$ 539,40</strong></span>
+						</aside>
+					</div>
+
+					<div class="op-flow" id="opFlow" role="list">
+						<div class="op-flow__step" data-status="pendente" data-tone="amber"><div class="op-flow__node">◷</div><span class="op-flow__label">Pendente</span></div>
+						<div class="op-flow__line"></div>
+						<div class="op-flow__step" data-status="cadastro_financeiro" data-tone="yellow"><div class="op-flow__node">◈</div><span class="op-flow__label">Cadastro Financeiro</span></div>
+						<div class="op-flow__line"></div>
+						<div class="op-flow__step" data-status="confirmado" data-tone="green"><div class="op-flow__node">✓</div><span class="op-flow__label">Pedido Confirmado</span></div>
+						<div class="op-flow__line"></div>
+						<div class="op-flow__step" data-status="em_separacao" data-tone="blue"><div class="op-flow__node">⚒</div><span class="op-flow__label">Em Separação</span></div>
+						<div class="op-flow__line"></div>
+						<div class="op-flow__step" data-status="faturamento" data-tone="purple"><div class="op-flow__node">▤</div><span class="op-flow__label">Faturamento</span></div>
+						<div class="op-flow__line"></div>
+						<div class="op-flow__step" data-status="aguardando_pagamento" data-tone="copper"><div class="op-flow__node">⧗</div><span class="op-flow__label">Aguardando Pagamento</span></div>
+						<div class="op-flow__line"></div>
+						<div class="op-flow__step" data-status="em_rota" data-tone="plum"><div class="op-flow__node">⤳</div><span class="op-flow__label">Em Rota</span></div>
+						<div class="op-flow__line"></div>
+						<div class="op-flow__step" data-status="entregue" data-tone="sage"><div class="op-flow__node">★</div><span class="op-flow__label">Entregue</span></div>
+					</div>
+				</header>
+
+				<!-- Painel real: order-detail.component.ts linhas 711-720 -->
+				<section class="op-col op-summary-cards" aria-label="Observações">
+					<article class="op-card">
+						<header><span class="op-card__eyebrow">Observação</span></header>
+						<p style="white-space: pre-line; margin: 0;">Entregar até 14h. Cliente pediu embalagem reforçada para transporte.</p>
+					</article>
+				</section>
+
+				<!-- Painel real: order-detail.component.ts linhas 723-1057 (tabela + etiquetas) -->
+				<section class="op-camara" aria-label="Itens do pedido — Câmara Fria">
+					<header class="op-camara__head">
+						<span class="op-card__eyebrow">Câmara Fria</span>
+						<h3 class="op-card__title">Itens do pedido</h3>
+						<p class="op-camara__hint">Preencha o peso real de cada item e clique em "Conferir". A linha fica verde ao confirmar.</p>
+					</header>
+
+					<div class="op-camara__table-wrap">
+						<table class="op-camara__table">
+							<thead>
+								<tr>
+									<th>Código</th><th>Produto</th><th>Peças</th><th>Peso aprox.</th><th>Peso real</th><th>Status</th><th>Ações</th>
+								</tr>
+							</thead>
+							<tbody id="camaraTbody"></tbody>
+							<tfoot>
+								<tr>
+									<td colspan="7">
+										<div class="op-camara__footer">
+											<span><strong id="footerItens">3</strong> itens</span>
+											<span><strong id="footerPecas">24</strong> peças</span>
+											<span>Peso aprox.: <strong id="footerPesoAprox">—</strong></span>
+											<span>Peso real: <strong id="footerPesoReal">—</strong></span>
+											<span id="footerDiferencaWrap">Diferença: <strong id="footerDiferenca">—</strong></span>
+											<span class="op-camara__footer-total">Total do pedido: <strong>R$ 539,40</strong></span>
+										</div>
+									</td>
+								</tr>
+							</tfoot>
+						</table>
+					</div>
+					<span class="cf-hint"><strong>Adicionar produto</strong> → inclui um novo item na composição do pedido; enquanto essa inclusão estiver aberta (sem confirmar nem cancelar), o envio para o faturamento e a impressão de etiquetas ficam bloqueados.</span>
+					<span class="cf-hint"><strong>Remover produto</strong> → exige motivo obrigatório antes de retirar o item da composição.</span>
+
+					<!-- Etiquetas térmicas da Câmara Fria (Fase 5, Sub-fase 5.1 — sem impressora física ainda; impressão via iframe/área isolada) -->
+					<div class="op-etiquetas" aria-label="Etiquetas da Câmara Fria">
+						<div class="op-etiquetas__status">
+							<span class="op-etiquetas__badge op-etiquetas__badge--nunca" id="etiquetasBadge">Nunca impressa</span>
+							<span class="op-etiquetas__meta" id="etiquetasMeta" hidden></span>
+						</div>
+						<div class="op-etiquetas__actions">
+							<button type="button" class="op-btn op-btn--ghost" id="btnVisualizarEtiquetas" disabled>Visualizar etiquetas</button>
+							<button type="button" class="op-btn op-btn--primary" id="btnImprimirEtiquetas">Imprimir etiquetas</button>
+							<button type="button" class="op-btn op-btn--primary" id="btnReimprimirEtiquetas" hidden>Reimprimir etiquetas</button>
+						</div>
+						<p class="op-etiquetas__bloqueio" id="etiquetasBloqueio"></p>
+						<span class="cf-hint"><strong>Visualizar etiquetas</strong> → abre a pré-visualização das etiquetas geradas a partir dos dados atuais do pedido, sem imprimir. <strong>Imprimir etiquetas</strong> → gera e envia a impressão (via impressão do navegador) e grava o registro de auditoria. <strong>Reimprimir</strong> → usada quando uma etiqueta já impressa precisar ser substituída; sempre exige motivo. Todos exigem itens conferidos e nenhuma inclusão de produto em aberto.</span>
+					</div>
+
+					<div class="cf-preview-block">
+						<p class="cf-preview-label">Exemplo de etiqueta gerada (pré-visualização — layout real de <code>etiqueta-preview-dialog.component.ts</code>, escala reduzida). Ilustração estática, independente do estado atual do pedido acima; use os botões "Visualizar etiquetas"/"Imprimir etiquetas" para a versão funcional.</p>
+						<article class="epd-page">
+							<header class="epd-page__header">
+								<span class="epd-page__pedido">PEDIDO Nº 16</span>
+								<span class="epd-page__volume">VOLUME 1/1</span>
+								<span class="epd-page__qr" aria-hidden="true">QR</span>
+							</header>
+							<p class="epd-page__entrega">Entrega: sexta-feira, 24/07/2026</p>
+							<section class="epd-page__cliente" data-font="grande">
+								<span class="epd-page__cliente-nome"><span class="epd-page__cliente-linha">CLIENTE TESTE LIMITE</span><span class="epd-page__cliente-linha">CREDITO</span></span>
+								<span class="epd-page__cliente-codigo">Cód. cliente: 33871</span>
+							</section>
+							<p class="epd-page__cidade">CANOAS - RS</p>
+							<div class="epd-page__logistica">
+								<span>Rota: —</span><span>Dia de entrega: sexta-feira</span><span>Volume: 1 de 1</span>
+							</div>
+							<table class="epd-page__itens">
+								<thead><tr><th>Cód.</th><th>Produto</th><th>Qtd</th><th>Un</th><th>Peso real</th></tr></thead>
+								<tbody>
+									<tr><td>00123</td><td>Picanha Bovina</td><td>2</td><td>KG</td><td>1,850 kg</td></tr>
+									<tr><td>00789</td><td>Linguiça Toscana</td><td>10</td><td>KG</td><td>—</td></tr>
+									<tr><td>01120</td><td>Espetinho Misto</td><td>12</td><td>UNID</td><td>—</td></tr>
+								</tbody>
+							</table>
+							<footer class="epd-page__footer">
+								<p>Itens neste volume: <strong>3</strong> · Peso neste volume: <strong>1,850 kg</strong></p>
+								<p>Obs. pedido: Entregar até 14h. Cliente pediu embalagem reforçada.</p>
+								<p class="epd-page__assinatura">Impresso em 24/07/2026 09:00 — Operador: Rafael T.</p>
+								<p class="epd-page__peso-geral">Peso total do pedido (todos os volumes): 1,850 kg</p>
+							</footer>
+						</article>
+					</div>
+
+					<div class="cf-preview-block">
+						<p class="cf-preview-label">Exemplo do diálogo de reimpressão (layout real de <code>reimprimir-etiqueta-dialog.component.ts</code>) — ilustração estática; use o botão "Reimprimir etiquetas" acima (após imprimir uma vez) para a versão funcional.</p>
+						<div class="red-preview">
+							<h4>Reimprimir etiquetas do pedido №16</h4>
+							<div class="red-content">
+								<p>As etiquetas serão geradas novamente com os dados mais atuais do pedido.</p>
+								<label class="red-field">
+									<span class="red-label">Motivo da reimpressão</span>
+									<select class="red-select" disabled>
+										<option>Selecione um motivo</option>
+										<option>Adicionar volume</option>
+										<option>Etiqueta molhada</option>
+										<option>Caixa substituída</option>
+										<option>Correção de peso</option>
+										<option>Erro de impressão</option>
+										<option>Etiqueta rasgada</option>
+										<option>Outro</option>
+									</select>
+								</label>
+								<div class="red-actions">
+									<button type="button" class="op-btn op-btn--ghost" disabled>Cancelar</button>
+									<button type="button" class="op-btn op-btn--primary" disabled>Reimprimir etiquetas</button>
+								</div>
+							</div>
+						</div>
+						<span class="cf-hint">"Adicionar volume" e "Etiqueta rasgada" são duas das 7 opções da mesma lista de motivos — não são botões separados. O motivo é obrigatório para confirmar a reimpressão.</span>
+					</div>
+				</section>
+
+				<!-- Painel real: order-detail.component.ts linhas 443-527 ("Avançar pedido") -->
+				<section class="op-actions" aria-label="Avançar status do pedido">
+					<div class="op-actions__head">
+						<span class="op-eyebrow">Próximo passo</span>
+						<h2 class="op-actions__title">Avançar pedido</h2>
+					</div>
+					<div class="op-actions__buttons">
+						<button type="button" class="op-action" id="btnAvancarFaturamento" data-tone="purple">
+							<span class="op-action__icon" aria-hidden="true">▤</span>
+							<span class="op-action__label">
+								<span class="op-action__title" id="btnAvancarFaturamentoTitulo">Confira todos os itens para liberar o faturamento</span>
+								<span class="op-action__hint" id="btnAvancarFaturamentoHint" hidden>Pronto para emitir NF</span>
+							</span>
+						</button>
+						<button type="button" class="op-action" data-tone="ruby" id="btnCancelarPedido">
+							<span class="op-action__icon" aria-hidden="true">⊘</span>
+							<span class="op-action__label">
+								<span class="op-action__title">Cancelado</span>
+								<span class="op-action__hint">Cancelar este pedido</span>
+							</span>
+						</button>
+					</div>
+					<p class="op-actions__blocked-msg" id="avancarBlockedMsg"></p>
+					<p class="op-actions__ok-msg" id="avancarOkMsg" hidden>"Pronto para enviar ao faturamento."</p>
+					<p class="cf-note" id="avancarCount"></p>
+					<div id="avancarSucesso" hidden></div>
+					<span class="cf-hint"><strong>Enviar para faturamento</strong> → só fica disponível quando todos os itens estiverem conferidos e não houver nenhuma inclusão de produto em aberto. Ao confirmar, o status do pedido muda para "Faturamento" e a nota fiscal poderá ser emitida em seguida.</span>
+
+					<div class="cf-preview-block">
+						<p class="cf-preview-label">Exemplo do botão liberado (ilustração estática — o botão real acima muda de cor sozinho quando a conferência é concluída):</p>
+						<button type="button" class="op-action op-action--ready" style="max-width:320px;" disabled>
+							<span class="op-action__icon" aria-hidden="true">▤</span>
+							<span class="op-action__label">
+								<span class="op-action__title">Enviar para faturamento</span>
+								<span class="op-action__hint">Pronto para emitir NF</span>
+							</span>
+						</button>
+						<p class="cf-note">Mensagem exibida nesta situação: <strong style="color:var(--tone-sage);">"Pronto para enviar ao faturamento."</strong> Ao clicar, o pedido avança para a etapa de Faturamento, onde a nota fiscal será emitida e, futuramente, os dados serão enviados ao Sentus.</p>
+					</div>
+				</section>
+
+			</div>
+
+			<!-- ═══════════════ DOCUMENTAÇÃO — fora da interface operacional ═══════════════ -->
+			<details class="cf-docs">
+				<summary>Observações das funcionalidades – Câmara Fria</summary>
+				<div class="cf-docs__body">
+					<div>
+						<h4>Objetivo da etapa</h4>
+						<p>Garantir que o peso real de cada item do pedido seja conferido fisicamente antes de seguir para o faturamento, permitindo corrigir a composição (adicionar, remover ou alterar quantidade) quando necessário.</p>
+					</div>
+					<div>
+						<h4>Quem utiliza</h4>
+						<p>A equipe operacional da Câmara Fria/separação, com acesso ao painel administrativo. Não é uma tela voltada ao cliente.</p>
+					</div>
+					<div>
+						<h4>Entrada de dados</h4>
+						<p>Um pedido já confirmado (status "Em Separação"), com os itens vindos do carrinho no momento da compra: nome, referência, quantidade e peso aproximado (peso_unidade cadastrado no catálogo).</p>
+					</div>
+					<div>
+						<h4>Saída da etapa</h4>
+						<p>O mesmo pedido com todos os itens ativos com peso real registrado e conferido, mais a composição final já ajustada (itens adicionados/removidos, quantidades corrigidas).</p>
+					</div>
+					<div>
+						<h4>O que segue para o Faturamento</h4>
+						<p>Status do pedido, os itens ativos com peso real, valor total, forma de pagamento e dados do cliente — usados no checklist da etapa seguinte.</p>
+					</div>
+					<div>
+						<h4>O que segue para a impressão das etiquetas</h4>
+						<p>Número do pedido, nome e código do cliente, cidade/UF, dia de entrega, itens com peso real e observação do pedido. Nenhuma informação financeira (valor, forma de pagamento) entra na etiqueta.</p>
+					</div>
+					<div>
+						<h4>O que será enviado posteriormente ao Sentus</h4>
+						<p>A Câmara Fria não envia nada diretamente ao Sentus. É na etapa seguinte (Faturamento) que os itens, preços, valor total, forma de pagamento e dados do cliente compõem o pedido enviado — hoje simulado, sem chamada real à API.</p>
+					</div>
+					<div>
+						<h4>Regra para produtos em KG e em unidade</h4>
+						<p>O rótulo abaixo do campo de quantidade mostra "peças" (produto vendido por KG) ou "unidades" (produto vendido por UNIDADE). O peso aproximado só aparece quando o produto tem peso cadastrado no catálogo — quando não tem, a coluna mostra "—", como no item "Espetinho Misto".</p>
+					</div>
+					<div>
+						<h4>Regra de conferência</h4>
+						<p>"Conferir" exige um peso real válido (número ≥ 0); ao confirmar, grava o peso, a data/hora e o responsável, e move o foco automaticamente para o campo de peso do próximo item ainda pendente. "Desmarcar conferência" reabre o item para edição, selecionando o conteúdo do campo, e mantém o valor já digitado.</p>
+					</div>
+					<div>
+						<h4>Regra para envio ao faturamento</h4>
+						<p>Bloqueado enquanto houver qualquer item não conferido OU uma inclusão de produto em aberto. Liberado (botão verde), muda o status do pedido para "Faturamento".</p>
+					</div>
+					<div>
+						<h4>Regra para impressão e reimpressão das etiquetas</h4>
+						<p>Mesmas condições do envio ao faturamento (todos conferidos, sem inclusão aberta), mais o pedido não estar cancelado. A reimpressão sempre exige a seleção de um motivo e sempre usa os dados mais atuais do pedido (nunca uma versão em cache). Respeita o limite real de 8 itens por etiqueta (<code>MAX_ITENS_POR_ETIQUETA</code>).</p>
+					</div>
+					<div>
+						<h4>Quais botões são reais do sistema e quais interações são simulação do protótipo</h4>
+						<p>Todos os botões operacionais (Conferir, Desmarcar, +/−, Adicionar produto, Remover produto, Enviar para faturamento, Visualizar/Imprimir/Reimprimir etiquetas) reproduzem exatamente o comportamento e as regras do componente real. O que é <strong>simulação exclusiva deste protótipo</strong>: os dados não são salvos em nenhum banco (tudo vive em memória do navegador e se perde ao recarregar a página), a impressão usa a janela de impressão do navegador sobre uma área isolada em vez de conexão real com impressora térmica, e não há chamada real a nenhuma API (Supabase ou Sentus).</p>
+					</div>
+					<div>
+						<h4>Ferramentas exclusivas do protótipo</h4>
+						<p>"Reiniciar demonstração" e "Restaurar teste da Câmara Fria" (painel "Ferramentas de demonstração" abaixo) existem apenas para permitir repetir os testes quantas vezes forem necessárias. Essas duas funções <strong>não existem no sistema real</strong> e não devem ser implementadas em produção sem uma regra administrativa explícita e auditoria apropriada — reverter o estado de um pedido real é uma operação sensível.</p>
+					</div>
+					<div>
+						<h4>O que já está implementado no código</h4>
+						<ul>
+							<li><span class="cf-tag cf-tag--real">Real</span> Conferência de peso, edição de composição (adicionar/remover/alterar quantidade), busca de produto por código ou nome</li>
+							<li><span class="cf-tag cf-tag--real">Real</span> Painel "Avançar pedido" com bloqueio/liberação para o faturamento</li>
+							<li><span class="cf-tag cf-tag--real">Real</span> Geração e pré-visualização de etiquetas, impressão via navegador (iframe isolado) e diálogo de reimpressão com motivo obrigatório</li>
+						</ul>
+					</div>
+					<div>
+						<h4>O que é mockado apenas para esta demonstração</h4>
+						<ul>
+							<li><span class="cf-tag cf-tag--mock">Mock</span> Todos os dados deste pedido (cliente, itens, pesos, valores) — não vêm de um banco de dados real</li>
+							<li><span class="cf-tag cf-tag--mock">Mock</span> A "confirmação de sucesso" ao enviar para faturamento e a lista de produtos da busca são geradas localmente em JavaScript, não vêm do Supabase</li>
+						</ul>
+					</div>
+					<div>
+						<h4>O que ainda é apenas planejado (não implementado)</h4>
+						<ul>
+							<li><span class="cf-tag cf-tag--planned">Planejado</span> Impressão física direta em impressora térmica via ZPL/serviço local (QZ Tray) — hoje a impressão usa o diálogo padrão do navegador</li>
+							<li><span class="cf-tag cf-tag--planned">Planejado</span> QR Code e código de barras funcionais na etiqueta (hoje é só um espaço reservado)</li>
+							<li><span class="cf-tag cf-tag--planned">Planejado</span> Rastreamento de volumes físicos e confirmação de carregamento</li>
+							<li><span class="cf-tag cf-tag--planned">Planejado</span> Integração real com o Sentus (cadastro, limite de crédito e faturamento) — hoje toda simulada em modo desenvolvimento</li>
+						</ul>
+					</div>
+				</div>
+			</details>
+
+			<details class="cf-docs">
+				<summary>Fluxo resumido da Câmara Fria</summary>
+				<div class="cf-docs__body">
+					<div class="cf-flow">
+						<div class="cf-flow__step">Cliente confirma pedido</div>
+						<div class="cf-flow__arrow">↓</div>
+						<div class="cf-flow__step">Separação inicia</div>
+						<div class="cf-flow__arrow">↓</div>
+						<div class="cf-flow__step">Pesagem real</div>
+						<div class="cf-flow__arrow">↓</div>
+						<div class="cf-flow__step">Conferência dos itens</div>
+						<div class="cf-flow__arrow">↓</div>
+						<div class="cf-flow__step">Correções</div>
+						<div class="cf-flow__arrow">↓</div>
+						<div class="cf-flow__step">Etiquetas</div>
+						<div class="cf-flow__arrow">↓</div>
+						<div class="cf-flow__step">Enviar para faturamento</div>
+					</div>
+				</div>
+			</details>
+
+			<details class="cf-docs" id="toolsPanel">
+				<summary>Ferramentas de demonstração (exclusivo do protótipo)</summary>
+				<div class="cf-docs__body">
+					<p class="cf-tools-warning">Função exclusiva do protótipo. Não existe no sistema de produção.</p>
+					<div>
+						<h4>Restaurar teste da Câmara Fria</h4>
+						<p>Devolve o pedido para "Em Separação", restaura pelo menos um item pendente, limpa os pesos editáveis e bloqueia novamente "Enviar para faturamento" — para repetir o teste de conferência, etiquetas e avanço.</p>
+						<div class="cf-tools-row">
+							<button type="button" class="op-btn op-btn--ghost" id="btnResetCamaraFria">Restaurar teste da Câmara Fria</button>
+						</div>
+					</div>
+					<div>
+						<h4>Reiniciar demonstração</h4>
+						<p>Restaura os dados mockados originais do pedido (itens, pesos, quantidades e estados) e move a linha do tempo para a etapa escolhida abaixo.</p>
+						<div class="cf-tools-row">
+							<label for="selectReiniciarStatus" class="red-label" style="text-transform:none; letter-spacing:normal; font-weight:500;">Voltar pedido para:</label>
+							<select class="cf-tools-select" id="selectReiniciarStatus">
+								<option value="pendente">Pendente</option>
+								<option value="cadastro_financeiro">Cadastro Financeiro</option>
+								<option value="confirmado">Pedido Confirmado</option>
+								<option value="em_separacao" selected>Em Separação</option>
+								<option value="faturamento">Faturamento</option>
+								<option value="aguardando_pagamento">Aguardando Pagamento</option>
+								<option value="em_rota">Em Rota</option>
+							</select>
+							<button type="button" class="op-btn op-btn--primary" id="btnReiniciarDemo">Reiniciar demonstração</button>
+						</div>
+					</div>
+				</div>
+			</details>
+
+		</main>
+	</div>
+</div>
+
+<!-- ═══════════════ MODAIS (funcionalidade real simulada em JS local) ═══════════════ -->
+
+<div class="cf-overlay" id="overlayDuplicado" hidden>
+	<div class="cf-modal" role="dialog" aria-modal="true">
+		<h2>Produto já está no pedido</h2>
+		<div class="red-content">
+			<p><strong id="duplicadoNome"></strong> já está na composição deste pedido, com <span id="duplicadoQtd"></span>.</p>
+			<p>O que você quer fazer?</p>
+		</div>
+		<div class="cf-modal-actions">
+			<button type="button" class="op-btn op-btn--ghost" id="duplicadoCancelar">Cancelar</button>
+			<button type="button" class="op-btn op-btn--ghost" id="duplicadoNovaLinha">Manter como nova linha</button>
+			<button type="button" class="op-btn op-btn--primary" id="duplicadoAumentar">Aumentar quantidade</button>
+		</div>
+	</div>
+</div>
+
+<div class="cf-overlay" id="overlayRemover" hidden>
+	<div class="cf-modal" role="dialog" aria-modal="true">
+		<h2 id="removerTitulo">Remover produto</h2>
+		<div class="red-content">
+			<p id="removerTexto"></p>
+			<label class="red-field">
+				<span class="red-label">Motivo da remoção</span>
+				<select class="red-select" id="removerMotivo">
+					<option value="" disabled selected>Selecione um motivo</option>
+					<option>Produto sem estoque</option>
+					<option>Substituição autorizada</option>
+					<option>Erro no pedido</option>
+					<option>Cliente desistiu do item</option>
+					<option>Outro</option>
+				</select>
+			</label>
+			<label class="red-field" id="removerOutroWrap" hidden>
+				<span class="red-label">Descreva o motivo</span>
+				<input type="text" class="red-input" id="removerMotivoOutro" placeholder="Ex.: cliente trocou por outro item por telefone" />
+			</label>
+		</div>
+		<div class="cf-modal-actions">
+			<button type="button" class="op-btn op-btn--ghost" id="removerCancelar">Cancelar</button>
+			<button type="button" class="op-btn op-btn--primary" id="removerConfirmar" disabled>Remover item</button>
+		</div>
+	</div>
+</div>
+
+<div class="cf-overlay" id="overlayReimprimir" hidden>
+	<div class="cf-modal" role="dialog" aria-modal="true">
+		<h2>Reimprimir etiquetas do pedido №16</h2>
+		<div class="red-content">
+			<p id="reimprimirTexto">As etiquetas serão geradas novamente com os dados mais atuais do pedido.</p>
+			<label class="red-field">
+				<span class="red-label">Motivo da reimpressão</span>
+				<select class="red-select" id="reimprimirMotivo">
+					<option value="" disabled selected>Selecione um motivo</option>
+					<option>Adicionar volume</option>
+					<option>Etiqueta molhada</option>
+					<option>Caixa substituída</option>
+					<option>Correção de peso</option>
+					<option>Erro de impressão</option>
+					<option>Etiqueta rasgada</option>
+					<option>Outro</option>
+				</select>
+			</label>
+			<label class="red-field" id="reimprimirOutroWrap" hidden>
+				<span class="red-label">Descreva o motivo</span>
+				<input type="text" class="red-input" id="reimprimirMotivoOutro" placeholder="Ex.: impressora travou na metade da etiqueta" />
+			</label>
+		</div>
+		<div class="cf-modal-actions">
+			<button type="button" class="op-btn op-btn--ghost" id="reimprimirCancelar">Cancelar</button>
+			<button type="button" class="op-btn op-btn--primary" id="reimprimirConfirmar" disabled>Reimprimir etiquetas</button>
+		</div>
+	</div>
+</div>
+
+<div class="cf-overlay" id="overlayEtiquetas" hidden>
+	<div class="cf-modal cf-modal--wide" role="dialog" aria-modal="true">
+		<h2 id="etiquetasModalTitulo">Etiquetas</h2>
+		<div class="cf-modal-pages" id="etiquetaModalPages"></div>
+		<p class="cf-modal-hint" id="etiquetasModalHint" hidden>Este pedido já foi impresso antes. Para gerar novas etiquetas, use "Reimprimir etiquetas" (exige motivo).</p>
+		<div class="cf-modal-actions">
+			<button type="button" class="op-btn op-btn--ghost" id="etiquetasModalFechar">Fechar</button>
+			<button type="button" class="op-btn op-btn--primary" id="etiquetasModalImprimir">Imprimir</button>
+		</div>
+	</div>
+</div>
+
+<div class="cf-toast-stack" id="toastStack"></div>
+
+<script>
+(function () {
+	'use strict';
+
+	/* ══════════════ Dados mockados (estado do protótipo) ══════════════ */
+	var STATUS_LABELS = {
+		pendente: 'Pendente', cadastro_financeiro: 'Cadastro Financeiro', confirmado: 'Pedido Confirmado',
+		em_separacao: 'Em Separação', faturamento: 'Faturamento', aguardando_pagamento: 'Aguardando Pagamento',
+		em_rota: 'Em Rota', entregue: 'Entregue'
+	};
+	var STATUS_TONES = {
+		pendente: 'amber', cadastro_financeiro: 'yellow', confirmado: 'green', em_separacao: 'blue',
+		faturamento: 'purple', aguardando_pagamento: 'copper', em_rota: 'plum', entregue: 'sage'
+	};
+	var STATUS_ICONS = {
+		pendente: '◷', cadastro_financeiro: '◈', confirmado: '✓', em_separacao: '⚒',
+		faturamento: '▤', aguardando_pagamento: '⧗', em_rota: '⤳', entregue: '★'
+	};
+	var TIMELINE = ['pendente', 'cadastro_financeiro', 'confirmado', 'em_separacao', 'faturamento', 'aguardando_pagamento', 'em_rota', 'entregue'];
+	var MAX_ITENS_POR_ETIQUETA = 8;
+	var REMOVER_MOTIVOS = ['Produto sem estoque', 'Substituição autorizada', 'Erro no pedido', 'Cliente desistiu do item', 'Outro'];
+
+	var CATALOGO = [
+		{ codigo: '00789', nome: 'Linguiça Toscana', pesoUnit: 1.0, unidLabel: 'peças' },
+		{ codigo: '00790', nome: 'Linguiça Calabresa', pesoUnit: 0.9, unidLabel: 'peças' },
+		{ codigo: '00456', nome: 'Frango Inteiro', pesoUnit: 1.2, unidLabel: 'peças' },
+		{ codigo: '01121', nome: 'Costela Suína', pesoUnit: 1.5, unidLabel: 'peças' },
+		{ codigo: '01200', nome: 'Queijo Coalho', pesoUnit: null, unidLabel: 'unidades' }
+	];
+
+	function pristineItems() {
+		return [
+			{ id: 'it1', codigo: '00123', nome: 'Picanha Bovina', qty: 2, unidLabel: 'peças', pesoUnit: 0.85, pesoReal: 1.850, conferido: true, meta: 'há 12 min · Rafael T.' },
+			{ id: 'it2', codigo: '00789', nome: 'Linguiça Toscana', qty: 10, unidLabel: 'peças', pesoUnit: 1.0, pesoReal: null, conferido: false, meta: '' },
+			{ id: 'it3', codigo: '01120', nome: 'Espetinho Misto', qty: 12, unidLabel: 'unidades', pesoUnit: null, pesoReal: null, conferido: false, meta: '' }
+		];
+	}
+
+	var state = {
+		items: pristineItems(),
+		nextId: 4,
+		novaLinhaAtiva: false,
+		novaLinhaBusca: '',
+		novaLinhaSelecionado: null,
+		novaLinhaQty: 1,
+		pesoDrafts: {},
+		etiquetasHistorico: [],
+		statusAtual: 'em_separacao',
+		pendingModalDuplicado: null,
+		pendingPrintTipo: 'inicial'
+	};
+
+	/* ══════════════ Toast ══════════════ */
+	function toast(msg, kind) {
+		var stack = document.getElementById('toastStack');
+		var el = document.createElement('div');
+		el.className = 'cf-toast' + (kind === 'success' ? ' cf-toast--success' : '');
+		el.textContent = msg;
+		stack.appendChild(el);
+		requestAnimationFrame(function () { el.classList.add('is-visible'); });
+		setTimeout(function () {
+			el.classList.remove('is-visible');
+			setTimeout(function () { el.remove(); }, 220);
+		}, 3600);
+	}
+
+	/* ══════════════ Cálculos (espelham order-detail.component.ts) ══════════════ */
+	function pesoAprox(item) { return item.pesoUnit != null ? item.pesoUnit * item.qty : null; }
+
+	function totals() {
+		var itens = state.items;
+		var aprox = 0, hasAprox = false, real = 0, hasReal = 0, pecas = 0;
+		itens.forEach(function (i) {
+			pecas += i.qty;
+			var pa = pesoAprox(i);
+			if (pa != null) { aprox += pa; hasAprox = true; }
+			if (i.pesoReal != null) { real += i.pesoReal; hasReal = true; }
+		});
+		return {
+			itens: itens.length,
+			pecas: pecas,
+			aprox: hasAprox ? aprox : null,
+			real: hasReal ? real : null,
+			diferenca: (hasAprox && hasReal) ? (real - aprox) : null
+		};
+	}
+
+	function todosConferidos() {
+		return state.items.length > 0 && state.items.every(function (i) { return i.conferido; });
+	}
+	function composicaoIncompleta() { return state.novaLinhaAtiva; }
+	function faturamentoBloqueado() { return !todosConferidos() || composicaoIncompleta(); }
+	function podeImprimirEtiqueta() {
+		return state.statusAtual !== 'cancelado' && !composicaoIncompleta() && todosConferidos();
+	}
+	function etiquetaJaImpressa() { return state.etiquetasHistorico.length > 0; }
+	function qtdReimpressoes() {
+		return state.etiquetasHistorico.filter(function (e) { return e.tipo === 'reimpressao'; }).length;
+	}
+
+	/* ══════════════ Formatação (porta fiel de etiqueta-camara-fria.util.ts) ══════════════ */
+	function formatarNomeCliente(nome) {
+		var GRANDE = 24, MEDIA = 30, MINIMA = 38;
+		var t = (nome || '').trim();
+		if (!t) return { linhas: ['—'], fontSize: 'grande' };
+		if (t.length <= GRANDE) return { linhas: [t], fontSize: 'grande' };
+		function quebrar(texto, max) {
+			var palavras = texto.split(' ').filter(Boolean);
+			var linha1 = '', i = 0;
+			for (; i < palavras.length; i++) {
+				var tentativa = linha1 ? linha1 + ' ' + palavras[i] : palavras[i];
+				if (tentativa.length > max && linha1) break;
+				linha1 = tentativa;
+			}
+			var linha2 = palavras.slice(i).join(' ');
+			return linha2 ? [linha1, linha2] : [linha1];
+		}
+		var linhas = quebrar(t, GRANDE);
+		if (linhas.every(function (l) { return l.length <= GRANDE; })) return { linhas: linhas, fontSize: 'grande' };
+		linhas = quebrar(t, MEDIA);
+		if (linhas.every(function (l) { return l.length <= MEDIA; })) return { linhas: linhas, fontSize: 'media' };
+		linhas = quebrar(t, MINIMA);
+		if (linhas[1] && linhas[1].length > MINIMA) linhas[1] = linhas[1].slice(0, MINIMA - 1).replace(/\s+$/, '') + '…';
+		return { linhas: linhas, fontSize: 'minima' };
+	}
+
+	function fmt3(n) { return n == null ? '—' : n.toLocaleString('pt-BR', { minimumFractionDigits: 3, maximumFractionDigits: 3 }); }
+
+	/* ══════════════ Render: linha da tabela ══════════════ */
+	function renderRow(item) {
+		var pa = pesoAprox(item);
+		var rowClass = 'op-camara__row ' + (item.conferido ? 'op-camara__row--conferido' : 'op-camara__row--pendente');
+		var pesoRealCell;
+		if (item.conferido) {
+			pesoRealCell = fmt3(item.pesoReal) + ' kg';
+		} else {
+			var draft = state.pesoDrafts[item.id] != null ? state.pesoDrafts[item.id] : '';
+			pesoRealCell = '<input type="number" class="op-camara__input" id="peso-real-' + item.id + '" step="0.001" min="0" placeholder="0.000" value="' + draft + '" data-action="peso-input" data-id="' + item.id + '" aria-label="Peso real de ' + item.nome + '" />';
+		}
+		var statusCell = item.conferido
+			? '<span class="op-camara__status op-camara__status--ok">✓ Conferido</span><span class="op-camara__meta">' + item.meta + '</span>'
+			: '<span class="op-camara__status op-camara__status--pendente">Pendente</span>';
+		var acaoBtn = item.conferido
+			? '<button type="button" class="op-camara__confirm op-camara__confirm--undo" data-action="desmarcar" data-id="' + item.id + '">Desmarcar conferência</button>'
+			: '<button type="button" class="op-camara__confirm" data-action="conferir" data-id="' + item.id + '">Conferir</button>';
+
+		return '<tr class="' + rowClass + '" data-row-id="' + item.id + '">' +
+			'<td class="op-camara__code">' + item.codigo + '</td>' +
+			'<td><span class="op-camara__nome">' + item.nome + '</span></td>' +
+			'<td><div class="op-camara__qty">' +
+				'<button type="button" class="op-camara__qty-btn" data-action="dec-qty" data-id="' + item.id + '" ' + (item.qty <= 1 ? 'disabled' : '') + ' aria-label="Diminuir quantidade">−</button>' +
+				'<input type="number" class="op-camara__qty-input" min="1" value="' + item.qty + '" data-action="qty-input" data-id="' + item.id + '" aria-label="' + item.unidLabel + ' de ' + item.nome + '" />' +
+				'<button type="button" class="op-camara__qty-btn" data-action="inc-qty" data-id="' + item.id + '" aria-label="Aumentar quantidade">+</button>' +
+				'</div><span class="op-camara__qty-label">' + item.unidLabel + '</span></td>' +
+			'<td>' + (pa != null ? fmt3(pa) + ' kg' : '—') + '</td>' +
+			'<td>' + pesoRealCell + '</td>' +
+			'<td>' + statusCell + '</td>' +
+			'<td><div class="op-camara__actions">' + acaoBtn +
+				'<button type="button" class="op-camara__remove" data-action="remover" data-id="' + item.id + '" aria-label="Remover ' + item.nome + '" title="Remover item">🗑</button>' +
+				'</div></td>' +
+			'</tr>';
+	}
+
+	function renderDraftRow() {
+		if (!state.novaLinhaAtiva) {
+			return '<tr><td colspan="7"><button type="button" class="op-camara__add-btn" id="btnAdicionarProduto">+ Adicionar produto</button></td></tr>';
+		}
+		var busca = state.novaLinhaBusca;
+		var buscaTrim = busca.trim().toLowerCase();
+		var resultados = [];
+		if (buscaTrim.length >= 2) {
+			resultados = CATALOGO.filter(function (p) {
+				return p.codigo.toLowerCase().indexOf(buscaTrim) !== -1 || p.nome.toLowerCase().indexOf(buscaTrim) !== -1;
+			});
+		}
+		var resultadosHtml = '';
+		if (resultados.length > 0) {
+			resultadosHtml = '<ul class="op-camara__draft-options">' + resultados.map(function (p) {
+				return '<li><button type="button" data-action="selecionar-produto" data-codigo="' + p.codigo + '"><span class="op-camara__draft-option-ref">' + p.codigo + '</span><span>' + p.nome + '</span></button></li>';
+			}).join('') + '</ul>';
+		} else if (buscaTrim.length >= 2) {
+			resultadosHtml = '<p class="op-camara__draft-empty">Nenhum produto ativo encontrado.</p>';
+		}
+
+		var selecionadoHtml = '';
+		if (state.novaLinhaSelecionado) {
+			var p2 = state.novaLinhaSelecionado;
+			selecionadoHtml = '<div class="op-camara__draft-selected">' +
+				'<span class="op-camara__draft-selected-nome">' + p2.codigo + ' — ' + p2.nome + '</span>' +
+				'<label class="op-camara__draft-qty">Peças<div class="op-camara__qty">' +
+					'<button type="button" class="op-camara__qty-btn" data-action="dec-draft-qty" ' + (state.novaLinhaQty <= 1 ? 'disabled' : '') + '>−</button>' +
+					'<input type="number" class="op-camara__qty-input" min="1" value="' + state.novaLinhaQty + '" id="draftQtyInput" />' +
+					'<button type="button" class="op-camara__qty-btn" data-action="inc-draft-qty">+</button>' +
+				'</div></label>' +
+				'<button type="button" class="op-camara__confirm" id="btnConfirmarNovaLinha">Adicionar</button>' +
+				'</div>';
+		}
+
+		return '<tr class="op-camara__row op-camara__row--draft"><td colspan="7"><div class="op-camara__draft">' +
+			'<div class="op-camara__draft-search">' +
+			'<input type="text" class="op-camara__draft-input" id="draftBuscaInput" placeholder="Buscar por código ou nome do produto…" value="' + busca.replace(/"/g, '&quot;') + '" />' +
+			resultadosHtml +
+			'<span class="cf-hint">Busca por código ou nome (mínimo 2 caracteres) → mostra os produtos ativos correspondentes; se o produto já existir no pedido, uma confirmação oferece aumentar a quantidade em vez de duplicar a linha.</span>' +
+			'</div>' +
+			selecionadoHtml +
+			'<button type="button" class="op-camara__confirm op-camara__confirm--undo" id="btnCancelarNovaLinha">Cancelar</button>' +
+			'</div></td></tr>';
+	}
+
+	/* ══════════════ Render: painel principal ══════════════ */
+	function render() {
+		var tbody = document.getElementById('camaraTbody');
+		tbody.innerHTML = state.items.map(renderRow).join('') + renderDraftRow();
+
+		var t = totals();
+		document.getElementById('footerItens').textContent = t.itens;
+		document.getElementById('footerPecas').textContent = t.pecas;
+		document.getElementById('footerPesoAprox').textContent = t.aprox != null ? fmt3(t.aprox) + ' kg' : '—';
+		document.getElementById('footerPesoReal').textContent = t.real != null ? fmt3(t.real) + ' kg' : '—';
+		var diffEl = document.getElementById('footerDiferenca');
+		var diffWrap = document.getElementById('footerDiferencaWrap');
+		diffEl.textContent = t.diferenca != null ? fmt3(t.diferenca) + ' kg' : '—';
+		diffWrap.classList.toggle('op-camara__diff--neg', t.diferenca != null && t.diferenca < 0);
+
+		renderAvancarPedido();
+		renderEtiquetasPanel();
+
+		if (typeof window.__cfFocusNextId !== 'undefined' && window.__cfFocusNextId) {
+			var id = window.__cfFocusNextId;
+			window.__cfFocusNextId = null;
+			setTimeout(function () {
+				var el = document.getElementById('peso-real-' + id);
+				if (el) el.focus();
+			}, 0);
+		}
+	}
+
+	function renderAvancarPedido() {
+		var btn = document.getElementById('btnAvancarFaturamento');
+		var titulo = document.getElementById('btnAvancarFaturamentoTitulo');
+		var hint = document.getElementById('btnAvancarFaturamentoHint');
+		var blockedMsg = document.getElementById('avancarBlockedMsg');
+		var okMsg = document.getElementById('avancarOkMsg');
+		var count = document.getElementById('avancarCount');
+
+		var bloqueado = faturamentoBloqueado();
+		btn.classList.toggle('op-action--blocked', bloqueado);
+		btn.classList.toggle('op-action--ready', !bloqueado);
+		btn.disabled = bloqueado || state.statusAtual === 'faturamento';
+
+		if (bloqueado) {
+			titulo.textContent = 'Confira todos os itens para liberar o faturamento';
+			hint.hidden = true;
+			okMsg.hidden = true;
+			blockedMsg.hidden = false;
+			if (composicaoIncompleta()) {
+				blockedMsg.textContent = 'Finalize ou cancele a inclusão do novo produto antes de avançar para o faturamento.';
+				count.textContent = '';
+			} else {
+				blockedMsg.textContent = 'Todos os itens precisam ter peso real informado e status "Conferido" antes de avançar para o faturamento.';
+				var faltam = state.items.filter(function (i) { return !i.conferido; }).length;
+				count.textContent = faltam + ' de ' + state.items.length + ' itens ainda não foram conferidos.';
+			}
+		} else {
+			titulo.textContent = 'Enviar para faturamento';
+			hint.hidden = false;
+			blockedMsg.hidden = true;
+			count.textContent = '';
+			okMsg.hidden = false;
+		}
+	}
+
+	function renderEtiquetasPanel() {
+		var badge = document.getElementById('etiquetasBadge');
+		var meta = document.getElementById('etiquetasMeta');
+		var btnVisualizar = document.getElementById('btnVisualizarEtiquetas');
+		var btnImprimir = document.getElementById('btnImprimirEtiquetas');
+		var btnReimprimir = document.getElementById('btnReimprimirEtiquetas');
+		var bloqueioMsg = document.getElementById('etiquetasBloqueio');
+
+		if (etiquetaJaImpressa()) {
+			badge.className = 'op-etiquetas__badge op-etiquetas__badge--ok';
+			var n = qtdReimpressoes();
+			badge.textContent = 'Etiqueta impressa' + (n > 0 ? (' — Reimpressa ' + n + (n === 1 ? ' vez' : ' vezes')) : '');
+			var last = state.etiquetasHistorico[state.etiquetasHistorico.length - 1];
+			meta.hidden = false;
+			meta.textContent = 'Última impressão: ' + last.data + ' — ' + last.operador;
+			btnImprimir.hidden = true;
+			btnReimprimir.hidden = false;
+		} else {
+			badge.className = 'op-etiquetas__badge op-etiquetas__badge--nunca';
+			badge.textContent = 'Nunca impressa';
+			meta.hidden = true;
+			btnImprimir.hidden = false;
+			btnReimprimir.hidden = true;
+		}
+
+		var pode = podeImprimirEtiqueta();
+		btnVisualizar.disabled = !pode;
+		btnImprimir.disabled = !pode;
+		btnReimprimir.disabled = !pode;
+
+		if (!pode) {
+			bloqueioMsg.hidden = false;
+			if (state.statusAtual === 'cancelado') {
+				bloqueioMsg.textContent = 'Pedido cancelado — não é possível gerar etiquetas.';
+			} else if (composicaoIncompleta()) {
+				bloqueioMsg.textContent = 'Finalize ou cancele a inclusão do novo produto antes de gerar etiquetas.';
+			} else {
+				bloqueioMsg.textContent = 'Todos os itens precisam estar conferidos (com peso real) antes de gerar etiquetas.';
+			}
+		} else {
+			bloqueioMsg.hidden = true;
+			bloqueioMsg.textContent = '';
+		}
+	}
+
+	function updateHeroStatus(status) {
+		state.statusAtual = status;
+		var hero = document.getElementById('opHero');
+		hero.setAttribute('data-status', status);
+		var aside = document.getElementById('opHeroStatus');
+		aside.setAttribute('data-tone', STATUS_TONES[status]);
+		document.getElementById('opHeroStatusIcon').textContent = STATUS_ICONS[status];
+		document.getElementById('opHeroStatusLabel').textContent = STATUS_LABELS[status];
+		document.getElementById('opHeroItensCount').textContent = state.items.length;
+
+		var idx = TIMELINE.indexOf(status);
+		var steps = document.querySelectorAll('#opFlow .op-flow__step');
+		var lines = document.querySelectorAll('#opFlow .op-flow__line');
+		steps.forEach(function (step) {
+			var stepStatus = step.getAttribute('data-status');
+			var stepIdx = TIMELINE.indexOf(stepStatus);
+			step.classList.toggle('op-flow__step--done', stepIdx < idx);
+			step.classList.toggle('op-flow__step--current', stepIdx === idx);
+		});
+		lines.forEach(function (line, i) {
+			line.classList.toggle('op-flow__line--done', i < idx);
+		});
+	}
+
+	/* ══════════════ Ações: conferência ══════════════ */
+	function focusNextPending() {
+		var proximo = state.items.find(function (i) { return !i.conferido; });
+		window.__cfFocusNextId = proximo ? proximo.id : null;
+	}
+
+	function conferirItem(id) {
+		var item = state.items.find(function (i) { return i.id === id; });
+		if (!item) return;
+		var raw = (state.pesoDrafts[id] != null ? state.pesoDrafts[id] : '').trim().replace(',', '.');
+		var peso = Number(raw);
+		if (!raw || !isFinite(peso) || peso < 0) {
+			toast('Informe um peso real válido para conferir o item.');
+			return;
+		}
+		item.pesoReal = peso;
+		item.conferido = true;
+		item.meta = 'agora · Operador Demo';
+		delete state.pesoDrafts[id];
+		focusNextPending();
+		render();
+	}
+
+	function desmarcarConferencia(id) {
+		var item = state.items.find(function (i) { return i.id === id; });
+		if (!item) return;
+		item.conferido = false;
+		state.pesoDrafts[id] = item.pesoReal != null ? String(item.pesoReal) : '';
+		render();
+		setTimeout(function () {
+			var el = document.getElementById('peso-real-' + id);
+			if (el) { el.focus(); el.select(); }
+		}, 0);
+	}
+
+	function alterarQuantidade(id, delta) {
+		var item = state.items.find(function (i) { return i.id === id; });
+		if (!item) return;
+		var novaQty = Math.max(1, item.qty + delta);
+		if (novaQty === item.qty) return;
+		item.qty = novaQty;
+		if (item.conferido) {
+			item.conferido = false;
+			state.pesoDrafts[id] = item.pesoReal != null ? String(item.pesoReal) : '';
+		}
+		render();
+	}
+
+	function setQuantidade(id, valor) {
+		var item = state.items.find(function (i) { return i.id === id; });
+		if (!item) return;
+		var n = Math.max(1, parseInt(valor, 10) || 1);
+		if (n === item.qty) return;
+		item.qty = n;
+		if (item.conferido) {
+			item.conferido = false;
+			state.pesoDrafts[id] = item.pesoReal != null ? String(item.pesoReal) : '';
+		}
+		render();
+	}
+
+	/* ══════════════ Ações: adicionar produto ══════════════ */
+	function iniciarNovaLinha() {
+		state.novaLinhaAtiva = true;
+		state.novaLinhaBusca = '';
+		state.novaLinhaSelecionado = null;
+		state.novaLinhaQty = 1;
+		render();
+		setTimeout(function () {
+			var el = document.getElementById('draftBuscaInput');
+			if (el) el.focus();
+		}, 0);
+	}
+
+	function cancelarNovaLinha() {
+		state.novaLinhaAtiva = false;
+		state.novaLinhaSelecionado = null;
+		render();
+	}
+
+	function selecionarProduto(codigo) {
+		var produto = CATALOGO.find(function (p) { return p.codigo === codigo; });
+		if (!produto) return;
+		var existente = state.items.find(function (i) { return i.codigo === codigo; });
+		if (existente) {
+			state.pendingModalDuplicado = { produto: produto, existente: existente };
+			document.getElementById('duplicadoNome').textContent = existente.nome;
+			document.getElementById('duplicadoQtd').textContent = existente.qty + (existente.qty === 1 ? ' peça' : ' peças');
+			abrirOverlay('overlayDuplicado');
+			return;
+		}
+		state.novaLinhaSelecionado = produto;
+		state.novaLinhaQty = 1;
+		render();
+	}
+
+	function confirmarNovaLinha() {
+		var p = state.novaLinhaSelecionado;
+		if (!p) return;
+		state.items.push({
+			id: 'it' + state.nextId++, codigo: p.codigo, nome: p.nome, qty: state.novaLinhaQty,
+			unidLabel: p.unidLabel, pesoUnit: p.pesoUnit, pesoReal: null, conferido: false, meta: ''
+		});
+		state.novaLinhaAtiva = false;
+		state.novaLinhaSelecionado = null;
+		toast(p.nome + ' adicionado ao pedido.', 'success');
+		render();
+	}
+
+	/* ══════════════ Ações: remover produto ══════════════ */
+	var removerAlvoId = null;
+	function abrirRemover(id) {
+		var item = state.items.find(function (i) { return i.id === id; });
+		if (!item) return;
+		removerAlvoId = id;
+		document.getElementById('removerTitulo').textContent = 'Remover ' + item.nome;
+		document.getElementById('removerTexto').textContent = item.qty + (item.qty === 1 ? ' peça será removida' : ' peças serão removidas') + ' da composição do pedido. Essa ação fica registrada no histórico do pedido.';
+		document.getElementById('removerMotivo').value = '';
+		document.getElementById('removerMotivoOutro').value = '';
+		document.getElementById('removerOutroWrap').hidden = true;
+		document.getElementById('removerConfirmar').disabled = true;
+		abrirOverlay('overlayRemover');
+	}
+
+	/* ══════════════ Etiquetas: geração ══════════════ */
+	function montarEtiquetas() {
+		var itens = state.items;
+		var grupos = [];
+		for (var i = 0; i < itens.length; i += MAX_ITENS_POR_ETIQUETA) grupos.push(itens.slice(i, i + MAX_ITENS_POR_ETIQUETA));
+		if (grupos.length === 0) grupos = [[]];
+		var pesoTotalGeral = itens.reduce(function (acc, i) { return acc + (i.pesoReal || 0); }, 0);
+		var nomeCliente = formatarNomeCliente('Cliente Teste Limite Credito');
+		return grupos.map(function (grupo, idx) {
+			var pesoVolume = grupo.reduce(function (acc, i) { return acc + (i.pesoReal || 0); }, 0);
+			return {
+				volumeAtual: idx + 1, volumeTotal: grupos.length, itens: grupo,
+				nomeLinhas: nomeCliente.linhas, nomeFont: nomeCliente.fontSize,
+				pesoVolume: pesoVolume, pesoTotalGeral: (idx + 1 === grupos.length) ? pesoTotalGeral : null
+			};
+		});
+	}
+
+	function renderEtiquetaPage(et) {
+		var linhasHtml = et.nomeLinhas.map(function (l) { return '<span class="epd-page__cliente-linha">' + l + '</span>'; }).join('');
+		var itensHtml = et.itens.map(function (i) {
+			var un = i.unidLabel === 'unidades' ? 'UNID' : 'KG';
+			return '<tr><td>' + i.codigo + '</td><td>' + i.nome + '</td><td>' + i.qty + '</td><td>' + un + '</td><td>' + (i.pesoReal != null ? fmt3(i.pesoReal) + ' kg' : '—') + '</td></tr>';
+		}).join('');
+		var pesoGeralHtml = et.pesoTotalGeral != null ? '<p class="epd-page__peso-geral">Peso total do pedido (todos os volumes): ' + fmt3(et.pesoTotalGeral) + ' kg</p>' : '';
+		var agora = new Date();
+		var horario = ('0' + agora.getHours()).slice(-2) + ':' + ('0' + agora.getMinutes()).slice(-2);
+		return '<article class="epd-page">' +
+			'<header class="epd-page__header"><span class="epd-page__pedido">PEDIDO Nº 16</span><span class="epd-page__volume">VOLUME ' + et.volumeAtual + '/' + et.volumeTotal + '</span><span class="epd-page__qr" aria-hidden="true">QR</span></header>' +
+			'<p class="epd-page__entrega">Entrega: sexta-feira, 24/07/2026</p>' +
+			'<section class="epd-page__cliente" data-font="' + et.nomeFont + '"><span class="epd-page__cliente-nome">' + linhasHtml + '</span><span class="epd-page__cliente-codigo">Cód. cliente: 33871</span></section>' +
+			'<p class="epd-page__cidade">CANOAS - RS</p>' +
+			'<div class="epd-page__logistica"><span>Rota: —</span><span>Dia de entrega: sexta-feira</span><span>Volume: ' + et.volumeAtual + ' de ' + et.volumeTotal + '</span></div>' +
+			'<table class="epd-page__itens"><thead><tr><th>Cód.</th><th>Produto</th><th>Qtd</th><th>Un</th><th>Peso real</th></tr></thead><tbody>' + itensHtml + '</tbody></table>' +
+			'<footer class="epd-page__footer"><p>Itens neste volume: <strong>' + et.itens.length + '</strong> · Peso neste volume: <strong>' + fmt3(et.pesoVolume) + ' kg</strong></p>' +
+			'<p>Obs. pedido: Entregar até 14h. Cliente pediu embalagem reforçada.</p>' +
+			'<p class="epd-page__assinatura">Impresso em 24/07/2026 ' + horario + ' — Operador: Operador Demo</p>' + pesoGeralHtml + '</footer>' +
+			'</article>';
+	}
+
+	function abrirModalEtiquetas(modo) {
+		var etiquetas = montarEtiquetas();
+		var titulo = 'Etiquetas — Pedido №16 (' + etiquetas.length + (etiquetas.length === 1 ? ' etiqueta' : ' etiquetas') + ')';
+		document.getElementById('etiquetasModalTitulo').textContent = titulo;
+		document.getElementById('etiquetaModalPages').innerHTML = etiquetas.map(renderEtiquetaPage).join('');
+		var hint = document.getElementById('etiquetasModalHint');
+		var btnImprimir = document.getElementById('etiquetasModalImprimir');
+		hint.hidden = modo !== 'somente-visualizacao';
+		btnImprimir.hidden = modo === 'somente-visualizacao';
+		state.pendingPrintTipo = modo === 'reimpressao' ? 'reimpressao' : 'inicial';
+		abrirOverlay('overlayEtiquetas');
+	}
+
+	function imprimirNoModal() {
+		document.body.classList.add('cf-printing');
+		window.print();
+		document.body.classList.remove('cf-printing');
+		var agora = new Date();
+		var dataStr = ('0' + agora.getDate()).slice(-2) + '/' + ('0' + (agora.getMonth() + 1)).slice(-2) + '/' + agora.getFullYear() +
+			' ' + ('0' + agora.getHours()).slice(-2) + ':' + ('0' + agora.getMinutes()).slice(-2);
+		state.etiquetasHistorico.push({ tipo: state.pendingPrintTipo, data: dataStr, operador: 'Operador Demo' });
+		toast('Etiquetas ' + (state.pendingPrintTipo === 'reimpressao' ? 'reimpressas' : 'impressas') + ' com sucesso.', 'success');
+		fecharOverlay('overlayEtiquetas');
+		render();
+	}
+
+	/* ══════════════ Enviar para faturamento ══════════════ */
+	function enviarFaturamento() {
+		if (faturamentoBloqueado() || state.statusAtual === 'faturamento') return;
+		updateHeroStatus('faturamento');
+		render();
+		var box = document.getElementById('avancarSucesso');
+		box.hidden = false;
+		box.innerHTML = '<p class="op-actions__ok-msg" style="margin-top:10px;">✓ Pedido enviado para o Faturamento com sucesso. <a href="08-faturamento.html" class="op-btn op-btn--ghost" style="margin-left:8px; display:inline-flex;">Abrir Faturamento →</a></p>';
+		toast('Pedido №16 enviado para o Faturamento.', 'success');
+	}
+
+	/* ══════════════ Reiniciar demonstração / Restaurar teste ══════════════ */
+	function reiniciarDemo(targetStatus) {
+		state.items = pristineItems();
+		state.nextId = 4;
+		state.novaLinhaAtiva = false;
+		state.novaLinhaSelecionado = null;
+		state.pesoDrafts = {};
+		state.etiquetasHistorico = [];
+		var idx = TIMELINE.indexOf(targetStatus);
+		var idxSeparacao = TIMELINE.indexOf('em_separacao');
+		if (idx > idxSeparacao) {
+			state.items.forEach(function (i) {
+				i.conferido = true;
+				i.pesoReal = i.pesoUnit != null ? pesoAprox(i) : 0.5;
+				i.meta = 'conferido antes do avanço · Operador Demo';
+			});
+		}
+		document.getElementById('avancarSucesso').hidden = true;
+		document.getElementById('avancarSucesso').innerHTML = '';
+		updateHeroStatus(targetStatus);
+		render();
+		toast('Função exclusiva do protótipo. Não existe no sistema de produção.');
+	}
+
+	function restaurarCamaraFria() { reiniciarDemo('em_separacao'); }
+
+	/* ══════════════ Overlays genéricos ══════════════ */
+	function abrirOverlay(id) { document.getElementById(id).hidden = false; }
+	function fecharOverlay(id) { document.getElementById(id).hidden = true; }
+
+	/* ══════════════ Listeners ══════════════ */
+	document.addEventListener('DOMContentLoaded', function () {
+		render();
+		updateHeroStatus(state.statusAtual);
+
+		// Delegação de eventos na tabela
+		document.getElementById('camaraTbody').addEventListener('click', function (e) {
+			var btn = e.target.closest('button');
+			if (!btn) return;
+			var action = btn.getAttribute('data-action');
+			var id = btn.getAttribute('data-id');
+			if (action === 'conferir') conferirItem(id);
+			else if (action === 'desmarcar') desmarcarConferencia(id);
+			else if (action === 'inc-qty') alterarQuantidade(id, 1);
+			else if (action === 'dec-qty') alterarQuantidade(id, -1);
+			else if (action === 'remover') abrirRemover(id);
+			else if (action === 'selecionar-produto') selecionarProduto(btn.getAttribute('data-codigo'));
+			else if (action === 'inc-draft-qty') { state.novaLinhaQty = state.novaLinhaQty + 1; render(); }
+			else if (action === 'dec-draft-qty') { state.novaLinhaQty = Math.max(1, state.novaLinhaQty - 1); render(); }
+			else if (btn.id === 'btnAdicionarProduto') iniciarNovaLinha();
+			else if (btn.id === 'btnCancelarNovaLinha') cancelarNovaLinha();
+			else if (btn.id === 'btnConfirmarNovaLinha') confirmarNovaLinha();
+		});
+
+		document.getElementById('camaraTbody').addEventListener('input', function (e) {
+			var el = e.target;
+			var action = el.getAttribute('data-action');
+			if (action === 'peso-input') {
+				state.pesoDrafts[el.getAttribute('data-id')] = el.value;
+			} else if (action === 'qty-input') {
+				setQuantidade(el.getAttribute('data-id'), el.value);
+			} else if (el.id === 'draftBuscaInput') {
+				state.novaLinhaBusca = el.value;
+				var pos = el.selectionStart;
+				render();
+				var el2 = document.getElementById('draftBuscaInput');
+				if (el2) { el2.focus(); el2.setSelectionRange(pos, pos); }
+			} else if (el.id === 'draftQtyInput') {
+				state.novaLinhaQty = Math.max(1, parseInt(el.value, 10) || 1);
+			}
+		});
+
+		// Modal: produto duplicado
+		document.getElementById('duplicadoCancelar').addEventListener('click', function () {
+			fecharOverlay('overlayDuplicado');
+			state.pendingModalDuplicado = null;
+		});
+		document.getElementById('duplicadoNovaLinha').addEventListener('click', function () {
+			var p = state.pendingModalDuplicado.produto;
+			fecharOverlay('overlayDuplicado');
+			state.pendingModalDuplicado = null;
+			state.novaLinhaSelecionado = p;
+			state.novaLinhaQty = 1;
+			render();
+		});
+		document.getElementById('duplicadoAumentar').addEventListener('click', function () {
+			var existente = state.pendingModalDuplicado.existente;
+			existente.qty += state.novaLinhaQty || 1;
+			if (existente.conferido) { existente.conferido = false; state.pesoDrafts[existente.id] = existente.pesoReal != null ? String(existente.pesoReal) : ''; }
+			fecharOverlay('overlayDuplicado');
+			state.pendingModalDuplicado = null;
+			state.novaLinhaAtiva = false;
+			state.novaLinhaSelecionado = null;
+			toast('Quantidade de ' + existente.nome + ' aumentada.', 'success');
+			render();
+		});
+
+		// Modal: remover item
+		document.getElementById('removerMotivo').addEventListener('change', function () {
+			var outro = this.value === 'Outro';
+			document.getElementById('removerOutroWrap').hidden = !outro;
+			document.getElementById('removerConfirmar').disabled = outro ? !document.getElementById('removerMotivoOutro').value.trim() : !this.value;
+		});
+		document.getElementById('removerMotivoOutro').addEventListener('input', function () {
+			document.getElementById('removerConfirmar').disabled = !this.value.trim();
+		});
+		document.getElementById('removerCancelar').addEventListener('click', function () { fecharOverlay('overlayRemover'); removerAlvoId = null; });
+		document.getElementById('removerConfirmar').addEventListener('click', function () {
+			if (!removerAlvoId) return;
+			var idx = state.items.findIndex(function (i) { return i.id === removerAlvoId; });
+			if (idx === -1) return;
+			var removido = state.items[idx];
+			state.items.splice(idx, 1);
+			fecharOverlay('overlayRemover');
+			removerAlvoId = null;
+			toast(removido.nome + ' removido do pedido.', 'success');
+			render();
+		});
+
+		// Etiquetas: visualizar / imprimir / reimprimir
+		document.getElementById('btnVisualizarEtiquetas').addEventListener('click', function () {
+			if (this.disabled) return;
+			abrirModalEtiquetas(etiquetaJaImpressa() ? 'somente-visualizacao' : 'inicial');
+		});
+		document.getElementById('btnImprimirEtiquetas').addEventListener('click', function () {
+			if (this.disabled) return;
+			abrirModalEtiquetas('inicial');
+		});
+		document.getElementById('btnReimprimirEtiquetas').addEventListener('click', function () {
+			if (this.disabled) return;
+			document.getElementById('reimprimirTexto').textContent = 'As etiquetas serão geradas novamente com os dados mais atuais do pedido.' +
+				(qtdReimpressoes() > 0 ? (' Esta será a ' + (qtdReimpressoes() + 1) + 'ª reimpressão.') : '');
+			document.getElementById('reimprimirMotivo').value = '';
+			document.getElementById('reimprimirMotivoOutro').value = '';
+			document.getElementById('reimprimirOutroWrap').hidden = true;
+			document.getElementById('reimprimirConfirmar').disabled = true;
+			abrirOverlay('overlayReimprimir');
+		});
+		document.getElementById('etiquetasModalFechar').addEventListener('click', function () { fecharOverlay('overlayEtiquetas'); });
+		document.getElementById('etiquetasModalImprimir').addEventListener('click', imprimirNoModal);
+
+		document.getElementById('reimprimirMotivo').addEventListener('change', function () {
+			var outro = this.value === 'Outro';
+			document.getElementById('reimprimirOutroWrap').hidden = !outro;
+			document.getElementById('reimprimirConfirmar').disabled = outro ? !document.getElementById('reimprimirMotivoOutro').value.trim() : !this.value;
+		});
+		document.getElementById('reimprimirMotivoOutro').addEventListener('input', function () {
+			document.getElementById('reimprimirConfirmar').disabled = !this.value.trim();
+		});
+		document.getElementById('reimprimirCancelar').addEventListener('click', function () { fecharOverlay('overlayReimprimir'); });
+		document.getElementById('reimprimirConfirmar').addEventListener('click', function () {
+			fecharOverlay('overlayReimprimir');
+			abrirModalEtiquetas('reimpressao');
+		});
+
+		// Avançar pedido
+		document.getElementById('btnAvancarFaturamento').addEventListener('click', enviarFaturamento);
+
+		// Ferramentas de demonstração
+		document.getElementById('btnResetCamaraFria').addEventListener('click', restaurarCamaraFria);
+		document.getElementById('btnReiniciarDemo').addEventListener('click', function () {
+			var status = document.getElementById('selectReiniciarStatus').value;
+			reiniciarDemo(status);
+			document.getElementById('toolsPanel').open = true;
+		});
+
+		// Fechar overlays clicando fora ou Esc
+		['overlayDuplicado', 'overlayRemover', 'overlayReimprimir', 'overlayEtiquetas'].forEach(function (id) {
+			document.getElementById(id).addEventListener('click', function (e) {
+				if (e.target === this) fecharOverlay(id);
+			});
+		});
+		document.addEventListener('keydown', function (e) {
+			if (e.key === 'Escape') {
+				['overlayDuplicado', 'overlayRemover', 'overlayReimprimir', 'overlayEtiquetas'].forEach(fecharOverlay);
+			}
+		});
+	});
+})();
+</script>
+</body>
+</html>

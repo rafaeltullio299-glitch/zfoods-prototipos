@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Catálogo — Handoff ZFoods</title>
+<link rel="stylesheet" href="assets/style.css" />
+<style>
+	.catalog-page { max-width: 1200px; margin: 0 auto; padding: 20px 20px 60px; }
+	.toolbar-controls { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; }
+	.toolbar-search { position: relative; flex: 1; max-width: 380px; }
+	.toolbar-search input { padding-left: 38px; }
+	.toolbar-search .icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--zf-warm-gray); }
+	.filters-shell { display: flex; gap: 8px; overflow-x: auto; padding: 4px 0 16px; }
+	.filter-chip { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 999px; border: 1px solid var(--zf-border); background: #fff; font-size: 0.84rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
+	.filter-chip.is-active { background: var(--zf-burgundy); color: #fff; border-color: var(--zf-burgundy); }
+	.active-filter-bar { display: flex; gap: 10px; font-size: 0.82rem; color: var(--zf-burgundy); background: var(--zf-cream); padding: 8px 14px; border-radius: var(--zf-radius-sm); margin-bottom: 14px; }
+
+	.catalog-results { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 18px; }
+	.card { border-radius: var(--zf-radius-md); overflow: hidden; cursor: pointer; background: #fff; border: 1px solid var(--zf-border); transition: box-shadow 150ms; }
+	.card:hover { box-shadow: var(--zf-shadow-md); }
+	.card-img { position: relative; height: 140px; background: var(--zf-cream-dark); display: flex; align-items: center; justify-content: center; font-size: 2.2rem; }
+	.card-badge { position: absolute; top: 8px; left: 8px; font-size: 0.65rem; font-weight: 700; padding: 3px 8px; border-radius: 999px; }
+	.card-badge.disponivel { background: var(--zf-success-bg); color: var(--zf-success); }
+	.card-badges-right { position: absolute; top: 8px; right: 8px; display: flex; flex-direction: column; gap: 4px; align-items: flex-end; }
+	.card-badge-promo { background: var(--zf-copper-light); color: #fff; font-size: 0.65rem; font-weight: 700; padding: 3px 8px; border-radius: 999px; }
+	.card-badge-top { background: var(--zf-success); color: #fff; font-size: 0.65rem; font-weight: 700; padding: 3px 8px; border-radius: 999px; }
+	.card-body { padding: 12px 14px; }
+	.card-name { margin: 0 0 4px; font-size: 0.88rem; }
+	.card-desc { margin: 0 0 8px; font-size: 0.76rem; color: var(--zf-warm-gray); }
+	.card-pricing { display: flex; align-items: baseline; gap: 6px; }
+	.card-price { font-weight: 700; color: var(--zf-burgundy); }
+	.card-price-old { color: var(--zf-warm-gray-light); font-size: 0.8rem; }
+	.card-unit { font-size: 0.72rem; color: var(--zf-warm-gray); }
+	.card-weight { display: block; font-size: 0.7rem; color: var(--zf-warm-gray); margin-top: 4px; }
+</style>
+</head>
+<body data-current="catalogo">
+<div class="proto-page">
+	<header class="proto-banner">
+		<span class="proto-banner__tag">Handoff · Catálogo</span>
+		<a href="index.html">← Voltar ao índice</a>
+	</header>
+
+	<nav class="zf-navbar">
+		<div class="zf-navbar__inner">
+			<a class="zf-navbar__logo zf-serif" href="index.html">ZFoods</a>
+			<div class="zf-navbar__links">
+				<a href="index.html" data-nav="home">Início</a>
+				<a href="01-catalogo.html" data-nav="catalogo">Catálogo</a>
+			</div>
+			<div class="zf-navbar__actions">
+				<a class="zf-icon-btn" href="02-carrinho.html" title="Carrinho">🛒<span class="zf-icon-btn__badge">2</span></a>
+			</div>
+		</div>
+	</nav>
+
+	<main class="proto-main">
+		<div class="container" style="padding-top:16px;">
+			<div class="future-note">Recriado a partir de <code>catalog-page.component.html</code>, <code>catalog-filters.component.ts</code> e <code>product-card.component.ts</code> — pasta principal (branch <code>111-top-vendas</code>). Classes de badge (Disponível/Promoção/Top vendas) e estrutura do card copiadas literalmente.</div>
+		</div>
+
+		<div class="catalog-page">
+			<section class="toolbar-controls">
+				<div class="toolbar-search"><span class="icon">🔍</span><input type="search" placeholder="Buscar produtos..." /></div>
+				<select style="max-width:180px;"><option>Relevância</option><option>Menor preço</option><option>Maior preço</option></select>
+			</section>
+
+			<nav class="filters-shell">
+				<button class="filter-chip is-active">🔲 Todos</button>
+				<button class="filter-chip">Carnes</button>
+				<button class="filter-chip">Laticínios</button>
+				<button class="filter-chip">Hortifruti</button>
+				<button class="filter-chip">Padaria</button>
+				<button class="filter-chip">Mercearia</button>
+			</nav>
+
+			<section class="catalog-results">
+				<a class="card" href="#" style="text-decoration:none; color:inherit;">
+					<div class="card-img">📦
+						<span class="card-badge disponivel">Disponível</span>
+						<div class="card-badges-right"><span class="card-badge-top">📈 Top vendas</span></div>
+					</div>
+					<div class="card-body"><h3 class="card-name">Produto Teste Kg</h3>
+						<div class="card-pricing"><span class="card-price">R$ 39,90</span><span class="card-unit">/ KG</span></div>
+						<span class="card-weight">⚖️ 0,500 KG</span>
+					</div>
+				</a>
+				<a class="card" href="#" style="text-decoration:none; color:inherit;">
+					<div class="card-img">📦
+						<span class="card-badge disponivel">Disponível</span>
+						<div class="card-badges-right"><span class="card-badge-promo">⚡ Promoção <strong>−20%</strong></span><span class="card-badge-top">📈 Top vendas</span></div>
+					</div>
+					<div class="card-body"><h3 class="card-name">Produto Teste Promo</h3>
+						<div class="card-pricing promo"><s class="card-price-old">R$ 31,25</s><span class="card-price">R$ 25,00</span></div>
+					</div>
+				</a>
+				<a class="card" href="#" style="text-decoration:none; color:inherit;">
+					<div class="card-img">📦<span class="card-badge disponivel">Disponível</span></div>
+					<div class="card-body"><h3 class="card-name">Produto Teste Caixa</h3>
+						<p class="card-desc">Caixa com 12 unidades</p>
+						<div class="card-pricing"><span class="card-price">R$ 89,90</span><span class="card-unit">/ UNID</span></div>
+					</div>
+				</a>
+			</section>
+		</div>
+	</main>
+</div>
+<script src="assets/app.js"></script>
+</body>
+</html>

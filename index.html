@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Handoff ZFoods — Guia visual para novos devs</title>
+<link rel="stylesheet" href="assets/style.css" />
+<style>
+	.hub-hero { background: linear-gradient(135deg, var(--zf-burgundy) 0%, var(--zf-burgundy-dark) 100%); color: #fff; padding: 56px 0 44px; }
+	.hub-hero h1 { font-size: 2.1rem; margin: 0 0 10px; }
+	.hub-hero p { max-width: 680px; color: #F0E1DD; line-height: 1.6; margin: 0 0 18px; }
+	.hub-hero .hub-meta { display: flex; gap: 18px; flex-wrap: wrap; font-size: 0.82rem; color: #F0E1DD; }
+	.hub-hero .hub-meta strong { color: #fff; }
+	.hub-section-title { display: flex; align-items: baseline; gap: 10px; margin: 0 0 4px; }
+	.hub-section-title h2 { margin: 0; font-size: 1.4rem; }
+	.hub-section-sub { color: var(--zf-warm-gray); margin: 0 0 24px; font-size: 0.88rem; }
+	.hub-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); margin-bottom: 48px; }
+	.proto-card { display: flex; flex-direction: column; gap: 10px; padding: 20px; text-decoration: none; color: inherit; transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease; }
+	.proto-card:hover { transform: translateY(-3px); box-shadow: var(--zf-shadow-md); border-color: var(--zf-copper-light); }
+	.proto-card__top { display: flex; align-items: center; justify-content: space-between; }
+	.proto-card__icon { width: 42px; height: 42px; border-radius: 50%; background: var(--zf-cream); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; }
+	.proto-card__num { font-size: 0.72rem; font-weight: 700; color: var(--zf-warm-gray-light); }
+	.proto-card h3 { margin: 0; font-size: 1.02rem; }
+	.proto-card p { margin: 0; font-size: 0.82rem; color: var(--zf-warm-gray); line-height: 1.5; flex: 1; }
+	.proto-card__source { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; padding: 3px 9px; border-radius: 999px; align-self: flex-start; }
+	.src-top-vendas { background: var(--zf-info-bg); color: var(--zf-info); }
+	.src-rafael-lab { background: var(--zf-success-bg); color: var(--zf-success); }
+	.src-planejado { background: var(--zf-warning-bg); color: var(--zf-warning); }
+	.proto-card__footer { display: flex; align-items: center; justify-content: flex-start; margin-top: 4px; }
+	.proto-card__btn { display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; border-radius: 999px; background: var(--zf-burgundy); color: #fff; font-size: 0.8rem; font-weight: 700; }
+	.proto-card:hover .proto-card__btn { background: var(--zf-burgundy-dark); }
+	.hub-footer { background: var(--zf-charcoal); color: #D8CFC2; padding: 32px 0; font-size: 0.82rem; }
+	.hub-footer a { color: #F5EBD9; }
+	.legend { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 28px; font-size: 0.78rem; }
+	.legend span { display: inline-flex; align-items: center; gap: 6px; }
+	.legend .dot { width: 10px; height: 10px; border-radius: 50%; }
+</style>
+</head>
+<body data-current="index">
+<div class="proto-page">
+	<header class="proto-banner">
+		<span class="proto-banner__tag">Handoff ZFoods</span>
+		<span>Documentação visual para onboarding — HTML/CSS/JS, sem backend, recriado a partir do código real</span>
+	</header>
+
+	<main class="proto-main">
+		<section class="hub-hero">
+			<div class="container">
+				<h1 class="zf-serif">Guia visual do ZFoods para novos desenvolvedores</h1>
+				<p>9 telas navegáveis recriadas a partir dos componentes Angular reais do projeto — cada uma com uma explicação do objetivo e das funcionalidades implementadas, para você entender rapidamente como o sistema funciona antes de mexer no código.</p>
+				<div class="hub-meta">
+					<span><strong>9</strong> telas</span>
+					<span><strong>2</strong> branches como fonte: <code style="color:#fff;">111-top-vendas</code> e <code style="color:#fff;">rafael-lab</code></span>
+					<span><strong>0</strong> dependências de servidor rodando</span>
+				</div>
+			</div>
+		</section>
+
+		<section class="section">
+			<div class="container">
+				<div class="legend">
+					<span><span class="dot" style="background:var(--zf-info);"></span> Fonte: branch <code>111-top-vendas</code></span>
+					<span><span class="dot" style="background:var(--zf-success);"></span> Fonte: branch <code>rafael-lab</code></span>
+					<span><span class="dot" style="background:var(--zf-warning);"></span> Planejado — ainda não implementado</span>
+				</div>
+
+				<div class="hub-section-title"><span>🛍️</span><h2>Área do Cliente</h2></div>
+				<p class="hub-section-sub">Jornada de compra: catálogo, carrinho e checkout de 5 etapas.</p>
+				<div class="grid hub-grid">
+					<a class="card proto-card" href="01-catalogo.html">
+						<div class="proto-card__top"><div class="proto-card__icon">🗂️</div><span class="proto-card__num">01</span></div>
+						<h3>Catálogo</h3>
+						<p>Busca, filtro por categoria e grid de produtos com badges de disponibilidade, promoção e top vendas.</p>
+						<span class="proto-card__source src-top-vendas">111-top-vendas</span>
+						<div class="proto-card__footer"><span class="proto-card__btn">Abrir protótipo →</span></div>
+					</a>
+					<a class="card proto-card" href="02-carrinho.html">
+						<div class="proto-card__top"><div class="proto-card__icon">🛒</div><span class="proto-card__num">02</span></div>
+						<h3>Carrinho</h3>
+						<p>Drawer lateral com itens, peso total, toggle entrega/retirada e regra de pedido mínimo (R$ 400).</p>
+						<span class="proto-card__source src-top-vendas">111-top-vendas</span>
+						<div class="proto-card__footer"><span class="proto-card__btn">Abrir protótipo →</span></div>
+					</a>
+					<a class="card proto-card" href="03-checkout.html">
+						<div class="proto-card__top"><div class="proto-card__icon">✅</div><span class="proto-card__num">03</span></div>
+						<h3>Checkout (5 etapas)</h3>
+						<p>Fluxo final: como receber, endereço, data de entrega, forma de pagamento e confirmação.</p>
+						<span class="proto-card__source src-top-vendas">111-top-vendas</span>
+						<div class="proto-card__footer"><span class="proto-card__btn">Abrir protótipo →</span></div>
+					</a>
+				</div>
+
+				<div class="hub-section-title"><span>🛠️</span><h2>Área Administrativa</h2></div>
+				<p class="hub-section-sub">Operação interna: dashboard, quadro de pedidos, câmara fria, financeiro e faturamento.</p>
+				<div class="grid hub-grid">
+					<a class="card proto-card" href="04-dashboard-admin.html">
+						<div class="proto-card__top"><div class="proto-card__icon">📊</div><span class="proto-card__num">04</span></div>
+						<h3>Dashboard Admin</h3>
+						<p>KPIs operacionais e atalhos para as principais áreas do painel.</p>
+						<span class="proto-card__source src-rafael-lab">rafael-lab</span>
+						<div class="proto-card__footer"><span class="proto-card__btn">Abrir protótipo →</span></div>
+					</a>
+					<a class="card proto-card" href="05-kanban.html">
+						<div class="proto-card__top"><div class="proto-card__icon">🧾</div><span class="proto-card__num">05</span></div>
+						<h3>Kanban (Quadro)</h3>
+						<p>Quadro de pedidos por etapa — 9 colunas, do Pendente ao Entregue/Cancelado.</p>
+						<span class="proto-card__source src-rafael-lab">rafael-lab</span>
+						<div class="proto-card__footer"><span class="proto-card__btn">Abrir protótipo →</span></div>
+					</a>
+					<a class="card proto-card" href="06-cadastro-financeiro.html">
+						<div class="proto-card__top"><div class="proto-card__icon">💰</div><span class="proto-card__num">06</span></div>
+						<h3>Cadastro Financeiro</h3>
+						<p>Análise cadastral em 4 etapas (dados, fiscal, comercial, crédito) antes do envio ao Sentus.</p>
+						<span class="proto-card__source src-rafael-lab">rafael-lab</span>
+						<div class="proto-card__footer"><span class="proto-card__btn">Abrir protótipo →</span></div>
+					</a>
+					<a class="card proto-card" href="07-camara-fria.html">
+						<div class="proto-card__top"><div class="proto-card__icon">🧊</div><span class="proto-card__num">07</span></div>
+						<h3>Câmara Fria</h3>
+						<p>Conferência de peso real vs. aproximado por item, adicionar/remover produto, alterar quantidade.</p>
+						<span class="proto-card__source src-rafael-lab">rafael-lab</span>
+						<div class="proto-card__footer"><span class="proto-card__btn">Abrir protótipo →</span></div>
+					</a>
+					<a class="card proto-card" href="08-faturamento.html">
+						<div class="proto-card__top"><div class="proto-card__icon">📤</div><span class="proto-card__num">08</span></div>
+						<h3>Faturamento</h3>
+						<p>Checklist de pré-envio, integração com Sentus e confirmação de nota fiscal.</p>
+						<span class="proto-card__source src-rafael-lab">rafael-lab</span>
+						<div class="proto-card__footer"><span class="proto-card__btn">Abrir protótipo →</span></div>
+					</a>
+					<a class="card proto-card" href="09-portal-vendedor.html">
+						<div class="proto-card__top"><div class="proto-card__icon">🚧</div><span class="proto-card__num">09</span></div>
+						<h3>Portal do Vendedor</h3>
+						<p>Roadmap da Etapa 6 — ainda não implementado, apenas o modelo de dados existe.</p>
+						<span class="proto-card__source src-planejado">Planejado</span>
+						<div class="proto-card__footer"><span class="proto-card__btn">Abrir protótipo →</span></div>
+					</a>
+				</div>
+			</div>
+		</section>
+	</main>
+
+	<footer class="hub-footer">
+		<div class="container flex-between" style="flex-wrap: wrap; gap: 8px;">
+			<span>ZFoods — Handoff · Documentação visual gerada a partir do código real do projeto</span>
+			<span>Gerado em <code>docs/handoff/</code> · não versionado como parte do build Angular</span>
+		</div>
+	</footer>
+</div>
+<script src="assets/app.js"></script>
+</body>
+</html>

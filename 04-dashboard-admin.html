@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Painel Administrativo</title>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..700&display=swap" rel="stylesheet">
+<style>
+	* { box-sizing: border-box; }
+	html, body { margin: 0; min-height: 100%; }
+	body { font-family: 'DM Sans', 'Source Sans 3', sans-serif; color: #1c1917; background: #fefaf5; }
+	.material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; font-size: 20px; line-height: 1; vertical-align: middle; }
+
+	/* ══════════════ material-theme.scss — design tokens globais ══════════════ */
+	:root {
+		--zf-burgundy: #6b1d2a;
+		--zf-burgundy-dark: #4a1019;
+		--zf-burgundy-light: #8b2e3d;
+		--zf-cream: #fdf6ec;
+		--zf-cream-dark: #f5ebd9;
+		--zf-copper: #b8722d;
+		--zf-copper-light: #d4943f;
+		--zf-charcoal: #1c1917;
+		--zf-warm-gray: #78716c;
+		--zf-warm-gray-light: #a8a29e;
+		--zf-border: #e7ddd1;
+		--zf-border-light: #f0e8dd;
+		--zf-surface: #fefaf5;
+		--zf-surface-card: #ffffff;
+		--zf-success: #166534;
+		--zf-success-bg: #dcfce7;
+		--zf-shadow-sm: 0 1px 3px rgb(28 25 23 / 0.06), 0 1px 2px rgb(28 25 23 / 0.04);
+		--zf-shadow-md: 0 4px 12px rgb(28 25 23 / 0.08), 0 2px 4px rgb(28 25 23 / 0.04);
+		--zf-shadow-lg: 0 10px 30px rgb(28 25 23 / 0.1), 0 4px 8px rgb(28 25 23 / 0.06);
+		--zf-radius-sm: 6px;
+		--zf-radius-md: 10px;
+		--zf-radius-lg: 16px;
+
+		/* ══════════════ admin-layout.component.ts :host — sidenav tokens ══════════════ */
+		--snav-bg: #6b1d2a;
+		--snav-bg-dark: #4a1019;
+		--snav-text: rgba(253, 246, 236, 0.82);
+		--snav-text-full: #fdf6ec;
+		--snav-active: #d4943f;
+		--snav-active-bg: rgba(212, 148, 63, 0.18);
+		--snav-hover-bg: rgba(253, 246, 236, 0.07);
+		--snav-divider: rgba(253, 246, 236, 0.14);
+	}
+
+	/* ── Container / Sidenav / Toolbar (admin-layout.component.ts) ── */
+	.layout-container { position: relative; display: flex; min-height: 100vh; }
+	.sidenav {
+		width: 260px; flex-shrink: 0; background: var(--snav-bg); color: var(--snav-text);
+		display: flex; flex-direction: column;
+	}
+	.sidenav-brand {
+		display: flex; align-items: center; gap: 8px;
+		padding: 22px 12px 18px 20px; border-bottom: 1px solid var(--snav-divider); flex-shrink: 0;
+	}
+	.brand-name { font-family: 'DM Serif Display', Georgia, serif; font-size: 1.625rem; color: var(--snav-text-full); letter-spacing: -0.02em; line-height: 1; }
+	.brand-badge {
+		font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+		color: var(--snav-active); background: rgba(212, 148, 63, 0.16); padding: 2px 7px;
+		border-radius: 4px; border: 1px solid rgba(212, 148, 63, 0.3);
+	}
+	.collapse-button { flex-shrink: 0; margin-left: auto; color: var(--snav-text); background: none; border: none; cursor: pointer; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+	.collapse-button:hover { color: var(--snav-text-full); background: var(--snav-hover-bg); }
+
+	.nav-list { padding: 10px 0; flex: 1; list-style: none; margin: 0; }
+	.nav-item {
+		display: flex; align-items: center; gap: 16px; margin: 2px 10px; padding: 0 16px;
+		border-radius: var(--zf-radius-md); min-height: 44px; color: var(--snav-text); text-decoration: none; font-size: 0.875rem;
+	}
+	.nav-item:hover { background: var(--snav-hover-bg); color: var(--snav-text-full); }
+	.nav-item.active { background-color: var(--snav-active-bg); color: var(--snav-active); font-weight: 500; }
+	.nav-item .material-symbols-outlined { font-size: 20px; }
+	.nav-external { color: rgba(253, 246, 236, 0.55); }
+	.nav-external .material-symbols-outlined { color: rgba(253, 246, 236, 0.45); }
+	.nav-external:hover { color: var(--snav-text-full); }
+	.nav-divider { margin: 8px 14px; border: none; border-top: 1px solid var(--snav-divider); }
+
+	.content { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+	.toolbar {
+		position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 4px;
+		height: 64px; padding: 0 16px; background: var(--zf-surface-card);
+		border-bottom: 1px solid var(--zf-border); box-shadow: var(--zf-shadow-sm);
+	}
+	.menu-button { margin-right: 4px; background: none; border: none; cursor: pointer; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--zf-warm-gray); }
+	.menu-button:hover { background: rgba(28,25,23,0.05); }
+	.toolbar-title { font-size: 0.9375rem; font-weight: 600; color: var(--zf-charcoal); letter-spacing: -0.01em; }
+	.spacer { flex: 1 1 auto; }
+	.admin-name { font-size: 0.8125rem; font-weight: 500; color: var(--zf-warm-gray); max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+	.logout-btn { background: none; border: none; cursor: pointer; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--zf-warm-gray); }
+	.logout-btn:hover { background: rgba(28,25,23,0.05); }
+
+	.main-content { flex: 1; padding: 24px; box-sizing: border-box; background-color: var(--zf-surface); }
+
+	/* ══════════════ admin-dashboard.component.ts ══════════════ */
+
+	/* ── Page header ── */
+	.page-header { margin-bottom: 28px; }
+	.page-title {
+		font-family: 'DM Serif Display', Georgia, serif; font-size: 1.875rem; font-weight: 400;
+		color: var(--zf-charcoal); letter-spacing: -0.02em; margin: 0 0 4px; line-height: 1.2;
+	}
+	.page-subtitle { font-size: 0.9375rem; color: var(--zf-warm-gray); margin: 0; }
+
+	/* ── Stat cards ── */
+	.stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; margin-bottom: 36px; }
+	.stat-card {
+		display: flex; align-items: center; gap: 16px; padding: 18px 16px;
+		background: var(--zf-surface-card); border: 1px solid var(--zf-border); border-radius: var(--zf-radius-lg);
+		text-decoration: none; color: inherit; cursor: pointer; box-shadow: var(--zf-shadow-sm);
+		transition: box-shadow 200ms ease, border-color 200ms ease, transform 200ms ease;
+	}
+	.stat-card:hover { box-shadow: var(--zf-shadow-md); border-color: var(--zf-copper); transform: translateY(-1px); }
+	.stat-card:focus-visible { outline: 2px solid var(--zf-burgundy); outline-offset: 2px; }
+	.stat-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+	.stat-icon .material-symbols-outlined { font-size: 22px; }
+	.stat-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+	.stat-label { font-size: 0.8125rem; font-weight: 500; color: var(--zf-warm-gray); line-height: 1.3; }
+	.stat-value { font-size: 1.625rem; font-weight: 700; color: var(--zf-charcoal); line-height: 1; font-variant-numeric: tabular-nums; }
+	.stat-arrow { color: var(--zf-warm-gray-light); font-size: 18px; flex-shrink: 0; margin-left: auto; }
+
+	/* ── Quick section ── */
+	.section-heading { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--zf-warm-gray); margin: 0 0 12px; }
+	.quick-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+	.quick-card {
+		display: inline-flex; align-items: center; gap: 7px; padding: 9px 14px;
+		background: var(--zf-surface-card); border: 1px solid var(--zf-border); border-radius: var(--zf-radius-md);
+		text-decoration: none; color: var(--zf-charcoal); font-size: 0.875rem; font-weight: 500; cursor: pointer;
+		box-shadow: var(--zf-shadow-sm); transition: background-color 150ms ease, border-color 150ms ease;
+	}
+	.quick-card:hover { background-color: var(--zf-cream); border-color: var(--zf-copper); }
+	.quick-card:focus-visible { outline: 2px solid var(--zf-burgundy); outline-offset: 2px; }
+	.quick-card .material-symbols-outlined { font-size: 17px; color: var(--zf-warm-gray); }
+	.quick-card--highlight { border-color: var(--zf-copper); color: var(--zf-copper); }
+	.quick-card--highlight .material-symbols-outlined { color: var(--zf-copper); }
+	.quick-card--highlight:hover { background-color: rgba(184, 114, 45, 0.06); }
+</style>
+</head>
+<body>
+<div class="layout-container">
+	<nav class="sidenav">
+		<div class="sidenav-brand">
+			<span class="brand-name">ZFood</span>
+			<span class="brand-badge">Admin</span>
+			<button class="collapse-button" aria-label="Fechar menu"><span class="material-symbols-outlined">chevron_left</span></button>
+		</div>
+		<ul class="nav-list">
+			<li><a class="nav-item nav-external" href="01-catalogo.html"><span class="material-symbols-outlined">storefront</span><span>Ver Catálogo</span></a></li>
+			<hr class="nav-divider" />
+			<li><a class="nav-item active" href="04-dashboard-admin.html"><span class="material-symbols-outlined">dashboard</span><span>Dashboard</span></a></li>
+			<li><a class="nav-item" href="05-kanban.html"><span class="material-symbols-outlined">receipt_long</span><span>Pedidos</span></a></li>
+			<li><a class="nav-item" href="06-cadastro-financeiro.html"><span class="material-symbols-outlined">account_balance</span><span>Cadastros Financeiros</span></a></li>
+			<li><a class="nav-item" href="#"><span class="material-symbols-outlined">people</span><span>Usuários</span></a></li>
+			<li><a class="nav-item" href="#"><span class="material-symbols-outlined">inventory_2</span><span>Produtos</span></a></li>
+			<li><a class="nav-item" href="#"><span class="material-symbols-outlined">category</span><span>Categorias</span></a></li>
+			<li><a class="nav-item" href="#"><span class="material-symbols-outlined">sync</span><span>Sincronização</span></a></li>
+			<li><a class="nav-item" href="#"><span class="material-symbols-outlined">settings</span><span>Configurações</span></a></li>
+		</ul>
+	</nav>
+
+	<div class="content">
+		<header class="toolbar">
+			<button class="menu-button" aria-label="Abrir menu"><span class="material-symbols-outlined">menu</span></button>
+			<span class="toolbar-title">Painel Administrativo</span>
+			<span class="spacer"></span>
+			<span class="admin-name">Administrador ZFOODs</span>
+			<button class="logout-btn" aria-label="Sair"><span class="material-symbols-outlined">logout</span></button>
+		</header>
+
+		<main class="main-content">
+			<div class="page-header">
+				<h1 class="page-title">Dashboard</h1>
+				<p class="page-subtitle">Visão geral da operação ZFood</p>
+			</div>
+
+			<div class="stats-grid" role="list">
+				<a class="stat-card" href="05-kanban.html" role="listitem" aria-label="Total de pedidos: —">
+					<div class="stat-icon" style="background: rgba(107, 29, 42, 0.1); color: #6b1d2a;"><span class="material-symbols-outlined" aria-hidden="true">receipt_long</span></div>
+					<div class="stat-body"><span class="stat-label">Total de pedidos</span><span class="stat-value">—</span></div>
+					<span class="material-symbols-outlined stat-arrow" aria-hidden="true">chevron_right</span>
+				</a>
+				<a class="stat-card" href="05-kanban.html" role="listitem" aria-label="Pedidos pendentes: —">
+					<div class="stat-icon" style="background: rgba(184, 114, 45, 0.1); color: #b8722d;"><span class="material-symbols-outlined" aria-hidden="true">schedule</span></div>
+					<div class="stat-body"><span class="stat-label">Pedidos pendentes</span><span class="stat-value">—</span></div>
+					<span class="material-symbols-outlined stat-arrow" aria-hidden="true">chevron_right</span>
+				</a>
+				<a class="stat-card" href="#" role="listitem" aria-label="Produtos ativos: —">
+					<div class="stat-icon" style="background: rgba(22, 101, 52, 0.1); color: #166534;"><span class="material-symbols-outlined" aria-hidden="true">inventory_2</span></div>
+					<div class="stat-body"><span class="stat-label">Produtos ativos</span><span class="stat-value">—</span></div>
+					<span class="material-symbols-outlined stat-arrow" aria-hidden="true">chevron_right</span>
+				</a>
+				<a class="stat-card" href="#" role="listitem" aria-label="Última sincronização: —">
+					<div class="stat-icon" style="background: rgba(29, 78, 216, 0.1); color: #1d4ed8;"><span class="material-symbols-outlined" aria-hidden="true">sync</span></div>
+					<div class="stat-body"><span class="stat-label">Última sincronização</span><span class="stat-value">—</span></div>
+					<span class="material-symbols-outlined stat-arrow" aria-hidden="true">chevron_right</span>
+				</a>
+			</div>
+
+			<section class="quick-section" aria-labelledby="quick-heading">
+				<h2 class="section-heading" id="quick-heading">Acesso rápido</h2>
+				<div class="quick-grid">
+					<a class="quick-card" href="#" aria-label="Produtos"><span class="material-symbols-outlined" aria-hidden="true">inventory_2</span><span>Produtos</span></a>
+					<a class="quick-card" href="05-kanban.html" aria-label="Pedidos"><span class="material-symbols-outlined" aria-hidden="true">receipt_long</span><span>Pedidos</span></a>
+					<a class="quick-card" href="#" aria-label="Categorias"><span class="material-symbols-outlined" aria-hidden="true">category</span><span>Categorias</span></a>
+					<a class="quick-card" href="#" aria-label="Sincronização"><span class="material-symbols-outlined" aria-hidden="true">sync</span><span>Sincronização</span></a>
+					<a class="quick-card quick-card--highlight" href="01-catalogo.html" aria-label="Ver Catálogo"><span class="material-symbols-outlined" aria-hidden="true">storefront</span><span>Ver Catálogo</span></a>
+				</div>
+			</section>
+		</main>
+	</div>
+</div>
+</body>
+</html>

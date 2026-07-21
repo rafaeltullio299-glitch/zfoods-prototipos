@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Painel Administrativo</title>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..700&display=swap" rel="stylesheet">
+<style>
+	* { box-sizing: border-box; }
+	html, body { margin: 0; min-height: 100%; }
+	body { font-family: 'DM Sans', 'Source Sans 3', sans-serif; color: #1c1917; background: #fefaf5; }
+	.material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; font-size: 20px; line-height: 1; vertical-align: middle; }
+
+	/* ══════════════ material-theme.scss + admin-layout.component.ts :host ══════════════ */
+	:root {
+		--zf-burgundy: #6b1d2a; --zf-burgundy-dark: #4a1019; --zf-cream: #fdf6ec; --zf-copper: #b8722d;
+		--zf-charcoal: #1c1917; --zf-warm-gray: #78716c; --zf-warm-gray-light: #a8a29e; --zf-border: #e7ddd1;
+		--zf-surface: #fefaf5; --zf-surface-card: #ffffff;
+		--zf-shadow-sm: 0 1px 3px rgb(28 25 23 / 0.06), 0 1px 2px rgb(28 25 23 / 0.04);
+		--zf-radius-md: 10px;
+
+		--snav-bg: #6b1d2a; --snav-bg-dark: #4a1019; --snav-text: rgba(253, 246, 236, 0.82);
+		--snav-text-full: #fdf6ec; --snav-active: #d4943f; --snav-active-bg: rgba(212, 148, 63, 0.18);
+		--snav-hover-bg: rgba(253, 246, 236, 0.07); --snav-divider: rgba(253, 246, 236, 0.14);
+	}
+
+	/* ── Container / Sidenav / Toolbar (admin-layout.component.ts) ── */
+	.layout-container { position: relative; display: flex; min-height: 100vh; }
+	.sidenav { width: 260px; flex-shrink: 0; background: var(--snav-bg); color: var(--snav-text); display: flex; flex-direction: column; }
+	.sidenav-brand { display: flex; align-items: center; gap: 8px; padding: 22px 12px 18px 20px; border-bottom: 1px solid var(--snav-divider); flex-shrink: 0; }
+	.brand-name { font-family: 'DM Serif Display', Georgia, serif; font-size: 1.625rem; color: var(--snav-text-full); letter-spacing: -0.02em; line-height: 1; }
+	.brand-badge { font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--snav-active); background: rgba(212, 148, 63, 0.16); padding: 2px 7px; border-radius: 4px; border: 1px solid rgba(212, 148, 63, 0.3); }
+	.collapse-button { flex-shrink: 0; margin-left: auto; color: var(--snav-text); background: none; border: none; cursor: pointer; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+	.collapse-button:hover { color: var(--snav-text-full); background: var(--snav-hover-bg); }
+	.nav-list { padding: 10px 0; flex: 1; list-style: none; margin: 0; }
+	.nav-item { display: flex; align-items: center; gap: 16px; margin: 2px 10px; padding: 0 16px; border-radius: var(--zf-radius-md); min-height: 44px; color: var(--snav-text); text-decoration: none; font-size: 0.875rem; }
+	.nav-item:hover { background: var(--snav-hover-bg); color: var(--snav-text-full); }
+	.nav-item.active { background-color: var(--snav-active-bg); color: var(--snav-active); font-weight: 500; }
+	.nav-item .material-symbols-outlined { font-size: 20px; }
+	.nav-external { color: rgba(253, 246, 236, 0.55); }
+	.nav-external .material-symbols-outlined { color: rgba(253, 246, 236, 0.45); }
+	.nav-external:hover { color: var(--snav-text-full); }
+	.nav-divider { margin: 8px 14px; border: none; border-top: 1px solid var(--snav-divider); }
+	.content { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+	.toolbar { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 4px; height: 64px; padding: 0 16px; background: var(--zf-surface-card); border-bottom: 1px solid var(--zf-border); box-shadow: var(--zf-shadow-sm); }
+	.menu-button { margin-right: 4px; background: none; border: none; cursor: pointer; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--zf-warm-gray); }
+	.menu-button:hover { background: rgba(28,25,23,0.05); }
+	.toolbar-title { font-size: 0.9375rem; font-weight: 600; color: var(--zf-charcoal); letter-spacing: -0.01em; }
+	.spacer { flex: 1 1 auto; }
+	.admin-name { font-size: 0.8125rem; font-weight: 500; color: var(--zf-warm-gray); max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+	.logout-btn { background: none; border: none; cursor: pointer; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--zf-warm-gray); }
+	.logout-btn:hover { background: rgba(28,25,23,0.05); }
+	.main-content { flex: 1; padding: 24px; box-sizing: border-box; background-color: var(--zf-surface); }
+
+	/* ══════════════ order-detail.component.ts :host tokens ══════════════ */
+	.op-root {
+		--op-paper: #fefaf5; --op-card: #ffffff; --op-ink: #1c1917; --op-ink-soft: #44403c;
+		--op-muted: #78716c; --op-muted-soft: #a8a29e; --op-rule: #e7ddd1; --op-rule-strong: #d6c9b6;
+		--op-burgundy: #6b1d2a; --op-burgundy-dark: #4a1019; --op-copper: #d4943f; --op-copper-soft: #f3e4d0; --op-cream: #fdf6ec;
+		--tone-amber: #ba7517; --tone-amber-bg: #fdf2dc;
+		--tone-yellow: #d4b106; --tone-yellow-bg: #fbf0c9;
+		--tone-green: #639922; --tone-green-bg: #e5f1d7;
+		--tone-blue: #378add; --tone-blue-bg: #dceaf5;
+		--tone-purple: #534ab7; --tone-purple-bg: #e5e3f6;
+		--tone-copper: #d85a30; --tone-copper-bg: #f8e1ca;
+		--tone-plum: #d4537e; --tone-plum-bg: #ecd9ee;
+		--tone-sage: #1d9e75; --tone-sage-bg: #d6e7d3;
+		--tone-ruby: #e24b4a; --tone-ruby-bg: #f4d6d8;
+		--op-radius: 14px; --op-radius-sm: 8px; --op-radius-pill: 999px;
+		display: block; font-family: 'DM Sans', system-ui, sans-serif; color: var(--op-ink);
+		max-width: 1200px; margin: 0 auto;
+	}
+	.op-detail { display: flex; flex-direction: column; gap: 24px; }
+	.op-eyebrow { font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--op-burgundy); }
+
+	/* ── Hero ── */
+	.op-hero { background: var(--op-card); border: 1px solid var(--op-rule); border-radius: 18px; padding: 28px 32px 24px; position: relative; overflow: hidden; box-shadow: 0 1px 0 rgba(28,25,23,0.04), 0 24px 60px -28px rgba(74,16,25,0.18); }
+	.op-hero::before { content: ''; position: absolute; inset: 0 0 auto 0; height: 5px; background: linear-gradient(90deg, var(--op-burgundy), var(--op-copper) 40%, var(--op-burgundy)); }
+	.op-hero__top { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; }
+	.op-back { display: inline-flex; align-items: center; gap: 6px; font-size: 0.8125rem; color: var(--op-muted); text-decoration: none; font-weight: 500; }
+	.op-back:hover { color: var(--op-burgundy); }
+	.op-print-btn { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; background: var(--op-card); color: var(--op-ink-soft); border: 1px solid var(--op-rule-strong); border-radius: var(--op-radius-sm); font-family: inherit; font-size: 0.8125rem; font-weight: 500; letter-spacing: 0.02em; cursor: pointer; }
+	.op-print-btn:hover { background: var(--op-cream); color: var(--op-burgundy); border-color: var(--op-burgundy); }
+
+	.op-highlights { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 22px; }
+	@media (max-width: 960px) { .op-highlights { grid-template-columns: repeat(2, 1fr); } }
+	.op-highlight-card { display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; background: var(--op-cream); border: 1px solid var(--op-rule); border-radius: var(--op-radius-sm); }
+	.op-highlight-card__eyebrow { font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--op-burgundy); }
+	.op-highlight-card__value { font-family: 'DM Serif Display', Georgia, serif; font-weight: 400; font-size: 1.1rem; line-height: 1.2; color: var(--op-ink); }
+	.op-highlight-card__note { font-size: 0.8125rem; color: var(--op-muted); }
+	.op-highlight-card__meta { font-size: 0.75rem; color: var(--op-muted-soft); margin-top: auto; padding-top: 4px; }
+	.op-highlight-card__address { font-style: normal; font-size: 0.8125rem; line-height: 1.5; color: var(--op-ink-soft); }
+
+	.op-hero__grid { display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: end; padding-bottom: 22px; border-bottom: 1px solid var(--op-rule); margin-bottom: 24px; }
+	@media (max-width: 720px) { .op-hero__grid { grid-template-columns: 1fr; } }
+	.op-hero__main { display: flex; flex-direction: column; gap: 8px; }
+	.op-hero__eyebrow { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+	.op-hero__sep { color: var(--op-muted-soft); }
+	.op-hero__date { font-size: 0.75rem; color: var(--op-muted); font-style: italic; }
+	.op-hero__title { margin: 0; font-family: 'DM Serif Display', Georgia, serif; font-weight: 400; line-height: 0.96; display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; }
+	.op-hero__label { font-size: clamp(1.5rem, 3vw, 2.25rem); color: var(--op-ink-soft); letter-spacing: -0.02em; }
+	.op-hero__num { font-size: clamp(3.5rem, 8vw, 6rem); color: var(--op-burgundy); letter-spacing: -0.04em; font-feature-settings: 'tnum' 1; font-style: italic; }
+	.op-hero__sub { margin: 0; font-size: 0.9375rem; color: var(--op-muted); }
+	.op-hero__sub em { font-style: italic; color: var(--op-ink-soft); }
+	.op-mode-chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: var(--op-radius-pill); font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; border: 1px solid currentColor; background: var(--mode-bg, transparent); color: var(--mode-color, var(--op-muted)); }
+	.op-mode-chip[data-mode='entrega'] { --mode-color: #b16518; --mode-bg: rgba(212, 148, 63, 0.12); }
+	.op-mode-chip[data-mode='retirada'] { --mode-color: #3e6b3a; --mode-bg: rgba(62, 107, 58, 0.12); }
+
+	.op-hero__status { background: var(--tone-bg, var(--op-cream)); border: 1px solid var(--tone-color, var(--op-rule)); border-radius: var(--op-radius); padding: 16px 20px; display: flex; flex-direction: column; gap: 6px; min-width: 220px; }
+	.op-hero__status[data-tone='amber'] { --tone-bg: var(--tone-amber-bg); --tone-color: var(--tone-amber); }
+	.op-hero__status[data-tone='yellow'] { --tone-bg: var(--tone-yellow-bg); --tone-color: var(--tone-yellow); }
+	.op-hero__status-label { font-size: 0.6875rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--tone-color, var(--op-muted)); font-weight: 600; opacity: 0.8; }
+	.op-hero__status-value { font-family: 'DM Serif Display', Georgia, serif; font-size: 1.625rem; line-height: 1; color: var(--tone-color, var(--op-ink)); display: inline-flex; align-items: center; gap: 10px; }
+	.op-hero__status-icon { font-size: 1.5rem; font-family: system-ui; }
+	.op-hero__status-meta { font-size: 0.8125rem; color: var(--op-ink-soft); }
+	.op-hero__status-meta strong { color: var(--op-ink); font-weight: 600; }
+
+	/* ── Flow ── */
+	.op-flow { display: flex; align-items: center; gap: 4px; padding: 4px 0; flex-wrap: nowrap; overflow-x: auto; }
+	.op-flow__step { display: flex; flex-direction: column; align-items: center; gap: 6px; flex-shrink: 0; min-width: 80px; }
+	.op-flow__node { width: 36px; height: 36px; border-radius: 50%; background: var(--op-card); border: 2px solid var(--op-rule); display: flex; align-items: center; justify-content: center; font-size: 1rem; color: var(--op-muted-soft); }
+	.op-flow__step--done .op-flow__node { background: var(--tone-color, var(--op-burgundy)); border-color: var(--tone-color, var(--op-burgundy)); color: var(--op-cream); }
+	.op-flow__step--current .op-flow__node { background: var(--tone-color, var(--op-burgundy)); border-color: var(--tone-color, var(--op-burgundy)); color: var(--op-cream); box-shadow: 0 0 0 6px rgba(107, 29, 42, 0.12); transform: scale(1.08); }
+	.op-flow__step[data-tone='amber'] { --tone-color: var(--tone-amber); }
+	.op-flow__step[data-tone='yellow'] { --tone-color: var(--tone-yellow); }
+	.op-flow__label { font-size: 0.75rem; color: var(--op-muted); text-align: center; white-space: nowrap; font-weight: 500; }
+	.op-flow__step--done .op-flow__label, .op-flow__step--current .op-flow__label { color: var(--op-ink); font-weight: 600; }
+	.op-flow__line { flex: 1; height: 2px; background: var(--op-rule); margin-bottom: 22px; min-width: 30px; }
+	.op-flow__line--done { background: var(--op-copper); }
+
+	/* ── Actions / panels ── */
+	.op-actions { background: var(--op-card); border: 1px solid var(--op-rule); border-radius: var(--op-radius); padding: 20px 24px 24px; display: flex; flex-direction: column; gap: 16px; }
+	.op-actions__head { display: flex; flex-direction: column; gap: 4px; }
+	.op-actions__title { margin: 0; font-family: 'DM Serif Display', Georgia, serif; font-weight: 400; font-size: 1.625rem; color: var(--op-ink); letter-spacing: -0.01em; }
+	.op-actions__commit { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
+	.op-field__label { font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--op-muted); }
+
+	/* Limite de crédito (Fase 3.3, real) */
+	.op-limite { border-left: 4px solid var(--tone-amber); }
+	.op-limite--analise { border-left-color: var(--tone-ruby); }
+	.op-limite__selo { display: inline-block; margin-left: 10px; padding: 3px 10px; border-radius: var(--op-radius-pill); background: var(--tone-ruby-bg); color: var(--tone-ruby); font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; vertical-align: middle; }
+	.op-limite__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+	.op-limite__item { display: flex; flex-direction: column; gap: 2px; }
+	.op-limite__label { font-size: 0.75rem; color: var(--op-muted); }
+	.op-limite__value { font-size: 1.0625rem; font-weight: 600; color: var(--op-ink); }
+	.op-limite__value--destaque { color: var(--tone-ruby); }
+	.op-limite__opcao { margin: 4px 0 0; padding-top: 12px; border-top: 1px dashed var(--op-rule); font-size: 0.875rem; color: var(--op-ink-soft); }
+	.op-limite__data { margin-left: 6px; font-size: 0.8125rem; color: var(--op-muted); }
+
+	/* Cadastro financeiro / Sentus (real) */
+	.op-cf-sentus__row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+	.op-sentus__status-value { font-weight: 600; color: var(--op-ink); padding: 2px 10px; border-radius: var(--op-radius-pill); background: var(--tone-purple-bg); }
+	.op-sentus__status-value[data-sentus-status='enviado'] { background: var(--tone-sage-bg); color: var(--tone-sage); }
+	.op-sentus__status-value[data-sentus-status='erro'] { background: var(--tone-ruby-bg); color: var(--tone-ruby); }
+	.op-sentus__status-value[data-sentus-status='enviando'] { background: var(--tone-amber-bg); color: var(--tone-amber); }
+	.op-sentus__status-error { font-size: 0.8125rem; color: var(--tone-ruby); }
+
+	/* Banner "já integrado" (real, de cadastro-financeiro-detail.component.ts) */
+	.cfd-banner { padding: 10px 14px; border-radius: var(--op-radius-sm); font-size: 0.875rem; }
+	.cfd-banner--ok { background: var(--tone-sage-bg); color: var(--tone-sage); }
+
+	.op-btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: var(--op-radius-sm); font-family: inherit; font-size: 0.875rem; font-weight: 500; cursor: pointer; border: 1px solid transparent; text-decoration: none; }
+	.op-btn--primary { background: var(--op-burgundy); color: var(--op-cream); }
+	.op-btn--primary:hover { background: var(--op-burgundy-dark); }
+	.op-btn--ghost { background: var(--op-card); color: var(--op-ink-soft); border-color: var(--op-rule-strong); }
+	.op-btn--ghost:hover { background: var(--op-cream); color: var(--op-burgundy); border-color: var(--op-burgundy); }
+	.op-btn--large { padding: 13px 22px; font-size: 0.9375rem; }
+
+	.op-input { padding: 11px 14px; border-radius: var(--op-radius-sm); border: 1px solid var(--op-rule-strong); background: var(--op-card); font-family: inherit; font-size: 0.9375rem; color: var(--op-ink); width: 100%; resize: vertical; }
+	.op-input:focus { outline: none; border-color: var(--op-burgundy); box-shadow: 0 0 0 3px rgba(107, 29, 42, 0.12); }
+
+	/* ── Complementos deste protótipo (não são componentes reais isolados —
+	     reusam os tokens/classes acima para cobrir dados descritos na
+	     documentação mas ainda sem UI própria hoje) ── */
+	.cf-scenario-label { display: flex; align-items: baseline; gap: 10px; margin: 8px 0 -6px; padding-top: 20px; border-top: 1px dashed var(--op-rule, #e7ddd1); }
+	.cf-scenario-label:first-child { border-top: none; padding-top: 0; margin-top: 0; }
+	.cf-scenario-label__title { font-family: 'DM Serif Display', Georgia, serif; font-size: 1.25rem; font-weight: 400; color: var(--op-ink, #1c1917); }
+	.cf-preview-label { margin: 4px 0 8px; font-size: 0.75rem; color: var(--op-muted, #78716c); font-style: italic; }
+</style>
+</head>
+<body>
+<div class="layout-container">
+	<nav class="sidenav">
+		<div class="sidenav-brand">
+			<span class="brand-name">ZFood</span>
+			<span class="brand-badge">Admin</span>
+			<button class="collapse-button" aria-label="Fechar menu"><span class="material-symbols-outlined">chevron_left</span></button>
+		</div>
+		<ul class="nav-list">
+			<li><a class="nav-item nav-external" href="01-catalogo.html"><span class="material-symbols-outlined">storefront</span><span>Ver Catálogo</span></a></li>
+			<hr class="nav-divider" />
+			<li><a class="nav-item" href="04-dashboard-admin.html"><span class="material-symbols-outlined">dashboard</span><span>Dashboard</span></a></li>
+			<li><a class="nav-item" href="05-kanban.html"><span class="material-symbols-outlined">receipt_long</span><span>Pedidos</span></a></li>
+			<li><a class="nav-item active" href="06-cadastro-financeiro.html"><span class="material-symbols-outlined">account_balance</span><span>Cadastros Financeiros</span></a></li>
+			<li><a class="nav-item" href="#"><span class="material-symbols-outlined">people</span><span>Usuários</span></a></li>
+			<li><a class="nav-item" href="#"><span class="material-symbols-outlined">inventory_2</span><span>Produtos</span></a></li>
+			<li><a class="nav-item" href="#"><span class="material-symbols-outlined">category</span><span>Categorias</span></a></li>
+			<li><a class="nav-item" href="#"><span class="material-symbols-outlined">sync</span><span>Sincronização</span></a></li>
+			<li><a class="nav-item" href="#"><span class="material-symbols-outlined">settings</span><span>Configurações</span></a></li>
+		</ul>
+	</nav>
+
+	<div class="content">
+		<header class="toolbar">
+			<button class="menu-button" aria-label="Abrir menu"><span class="material-symbols-outlined">menu</span></button>
+			<span class="toolbar-title">Painel Administrativo</span>
+			<span class="spacer"></span>
+			<span class="admin-name">Administrador ZFOODs</span>
+			<button class="logout-btn" aria-label="Sair"><span class="material-symbols-outlined">logout</span></button>
+		</header>
+
+		<main class="main-content">
+			<div class="op-root op-detail">
+
+				<!-- ═══════════════ CENÁRIO 1 — Cliente sem cadastro no Sentus ═══════════════ -->
+				<div class="cf-scenario-label">
+					<span class="op-eyebrow">Cenário 1</span>
+					<span class="cf-scenario-label__title">Cliente sem cadastro no Sentus</span>
+				</div>
+
+				<header class="op-hero" data-status="cadastro_financeiro">
+					<div class="op-hero__top">
+						<a class="op-back" href="05-kanban.html"><span aria-hidden="true">←</span><span>Pedidos</span></a>
+						<button type="button" class="op-print-btn"><span aria-hidden="true">⎙</span><span>Imprimir</span></button>
+					</div>
+
+					<div class="op-highlights">
+						<article class="op-highlight-card">
+							<span class="op-highlight-card__eyebrow">Pedido</span>
+							<strong class="op-highlight-card__value">Ref. Catálogo Nº 20</strong>
+							<span class="op-highlight-card__note">Nº Sentus: aguardando integração</span>
+							<span class="op-highlight-card__meta">Pedido em 20/07/2026</span>
+						</article>
+						<article class="op-highlight-card">
+							<span class="op-highlight-card__eyebrow">Cliente</span>
+							<strong class="op-highlight-card__value">Hamburgueria Bairro Novo</strong>
+							<span class="op-highlight-card__note">Contato: Fernanda Ribas</span>
+							<span class="op-highlight-card__meta">(51) 3241-7788 · financeiro@bairronovo.com.br</span>
+						</article>
+						<article class="op-highlight-card">
+							<span class="op-highlight-card__eyebrow">Dia da entrega</span>
+							<strong class="op-highlight-card__weekday" style="font-size:0.8125rem;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:var(--op-ink-soft);">Quinta-feira</strong>
+							<strong class="op-highlight-card__value" style="font-size:1.375rem;color:var(--op-burgundy);">23 de julho</strong>
+							<address class="op-highlight-card__address">Rua das Palmeiras, 220<br />Bairro Novo — Porto Alegre/RS<br />CEP 91000-000</address>
+						</article>
+						<article class="op-highlight-card">
+							<span class="op-highlight-card__eyebrow">Forma de pagamento</span>
+							<strong class="op-highlight-card__value">PIX</strong>
+							<span class="op-highlight-card__note">Pagamento instantâneo via PIX</span>
+						</article>
+					</div>
+
+					<div class="op-hero__grid">
+						<div class="op-hero__main">
+							<div class="op-hero__eyebrow">
+								<span class="op-eyebrow">Ticket de Operação</span>
+								<span class="op-hero__sep">·</span>
+								<span class="op-hero__date">20 de julho de 2026</span>
+								<span class="op-hero__sep">·</span>
+								<span class="op-mode-chip" data-mode="entrega"><span aria-hidden="true">⇨</span> Entrega</span>
+							</div>
+							<h1 class="op-hero__title"><span class="op-hero__label">Pedido</span><span class="op-hero__num">№20</span></h1>
+							<p class="op-hero__sub">Aberto às 09:14 · <em>hoje</em></p>
+						</div>
+						<aside class="op-hero__status" data-tone="yellow">
+							<span class="op-hero__status-label">Status atual</span>
+							<span class="op-hero__status-value"><span class="op-hero__status-icon" aria-hidden="true">◈</span> Cadastro Financeiro</span>
+							<span class="op-hero__status-meta"><strong>1</strong> item · <strong>R$ 179,80</strong></span>
+						</aside>
+					</div>
+
+					<div class="op-flow" role="list">
+						<div class="op-flow__step op-flow__step--done" data-tone="amber"><div class="op-flow__node">◷</div><span class="op-flow__label">Pendente</span></div>
+						<div class="op-flow__line op-flow__line--done"></div>
+						<div class="op-flow__step op-flow__step--current" data-tone="yellow"><div class="op-flow__node">◈</div><span class="op-flow__label">Cadastro Financeiro</span></div>
+						<div class="op-flow__line"></div>
+						<div class="op-flow__step" data-tone="green"><div class="op-flow__node">✓</div><span class="op-flow__label">Pedido Confirmado</span></div>
+						<div class="op-flow__line"></div>
+						<div class="op-flow__step" data-tone="blue"><div class="op-flow__node">⚒</div><span class="op-flow__label">Em Separação</span></div>
+						<div class="op-flow__line"></div>
+						<div class="op-flow__step" data-tone="purple"><div class="op-flow__node">▤</div><span class="op-flow__label">Faturamento</span></div>
+						<div class="op-flow__line"></div>
+						<div class="op-flow__step" data-tone="copper"><div class="op-flow__node">⧗</div><span class="op-flow__label">Aguardando Pagamento</span></div>
+						<div class="op-flow__line"></div>
+						<div class="op-flow__step" data-tone="plum"><div class="op-flow__node">⤳</div><span class="op-flow__label">Em Rota</span></div>
+						<div class="op-flow__line"></div>
+						<div class="op-flow__step" data-tone="sage"><div class="op-flow__node">★</div><span class="op-flow__label">Entregue</span></div>
+					</div>
+				</header>
+
+				<!-- Painel real: order-detail.component.ts linhas 530-567 -->
+				<section class="op-actions" aria-label="Cadastro financeiro">
+					<div class="op-actions__head">
+						<span class="op-eyebrow">Financeiro</span>
+						<h2 class="op-actions__title">Cadastro financeiro pendente</h2>
+					</div>
+					<p class="op-field__label" style="text-transform:none;letter-spacing:normal;font-weight:400;">
+						Cliente sem código no Sentus. A análise cadastral e financeira completa acontece numa página dedicada.
+					</p>
+					<div class="op-cf-sentus__row">
+						<span class="op-sentus__status-value" data-sentus-status="enviando">Enviando…</span>
+						<span class="op-sentus__status-error" style="color:var(--op-muted);">Aguardando retorno do cadastro no Sentus.</span>
+					</div>
+
+					<!-- Complemento — dados descritos em docs/integracao-sentus-cadastro-cliente.md,
+					     hoje espalhados em clientes/cadastros_financeiros mas não reunidos neste painel -->
+					<div class="op-limite__grid">
+						<div class="op-limite__item"><span class="op-limite__label">CNPJ</span><span class="op-limite__value" style="font-size:0.9375rem;">18.442.907/0001-33</span></div>
+						<div class="op-limite__item"><span class="op-limite__label">Razão social</span><span class="op-limite__value" style="font-size:0.9375rem;">Hamburgueria Bairro Novo</span></div>
+						<div class="op-limite__item"><span class="op-limite__label">Pedido vinculado</span><span class="op-limite__value" style="font-size:0.9375rem;">Nº 20</span></div>
+						<div class="op-limite__item"><span class="op-limite__label">Enviado em</span><span class="op-limite__value" style="font-size:0.9375rem;">20/07/2026 09:16</span></div>
+					</div>
+
+					<div class="op-actions__commit">
+						<a class="op-btn op-btn--primary op-btn--large" href="#">Abrir análise cadastral e financeira</a>
+					</div>
+
+					<p class="cf-preview-label">Assim que o Sentus retornar o código do cliente:</p>
+					<div class="cfd-banner cfd-banner--ok">
+						Cadastro concluído — código do cliente recebido: <strong>48213</strong>. O pedido Nº 20 é liberado automaticamente para "Pedido Confirmado".
+					</div>
+				</section>
+
+				<!-- ═══════════════ CENÁRIO 2 — Pedido de cliente CNPJ acima do limite ═══════════════ -->
+				<div class="cf-scenario-label">
+					<span class="op-eyebrow">Cenário 2</span>
+					<span class="cf-scenario-label__title">Pedido de cliente CNPJ acima do limite</span>
+				</div>
+
+				<header class="op-hero" data-status="pendente">
+					<div class="op-hero__top">
+						<a class="op-back" href="05-kanban.html"><span aria-hidden="true">←</span><span>Pedidos</span></a>
+						<button type="button" class="op-print-btn"><span aria-hidden="true">⎙</span><span>Imprimir</span></button>
+					</div>
+
+					<div class="op-highlights">
+						<article class="op-highlight-card">
+							<span class="op-highlight-card__eyebrow">Pedido</span>
+							<strong class="op-highlight-card__value">Ref. Catálogo Nº 18</strong>
+							<span class="op-highlight-card__note">Nº Sentus: aguardando integração</span>
+							<span class="op-highlight-card__meta">Pedido em 19/07/2026</span>
+						</article>
+						<article class="op-highlight-card">
+							<span class="op-highlight-card__eyebrow">Cliente</span>
+							<strong class="op-highlight-card__value" style="font-feature-settings:'tnum' 1;">33871</strong>
+							<strong class="op-highlight-card__value">Cliente Teste Limite Credito</strong>
+							<span class="op-highlight-card__note">Contato: Marcos Villela</span>
+							<span class="op-highlight-card__meta">(51) 3555-2200 · financeiro@limitecredito.com.br</span>
+						</article>
+						<article class="op-highlight-card">
+							<span class="op-highlight-card__eyebrow">Dia da entrega</span>
+							<strong class="op-highlight-card__weekday" style="font-size:0.8125rem;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:var(--op-ink-soft);">Sexta-feira</strong>
+							<strong class="op-highlight-card__value" style="font-size:1.375rem;color:var(--op-burgundy);">24 de julho</strong>
+							<address class="op-highlight-card__address">Av. Industrial, 1450<br />Distrito Sul — Canoas/RS<br />CEP 92000-000</address>
+						</article>
+						<article class="op-highlight-card">
+							<span class="op-highlight-card__eyebrow">Forma de pagamento</span>
+							<strong class="op-highlight-card__value">Boleto</strong>
+							<span class="op-highlight-card__note">Boleto bancário (prazo conforme liberação do sistema interno)</span>
+						</article>
+					</div>
+
+					<div class="op-hero__grid">
+						<div class="op-hero__main">
+							<div class="op-hero__eyebrow">
+								<span class="op-eyebrow">Ticket de Operação</span>
+								<span class="op-hero__sep">·</span>
+								<span class="op-hero__date">19 de julho de 2026</span>
+								<span class="op-hero__sep">·</span>
+								<span class="op-mode-chip" data-mode="entrega"><span aria-hidden="true">⇨</span> Entrega</span>
+							</div>
+							<h1 class="op-hero__title"><span class="op-hero__label">Pedido</span><span class="op-hero__num">№18</span></h1>
+							<p class="op-hero__sub">Aberto às 16:40 · <em>1d atrás</em></p>
+						</div>
+						<aside class="op-hero__status" data-tone="amber">
+							<span class="op-hero__status-label">Status atual</span>
+							<span class="op-hero__status-value"><span class="op-hero__status-icon" aria-hidden="true">◷</span> Pendente</span>
+							<span class="op-hero__status-meta"><strong>1</strong> item · <strong>R$ 1.798,00</strong></span>
+						</aside>
+					</div>
+
+					<div class="op-flow" role="list">
+						<div class="op-flow__step op-flow__step--current" data-tone="amber"><div class="op-flow__node">◷</div><span class="op-flow__label">Pendente</span></div>
+						<div class="op-flow__line"></div>
+						<div class="op-flow__step" data-tone="yellow"><div class="op-flow__node">◈</div><span class="op-flow__label">Cadastro Financeiro</span></div>
+						<div class="op-flow__line"></div>
+						<div class="op-flow__step" data-tone="green"><div class="op-flow__node">✓</div><span class="op-flow__label">Pedido Confirmado</span></div>
+						<div class="op-flow__line"></div>
+						<div class="op-flow__step" data-tone="blue"><div class="op-flow__node">⚒</div><span class="op-flow__label">Em Separação</span></div>
+						<div class="op-flow__line"></div>
+						<div class="op-flow__step" data-tone="purple"><div class="op-flow__node">▤</div><span class="op-flow__label">Faturamento</span></div>
+						<div class="op-flow__line"></div>
+						<div class="op-flow__step" data-tone="copper"><div class="op-flow__node">⧗</div><span class="op-flow__label">Aguardando Pagamento</span></div>
+						<div class="op-flow__line"></div>
+						<div class="op-flow__step" data-tone="plum"><div class="op-flow__node">⤳</div><span class="op-flow__label">Em Rota</span></div>
+						<div class="op-flow__line"></div>
+						<div class="op-flow__step" data-tone="sage"><div class="op-flow__node">★</div><span class="op-flow__label">Entregue</span></div>
+					</div>
+				</header>
+
+				<!-- Painel real: order-detail.component.ts linhas 569-635 (op-limite, 100% implementado, somente leitura) -->
+				<section class="op-actions op-limite op-limite--analise" aria-label="Limite de crédito excedido">
+					<div class="op-actions__head">
+						<span class="op-eyebrow">Financeiro</span>
+						<h2 class="op-actions__title">Limite de crédito excedido <span class="op-limite__selo">Requer análise financeira</span></h2>
+					</div>
+					<div class="op-limite__grid">
+						<div class="op-limite__item"><span class="op-limite__label">Valor total do pedido</span><span class="op-limite__value">R$ 1.798,00</span></div>
+						<div class="op-limite__item"><span class="op-limite__label">Limite de crédito</span><span class="op-limite__value">R$ 1.200,00</span></div>
+						<div class="op-limite__item"><span class="op-limite__label">Limite utilizado</span><span class="op-limite__value">R$ 700,00</span></div>
+						<div class="op-limite__item"><span class="op-limite__label">Limite disponível</span><span class="op-limite__value">R$ 500,00</span></div>
+						<div class="op-limite__item"><span class="op-limite__label">Valor coberto pelo boleto</span><span class="op-limite__value">R$ 500,00</span></div>
+						<div class="op-limite__item"><span class="op-limite__label">Valor excedente</span><span class="op-limite__value op-limite__value--destaque">R$ 1.298,00</span></div>
+					</div>
+					<p class="op-limite__opcao">
+						Escolha do cliente: <strong>Pedido completo enviado para análise financeira</strong>
+						<span class="op-limite__data">em 19/07/2026 16:41</span>
+					</p>
+				</section>
+
+				<!-- Complemento — ações desenhadas na Etapa 4 (plan/limite-credito-analise-financeira-pedido.md,
+				     linhas 203-248) e ainda não implementadas em código; "Reduzir pedido" e a mensagem
+				     interna seguem a definição funcional passada nesta conversa -->
+				<section class="op-actions" aria-label="Decisão financeira do pedido">
+					<div class="op-actions__head">
+						<span class="op-eyebrow">Financeiro</span>
+						<h2 class="op-actions__title">Decisão financeira</h2>
+					</div>
+					<label class="op-field" style="display:flex;flex-direction:column;gap:6px;">
+						<span class="op-field__label">Mensagem interna para o faturamento <em style="font-style:italic;text-transform:none;font-weight:400;letter-spacing:0.02em;color:var(--op-muted-soft);">(opcional)</em></span>
+						<textarea class="op-input" rows="3" placeholder="Anotação visível para a equipe de faturamento"></textarea>
+					</label>
+					<div class="op-actions__commit">
+						<button type="button" class="op-btn op-btn--ghost">Cancelar pedido</button>
+						<button type="button" class="op-btn op-btn--ghost">Reduzir pedido</button>
+						<button type="button" class="op-btn op-btn--ghost">Consultar vendedor</button>
+						<button type="button" class="op-btn op-btn--primary op-btn--large">Liberar pedido</button>
+					</div>
+				</section>
+
+			</div>
+		</main>
+	</div>
+</div>
+</body>
+</html>

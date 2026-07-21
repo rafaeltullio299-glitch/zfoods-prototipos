@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Checkout — Handoff ZFoods</title>
+<link rel="stylesheet" href="assets/style.css" />
+<style>
+	.checkout-page { max-width: 1080px; margin: 0 auto; padding: 24px 20px 60px; }
+	.nav-back { display: inline-flex; align-items: center; gap: 6px; color: var(--zf-warm-gray); text-decoration: none; font-size: 0.85rem; margin-bottom: 14px; }
+	.checkout-title { font-size: 1.6rem; margin: 0 0 20px; }
+	.checkout-layout { display: grid; grid-template-columns: 1.5fr 1fr; gap: 28px; align-items: start; }
+	@media (max-width: 860px) { .checkout-layout { grid-template-columns: 1fr; } }
+
+	.progress-bar-sticky { background: var(--zf-cream); border-radius: var(--zf-radius-md); padding: 16px; margin-bottom: 18px; }
+	.progress-nodes { display: flex; align-items: center; margin-bottom: 10px; }
+	.progress-node { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 700; background: var(--zf-danger-bg); color: var(--zf-danger); flex-shrink: 0; }
+	.progress-node[data-status="complete"] { background: var(--zf-success); color: #fff; }
+	.progress-line { flex: 1; height: 2px; background: var(--zf-danger-bg); }
+	.progress-line[data-status="complete"] { background: var(--zf-success); }
+	.progress-legend { display: flex; gap: 16px; font-size: 0.76rem; color: var(--zf-warm-gray); }
+	.progress-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; }
+	.progress-dot[data-status="complete"] { background: var(--zf-success); }
+	.progress-dot[data-status="error"] { background: var(--zf-danger); }
+
+	.step-card { background: #fff; border: 1px solid var(--zf-border); border-radius: var(--zf-radius-md); padding: 18px 20px; margin-bottom: 16px; }
+	.step-card[data-status="complete"] { border-color: var(--zf-success); }
+	.step-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 8px; }
+	.step-header-left { display: flex; align-items: center; gap: 10px; }
+	.step-num { width: 26px; height: 26px; border-radius: 50%; background: var(--zf-danger-bg); color: var(--zf-danger); display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; }
+	.step-num[data-status="complete"] { background: var(--zf-success); color: #fff; }
+	.step-title { margin: 0; font-size: 1.05rem; }
+	.status-badge { font-size: 0.72rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; background: var(--zf-danger-bg); color: var(--zf-danger); }
+	.status-badge[data-status="complete"] { background: var(--zf-success-bg); color: var(--zf-success); }
+
+	.delivery-options { display: flex; gap: 12px; flex-wrap: wrap; }
+	.delivery-card { flex: 1; min-width: 180px; display: flex; align-items: center; gap: 12px; padding: 14px; border: 1.5px solid var(--zf-border); border-radius: var(--zf-radius-md); background: #fff; cursor: pointer; position: relative; text-align: left; }
+	.delivery-card.active { border-color: var(--zf-burgundy); background: var(--zf-cream); }
+	.delivery-card-icon { width: 38px; height: 38px; border-radius: 50%; background: var(--zf-cream-dark); display: flex; align-items: center; justify-content: center; }
+	.delivery-card-title { display: block; font-size: 0.9rem; }
+	.delivery-card-sub { font-size: 0.78rem; color: var(--zf-warm-gray); }
+	.delivery-check { display: none; color: var(--zf-burgundy); margin-left: auto; }
+	.delivery-card.active .delivery-check { display: block; }
+
+	.address-list { list-style: none; margin: 0 0 12px; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+	.address-card { width: 100%; display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 1.5px solid var(--zf-border); border-radius: var(--zf-radius-sm); background: #fff; cursor: pointer; text-align: left; }
+	.address-card.selected { border-color: var(--zf-burgundy); background: var(--zf-cream); }
+	.addr-radio { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--zf-border); flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+	.address-card.selected .addr-radio { border-color: var(--zf-burgundy); }
+	.addr-radio-dot { width: 9px; height: 9px; border-radius: 50%; background: transparent; }
+	.address-card.selected .addr-radio-dot { background: var(--zf-burgundy); }
+	.addr-line { margin: 0; font-weight: 600; font-size: 0.88rem; }
+	.addr-detail { margin: 2px 0 0; font-size: 0.78rem; color: var(--zf-warm-gray); }
+	.addr-badge { display: inline-block; margin-top: 4px; font-size: 0.68rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: var(--zf-copper-light); color: #fff; }
+	.btn-add-address-row { border: 1px dashed var(--zf-border); background: none; border-radius: var(--zf-radius-sm); padding: 10px; width: 100%; color: var(--zf-burgundy); font-weight: 600; font-size: 0.85rem; cursor: pointer; }
+
+	.date-cards { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+	.date-card { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border: 1.5px solid var(--zf-border); border-radius: var(--zf-radius-sm); background: #fff; cursor: pointer; text-align: left; }
+	.date-card.selected { border-color: var(--zf-burgundy); background: var(--zf-cream); }
+	.date-card-num { font-size: 1.2rem; font-weight: 700; width: 32px; text-align: center; }
+	.date-card-weekday { display: block; font-size: 0.85rem; text-transform: capitalize; }
+	.date-card-full { font-size: 0.76rem; color: var(--zf-warm-gray); }
+	.delivery-cutoff-note { display: flex; gap: 8px; font-size: 0.78rem; color: var(--zf-warm-gray); background: var(--zf-cream); padding: 10px 12px; border-radius: var(--zf-radius-sm); margin: 10px 0; }
+	.delivery-routes-expand summary { cursor: pointer; font-size: 0.8rem; color: var(--zf-burgundy); font-weight: 600; display: flex; align-items: center; gap: 6px; }
+
+	.payment-intro { display: flex; gap: 8px; font-size: 0.78rem; color: var(--zf-warm-gray); background: var(--zf-info-bg); color: var(--zf-info); padding: 10px 12px; border-radius: var(--zf-radius-sm); margin: 0 0 14px; }
+	.payment-instruction { display: flex; gap: 10px; background: var(--zf-cream); padding: 12px 14px; border-radius: var(--zf-radius-sm); font-size: 0.82rem; margin-top: 12px; }
+	.payment-instruction-detail { font-size: 0.74rem; color: var(--zf-warm-gray); margin: 4px 0 0; }
+	.payment-footer { font-size: 0.78rem; color: var(--zf-warm-gray); margin: 14px 0 0; }
+	.payment-footer a { color: var(--zf-burgundy); }
+
+	.checkout-summary { background: #fff; border: 1px solid var(--zf-border); border-radius: var(--zf-radius-md); padding: 20px; position: sticky; top: 20px; }
+	.summary-title { display: flex; align-items: center; gap: 8px; font-size: 1rem; margin: 0 0 14px; }
+	.summary-items { list-style: none; margin: 0 0 14px; padding: 0; display: flex; flex-direction: column; gap: 12px; max-height: 340px; overflow-y: auto; }
+	.summary-item { display: flex; gap: 10px; align-items: flex-start; }
+	.summary-item-img { width: 44px; height: 44px; border-radius: var(--zf-radius-sm); background: var(--zf-cream-dark); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+	.summary-item-name { margin: 0; font-size: 0.84rem; font-weight: 600; }
+	.summary-item-price-detail { margin: 2px 0; font-size: 0.72rem; color: var(--zf-warm-gray); }
+	.summary-item-bottom { display: flex; justify-content: space-between; font-size: 0.8rem; margin-top: 4px; }
+	.summary-item-total { font-weight: 700; color: var(--zf-burgundy); }
+	.btn-remove-item { border: none; background: none; color: var(--zf-warm-gray-light); cursor: pointer; }
+	.weight-row { display: flex; gap: 8px; align-items: center; font-size: 0.8rem; color: var(--zf-warm-gray); padding: 10px 0; border-top: 1px solid var(--zf-border-light); }
+	.summary-total-row { display: flex; justify-content: space-between; align-items: baseline; padding: 12px 0; border-top: 1px solid var(--zf-border); margin-top: 6px; }
+	.total-label { font-size: 0.85rem; color: var(--zf-warm-gray); }
+	.total-value { font-size: 1.3rem; color: var(--zf-burgundy); }
+	.min-order-block { display: block; background: var(--zf-warning-bg); border-radius: var(--zf-radius-sm); padding: 12px; margin-bottom: 12px; }
+	.min-order-header { display: flex; justify-content: space-between; font-size: 0.76rem; color: var(--zf-warning); margin-bottom: 6px; }
+	.min-order-track { height: 6px; border-radius: 999px; background: #fff; overflow: hidden; }
+	.min-order-fill { height: 100%; background: var(--zf-warning); }
+	.min-order-text { font-size: 0.76rem; color: var(--zf-warning); margin: 6px 0 0; }
+
+	.btn-confirm { width: 100%; padding: 13px; border-radius: 999px; border: none; background: var(--zf-burgundy); color: #fff; font-weight: 700; font-size: 0.92rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+	.btn-confirm.success { background: var(--zf-success); }
+	.order-success-msg { display: flex; gap: 10px; margin-top: 10px; padding: 12px 14px; background: var(--zf-success-bg); border-radius: 10px; color: var(--zf-success); }
+	.order-success-title { margin: 0; font-size: 0.87rem; font-weight: 600; }
+	.order-success-sub { margin: 3px 0 0; font-size: 0.78rem; opacity: 0.85; }
+	.btn-back { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 10px; color: var(--zf-warm-gray); text-decoration: none; font-size: 0.82rem; }
+
+	.source-note { max-width: 1080px; margin: 0 auto 20px; }
+</style>
+</head>
+<body data-current="checkout">
+<div class="proto-page">
+	<header class="proto-banner">
+		<span class="proto-banner__tag">Handoff · Checkout (5 etapas)</span>
+		<a href="index.html">← Voltar ao índice</a>
+	</header>
+
+	<main class="proto-main">
+		<div class="container source-note" style="padding-top:16px;">
+			<div class="future-note">Recriado a partir de <code>src/app/features/user/checkout/checkout-page.component.ts</code> (branch <code>111-top-vendas</code>, commit <code>e2f4461</code> — versão finalizada das 5 etapas). Textos, rótulos e regras (mínimo R$ 400, CNPJ do PIX, WhatsApp do financeiro) copiados do componente real.</div>
+		</div>
+
+		<div class="checkout-page">
+			<nav><a class="nav-back" href="01-catalogo.html">← Continuar comprando</a></nav>
+			<h1 class="checkout-title zf-serif">Finalizar Pedido</h1>
+
+			<div class="checkout-layout">
+				<div class="checkout-steps">
+					<div class="progress-bar-sticky">
+						<div class="progress-nodes">
+							<span class="progress-node" data-status="complete">✓</span>
+							<span class="progress-line" data-status="complete"></span>
+							<span class="progress-node" data-status="complete">✓</span>
+							<span class="progress-line" data-status="complete"></span>
+							<span class="progress-node" data-status="complete">✓</span>
+							<span class="progress-line" data-status="error"></span>
+							<span class="progress-node" data-status="error">4</span>
+							<span class="progress-line" data-status="error"></span>
+							<span class="progress-node" data-status="error">5</span>
+						</div>
+						<div class="progress-legend">
+							<span><span class="progress-dot" data-status="complete"></span> Selecionado</span>
+							<span><span class="progress-dot" data-status="error"></span> Falta selecionar</span>
+						</div>
+					</div>
+
+					<!-- Etapa 1 -->
+					<section class="step-card" data-status="complete">
+						<div class="step-header">
+							<div class="step-header-left"><span class="step-num" data-status="complete">1</span><h2 class="step-title">Como deseja receber?</h2></div>
+							<span class="status-badge" data-status="complete">✓ Selecionado</span>
+						</div>
+						<div class="delivery-options">
+							<button class="delivery-card active" type="button">
+								<div class="delivery-card-icon">🚚</div>
+								<div class="delivery-card-info"><strong class="delivery-card-title">Entrega Grátis</strong><span class="delivery-card-sub">Receba em casa</span></div>
+								<span class="delivery-check">✓</span>
+							</button>
+							<button class="delivery-card" type="button">
+								<div class="delivery-card-icon">🏬</div>
+								<div class="delivery-card-info"><strong class="delivery-card-title">Retirar na empresa</strong><span class="delivery-card-sub">Você retira no local</span></div>
+								<span class="delivery-check">✓</span>
+							</button>
+						</div>
+					</section>
+
+					<!-- Etapa 2 -->
+					<section class="step-card" data-status="complete">
+						<div class="step-header">
+							<div class="step-header-left"><span class="step-num" data-status="complete">2</span><h2 class="step-title">Endereço de Entrega</h2></div>
+							<span class="status-badge" data-status="complete">✓ Selecionado</span>
+						</div>
+						<ul class="address-list">
+							<li>
+								<button class="address-card selected" type="button">
+									<div class="addr-radio"><span class="addr-radio-dot"></span></div>
+									<div>
+										<p class="addr-line">Av. Paulista, 1000</p>
+										<p class="addr-detail">Bela Vista · São Paulo/SP · CEP 01310-100</p>
+										<span class="addr-badge">Principal</span>
+									</div>
+								</button>
+							</li>
+						</ul>
+						<button class="btn-add-address-row" type="button">+ Cadastrar novo endereço</button>
+					</section>
+
+					<!-- Etapa 3 -->
+					<section class="step-card" data-status="complete">
+						<div class="step-header">
+							<div class="step-header-left"><span class="step-num" data-status="complete">3</span><h2 class="step-title">Data de Entrega</h2></div>
+							<span class="status-badge" data-status="complete">✓ Selecionado</span>
+						</div>
+						<div class="date-cards">
+							<button class="date-card selected" type="button">
+								<span class="date-card-num">22</span>
+								<span class="date-card-info"><strong class="date-card-weekday">Quarta-feira</strong><span class="date-card-full">22 de julho</span></span>
+							</button>
+						</div>
+						<p class="delivery-cutoff-note">⏰ Pedidos confirmados até <strong>14h</strong> podem ser entregues no mesmo dia, conforme os dias de entrega da sua região. Após esse horário, a entrega ocorre a partir do próximo dia disponível.</p>
+						<details class="delivery-routes-expand"><summary>🗺️ Ver todas as regiões e dias de entrega ▾</summary></details>
+					</section>
+
+					<!-- Etapa 4 -->
+					<section class="step-card" data-status="error">
+						<div class="step-header">
+							<div class="step-header-left"><span class="step-num" data-status="error">4</span><h2 class="step-title">Forma de Pagamento</h2></div>
+							<span class="status-badge" data-status="error">● Falta selecionar</span>
+						</div>
+						<p class="payment-intro">ℹ️ O valor final da compra será definido após a separação dos produtos e o faturamento da nota fiscal. Assim que faturada a nota fiscal, ela entrará no seu e-mail.</p>
+						<div class="delivery-options" data-tabs>
+							<button class="delivery-card" type="button" data-tab="pix">
+								<div class="delivery-card-icon">📱</div>
+								<div class="delivery-card-info"><strong class="delivery-card-title">PIX</strong><span class="delivery-card-sub">Pagamento instantâneo</span></div>
+							</button>
+							<button class="delivery-card" type="button" data-tab="cartao">
+								<div class="delivery-card-icon">💳</div>
+								<div class="delivery-card-info"><strong class="delivery-card-title">Cartão</strong><span class="delivery-card-sub">Crédito ou débito</span></div>
+							</button>
+							<button class="delivery-card" type="button" data-tab="boleto">
+								<div class="delivery-card-icon">🧾</div>
+								<div class="delivery-card-info"><strong class="delivery-card-title">Boleto bancário</strong><span class="delivery-card-sub">Até 3 dias úteis (só CNPJ)</span></div>
+							</button>
+						</div>
+						<div class="tab-panel is-active" data-tab-panel="pix">
+							<div class="payment-instruction">📱<div><p>Após receber o valor da nota fiscal no seu e-mail, realize o pagamento via Pix para o CNPJ da empresa <strong>24.863.239/0001-53</strong>.</p><p class="payment-instruction-detail">Razão social: Z FOODS COMERCIO DE ALIMENTOS LTDA</p></div></div>
+						</div>
+						<div class="tab-panel" data-tab-panel="cartao">
+							<div class="payment-instruction">💳<p>Após o faturamento da nota fiscal, enviaremos no WhatsApp o link para pagamento no cartão.</p></div>
+						</div>
+						<div class="tab-panel" data-tab-panel="boleto">
+							<div class="payment-instruction">🧾<p>Pagamento via boleto disponível com o prazo que você já possui aprovado.</p></div>
+						</div>
+						<p class="payment-footer">Após o faturamento da nota fiscal, em caso de dúvidas, fale com nosso financeiro: <a href="#">(51) 99856-4509</a></p>
+					</section>
+
+					<!-- Observação -->
+					<section class="step-card">
+						<div class="step-header"><h2 class="step-title">Observação (opcional)</h2></div>
+						<textarea rows="2" placeholder="Ex.: entregar na portaria dos fundos"></textarea>
+					</section>
+
+					<!-- Etapa 5 -->
+					<div class="step-card" data-status="error">
+						<div class="step-header">
+							<div class="step-header-left"><span class="step-num" data-status="error">5</span><h2 class="step-title">Finalizar Pedido</h2></div>
+							<span class="status-badge" data-status="error">● Falta selecionar</span>
+						</div>
+						<button class="btn-confirm" type="button" data-toast="Simulação: pedido seria confirmado aqui" disabled>✓ Confirmar Pedido</button>
+						<a class="btn-back" href="01-catalogo.html">← Voltar ao catálogo</a>
+					</div>
+				</div>
+
+				<aside class="checkout-summary">
+					<h2 class="summary-title">🧾 Resumo do Pedido</h2>
+					<ul class="summary-items">
+						<li class="summary-item">
+							<div class="summary-item-img">📦</div>
+							<div class="summary-item-info" style="flex:1;">
+								<p class="summary-item-name">Produto Teste Kg</p>
+								<p class="summary-item-price-detail">R$ 39,90/kg × 0,500 kg = <strong>R$ 19,95/peça</strong></p>
+								<div class="summary-item-bottom"><span>2× peça</span><span class="summary-item-total">R$ 39,90</span></div>
+							</div>
+							<button class="btn-remove-item">✕</button>
+						</li>
+						<li class="summary-item">
+							<div class="summary-item-img">📦</div>
+							<div class="summary-item-info" style="flex:1;">
+								<p class="summary-item-name">Produto Teste Caixa</p>
+								<p class="summary-item-price-detail">R$ 89,90/un</p>
+								<div class="summary-item-bottom"><span>1× peça</span><span class="summary-item-total">R$ 89,90</span></div>
+							</div>
+							<button class="btn-remove-item">✕</button>
+						</li>
+					</ul>
+					<div class="weight-row">⚖️ Peso total: <strong>1,00 kg</strong></div>
+					<div class="summary-total-row"><span class="total-label">Total do pedido</span><strong class="total-value">R$ 129,80</strong></div>
+					<output class="min-order-block">
+						<div class="min-order-header"><span>Pedido mínimo</span><span>R$ 129,80 / R$ 400,00</span></div>
+						<div class="min-order-track"><div class="min-order-fill" style="width: 32%;"></div></div>
+						<p class="min-order-text">Faltam <strong>R$ 270,20</strong> para o mínimo de R$ 400,00</p>
+					</output>
+				</aside>
+			</div>
+		</div>
+	</main>
+</div>
+<script src="assets/app.js"></script>
+</body>
+</html>

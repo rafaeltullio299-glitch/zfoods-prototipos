@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Portal do Vendedor (Planejado) — Handoff ZFoods</title>
+<link rel="stylesheet" href="assets/style.css" />
+<style>
+	.pv-wrap { max-width: 900px; margin: 0 auto; padding: 28px 20px 60px; }
+	.pv-flag { display: inline-flex; align-items: center; gap: 8px; background: var(--zf-warning-bg); color: var(--zf-warning); padding: 8px 16px; border-radius: 999px; font-size: 0.8rem; font-weight: 700; margin-bottom: 16px; }
+	.pv-title { font-size: 1.7rem; margin: 0 0 8px; }
+	.pv-sub { color: var(--zf-warm-gray); max-width: 640px; margin: 0 0 28px; }
+	.pv-progress { display: flex; align-items: center; gap: 4px; margin-bottom: 30px; flex-wrap: wrap; }
+	.pv-step { display: flex; align-items: center; gap: 6px; font-size: 0.76rem; padding: 6px 12px; border-radius: 999px; background: var(--zf-cream-dark); color: var(--zf-warm-gray); }
+	.pv-step.is-done { background: var(--zf-success-bg); color: var(--zf-success); font-weight: 700; }
+	.pv-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; }
+	.pv-card { background: #fff; border: 1px dashed var(--zf-border); border-radius: var(--zf-radius-md); padding: 18px; opacity: 0.85; }
+	.pv-card__num { font-size: 0.7rem; font-weight: 700; color: var(--zf-warm-gray-light); }
+	.pv-card h3 { margin: 6px 0; font-size: 0.98rem; }
+	.pv-card p { margin: 0; font-size: 0.8rem; color: var(--zf-warm-gray); }
+	.pv-card__badge { display: inline-block; margin-top: 10px; font-size: 0.68rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: var(--zf-cream-dark); color: var(--zf-warm-gray); }
+</style>
+</head>
+<body data-current="portal-vendedor">
+<div class="proto-page">
+	<header class="proto-banner">
+		<span class="proto-banner__tag">Handoff · Portal do Vendedor (planejado)</span>
+		<a href="index.html">← Voltar ao índice</a>
+	</header>
+	<main class="proto-main">
+		<div class="container" style="padding-top:16px;">
+			<div class="future-note">Baseado em <code>docs/etapa-6-portal-vendedor.md</code> e na migration <code>20260717000001_vendedor_profiles.sql</code> — worktree <code>rafael-lab</code>. <strong>Esta tela ainda não existe no código</strong> — nenhum componente ou rota foi implementado. O conteúdo abaixo é o roteiro planejado (Subetapas 6.1–6.10), não uma tela real.</div>
+		</div>
+
+		<div class="pv-wrap">
+			<span class="pv-flag">🚧 Funcionalidade planejada — não implementada</span>
+			<h1 class="pv-title zf-serif">Portal do Vendedor / CRM Comercial</h1>
+			<p class="pv-sub">Etapa 6 do roadmap: um portal para o representante/vendedor acompanhar a própria carteira de clientes, pedidos e indicadores comerciais — sem acesso ao restante do painel administrativo.</p>
+
+			<h3 style="font-size:0.85rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--zf-warm-gray);">Progresso das subetapas</h3>
+			<div class="pv-progress">
+				<span class="pv-step is-done">✓ 6.1 Investigação das APIs</span>
+				<span class="pv-step is-done">✓ 6.2 Modelo de dados (vendedor_profiles)</span>
+				<span class="pv-step">6.3 Perfil e permissões</span>
+				<span class="pv-step">6.4 Sincronização da carteira</span>
+				<span class="pv-step">6.5–6.10 Telas do portal</span>
+			</div>
+
+			<h3 style="font-size:0.85rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--zf-warm-gray); margin-bottom:14px;">Telas planejadas (ainda não construídas)</h3>
+			<div class="pv-grid">
+				<div class="pv-card"><span class="pv-card__num">Subetapa 6.5</span><h3>👥 Meus Clientes</h3><p>Lista da carteira do vendedor autenticado. Reaproveitaria o padrão de <code>order-list.component.ts</code>.</p><span class="pv-card__badge">Planejado</span></div>
+				<div class="pv-card"><span class="pv-card__num">Subetapa 6.6</span><h3>📊 Histórico de Compras</h3><p>Ticket médio, frequência, produtos mais comprados e dias sem comprar por cliente da carteira.</p><span class="pv-card__badge">Planejado</span></div>
+				<div class="pv-card"><span class="pv-card__num">Subetapa 6.7</span><h3>🧾 Pedidos em Andamento</h3><p>Versão simplificada do Kanban/Lista, sem as ações de Câmara Fria, Faturamento ou Financeiro.</p><span class="pv-card__badge">Planejado</span></div>
+				<div class="pv-card"><span class="pv-card__num">Subetapa 6.8</span><h3>📈 Dashboard do Vendedor</h3><p>KPIs da carteira: vendas, ticket médio, clientes ativos/inativos, limite de crédito.</p><span class="pv-card__badge">Planejado</span></div>
+				<div class="pv-card"><span class="pv-card__num">Subetapa 6.9</span><h3>⚠️ Alertas Comerciais</h3><p>Identifica carteira inativa ou próxima do limite — só leitura, sem ação automática. Fora do escopo: metas, comissão, ranking, IA.</p><span class="pv-card__badge">Planejado</span></div>
+				<div class="pv-card"><span class="pv-card__num">Subetapa 6.10</span><h3>📝 Observações e Tarefas</h3><p>Estrutura preparatória (não funcional ainda) para anotações/tarefas do vendedor sobre um cliente.</p><span class="pv-card__badge">Planejado</span></div>
+			</div>
+		</div>
+	</main>
+</div>
+<script src="assets/app.js"></script>
+</body>
+</html>

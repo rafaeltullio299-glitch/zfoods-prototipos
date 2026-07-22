@@ -3,99 +3,1918 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Faturamento — Handoff ZFoods</title>
-<link rel="stylesheet" href="assets/style.css" />
+<title>Painel Administrativo</title>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..700&display=swap" rel="stylesheet">
 <style>
-	.op-detail { max-width: 900px; margin: 0 auto; padding: 24px 20px 60px; }
-	.op-detail__title { margin: 4px 0 4px; font-size: 1.4rem; }
-	.op-card { background: #fff; border: 1px solid var(--zf-border); border-radius: var(--zf-radius-md); padding: 18px 20px; margin-bottom: 18px; }
-	.op-card__eyebrow { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--zf-info); font-weight: 700; }
-	.op-card__title { margin: 4px 0 14px; font-size: 1.1rem; }
+	* { box-sizing: border-box; }
+	html, body { margin: 0; min-height: 100%; }
+	body { font-family: 'DM Sans', 'Source Sans 3', sans-serif; color: #1c1917; background: #fefaf5; }
+	.material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; font-size: 20px; line-height: 1; vertical-align: middle; }
 
-	.op-sentus__checklist { list-style: none; margin: 0 0 18px; padding: 0; display: flex; flex-direction: column; gap: 8px; }
-	.op-sentus__check { display: grid; grid-template-columns: 24px 1fr auto; gap: 10px; align-items: center; padding: 8px 10px; border-radius: var(--zf-radius-sm); background: var(--zf-cream); font-size: 0.84rem; }
-	.op-sentus__check-icon { font-weight: 700; color: var(--zf-success); text-align: center; }
-	.op-sentus__check--fail .op-sentus__check-icon { color: var(--zf-danger); }
-	.op-sentus__check--fail { background: var(--zf-danger-bg); }
-	.op-sentus__check-label { font-weight: 600; }
-	.op-sentus__check-detail { color: var(--zf-warm-gray); font-size: 0.78rem; }
+	/* ══════════════ material-theme.scss + admin-layout.component.ts :host ══════════════ */
+	:root {
+		--zf-burgundy: #6b1d2a; --zf-burgundy-dark: #4a1019; --zf-cream: #fdf6ec; --zf-copper: #b8722d;
+		--zf-charcoal: #1c1917; --zf-warm-gray: #78716c; --zf-warm-gray-light: #a8a29e; --zf-border: #e7ddd1;
+		--zf-surface: #fefaf5; --zf-surface-card: #ffffff;
+		--zf-shadow-sm: 0 1px 3px rgb(28 25 23 / 0.06), 0 1px 2px rgb(28 25 23 / 0.04);
+		--zf-radius-md: 10px;
 
-	.op-sentus__status { display: flex; flex-direction: column; gap: 4px; padding: 14px; background: var(--zf-cream); border-radius: var(--zf-radius-sm); margin-bottom: 16px; }
-	.op-sentus__status-label { font-size: 0.72rem; text-transform: uppercase; color: var(--zf-warm-gray); }
-	.op-sentus__status-value { font-weight: 700; font-size: 0.95rem; }
-	.op-sentus__status-value[data-sentus-status="nao_enviado"] { color: var(--zf-warm-gray); }
-	.op-sentus__status-value[data-sentus-status="enviado"] { color: var(--zf-success); }
-	.op-sentus__status-ref { font-size: 0.78rem; color: var(--zf-warm-gray); }
+		--snav-bg: #6b1d2a; --snav-bg-dark: #4a1019; --snav-text: rgba(253, 246, 236, 0.82);
+		--snav-text-full: #fdf6ec; --snav-active: #d4943f; --snav-active-bg: rgba(212, 148, 63, 0.18);
+		--snav-hover-bg: rgba(253, 246, 236, 0.07); --snav-divider: rgba(253, 246, 236, 0.14);
+	}
 
-	.op-actions__commit { display: flex; flex-direction: column; gap: 10px; }
-	.op-btn--primary { background: var(--zf-burgundy); color: #fff; border: none; border-radius: 999px; padding: 12px 22px; font-weight: 700; cursor: pointer; }
-	.op-btn--ghost { background: none; border: 1px solid var(--zf-border); border-radius: 999px; padding: 11px 22px; font-weight: 600; cursor: pointer; }
-	.op-sentus__dev-note { font-size: 0.74rem; color: var(--zf-warm-gray-light); margin: 14px 0 0; font-style: italic; }
+	/* ── Container / Sidenav / Toolbar (admin-layout.component.ts) ── */
+	.layout-container { position: relative; display: flex; min-height: 100vh; }
+	.sidenav { width: 260px; flex-shrink: 0; background: var(--snav-bg); color: var(--snav-text); display: flex; flex-direction: column; }
+	.sidenav-brand { display: flex; align-items: center; gap: 8px; padding: 22px 12px 18px 20px; border-bottom: 1px solid var(--snav-divider); flex-shrink: 0; }
+	.brand-name { font-family: 'DM Serif Display', Georgia, serif; font-size: 1.625rem; color: var(--snav-text-full); letter-spacing: -0.02em; line-height: 1; }
+	.brand-badge { font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--snav-active); background: rgba(212, 148, 63, 0.16); padding: 2px 7px; border-radius: 4px; border: 1px solid rgba(212, 148, 63, 0.3); }
+	.collapse-button { flex-shrink: 0; margin-left: auto; color: var(--snav-text); background: none; border: none; cursor: pointer; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+	.collapse-button:hover { color: var(--snav-text-full); background: var(--snav-hover-bg); }
+	.nav-list { padding: 10px 0; flex: 1; list-style: none; margin: 0; }
+	.nav-item { display: flex; align-items: center; gap: 16px; margin: 2px 10px; padding: 0 16px; border-radius: var(--zf-radius-md); min-height: 44px; color: var(--snav-text); text-decoration: none; font-size: 0.875rem; }
+	.nav-item:hover { background: var(--snav-hover-bg); color: var(--snav-text-full); }
+	.nav-item.active { background-color: var(--snav-active-bg); color: var(--snav-active); font-weight: 500; }
+	.nav-item .material-symbols-outlined { font-size: 20px; }
+	.nav-external { color: rgba(253, 246, 236, 0.55); }
+	.nav-external .material-symbols-outlined { color: rgba(253, 246, 236, 0.45); }
+	.nav-external:hover { color: var(--snav-text-full); }
+	.nav-divider { margin: 8px 14px; border: none; border-top: 1px solid var(--snav-divider); }
+	.content { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+	.toolbar { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 4px; height: 64px; padding: 0 16px; background: var(--zf-surface-card); border-bottom: 1px solid var(--zf-border); box-shadow: var(--zf-shadow-sm); }
+	.menu-button { margin-right: 4px; background: none; border: none; cursor: pointer; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--zf-warm-gray); }
+	.menu-button:hover { background: rgba(28,25,23,0.05); }
+	.toolbar-title { font-size: 0.9375rem; font-weight: 600; color: var(--zf-charcoal); letter-spacing: -0.01em; }
+	.spacer { flex: 1 1 auto; }
+	.admin-name { font-size: 0.8125rem; font-weight: 500; color: var(--zf-warm-gray); max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+	.logout-btn { background: none; border: none; cursor: pointer; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--zf-warm-gray); }
+	.logout-btn:hover { background: rgba(28,25,23,0.05); }
+	.main-content { flex: 1; padding: 24px; box-sizing: border-box; background-color: var(--zf-surface); }
+
+	/* ══════════════ order-detail.component.ts :host tokens ══════════════ */
+	.op-root {
+		--op-paper: #fefaf5; --op-card: #ffffff; --op-ink: #1c1917; --op-ink-soft: #44403c;
+		--op-muted: #78716c; --op-muted-soft: #a8a29e; --op-rule: #e7ddd1; --op-rule-strong: #d6c9b6;
+		--op-burgundy: #6b1d2a; --op-burgundy-dark: #4a1019; --op-copper: #d4943f; --op-copper-soft: #f3e4d0; --op-cream: #fdf6ec;
+		--tone-amber: #ba7517; --tone-amber-bg: #fdf2dc;
+		--tone-yellow: #d4b106; --tone-yellow-bg: #fbf0c9;
+		--tone-green: #639922; --tone-green-bg: #e5f1d7;
+		--tone-blue: #378add; --tone-blue-bg: #dceaf5;
+		--tone-purple: #534ab7; --tone-purple-bg: #e5e3f6;
+		--tone-copper: #d85a30; --tone-copper-bg: #f8e1ca;
+		--tone-plum: #d4537e; --tone-plum-bg: #ecd9ee;
+		--tone-sage: #1d9e75; --tone-sage-bg: #d6e7d3;
+		--tone-ruby: #e24b4a; --tone-ruby-bg: #f4d6d8;
+		--op-shadow-sm: 0 1px 2px rgba(28, 25, 23, 0.04);
+		--op-radius: 14px; --op-radius-sm: 8px; --op-radius-pill: 999px;
+		display: block; font-family: 'DM Sans', system-ui, sans-serif; color: var(--op-ink);
+		max-width: 1200px; margin: 0 auto;
+	}
+	.op-detail { display: flex; flex-direction: column; gap: 24px; }
+	.op-eyebrow { font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--op-burgundy); }
+
+	/* ── Hero ── */
+	.op-hero { background: var(--op-card); border: 1px solid var(--op-rule); border-radius: 18px; padding: 28px 32px 24px; position: relative; overflow: hidden; box-shadow: 0 1px 0 rgba(28,25,23,0.04), 0 24px 60px -28px rgba(74,16,25,0.18); }
+	.op-hero::before { content: ''; position: absolute; inset: 0 0 auto 0; height: 5px; background: linear-gradient(90deg, var(--op-burgundy), var(--op-copper) 40%, var(--op-burgundy)); }
+	.op-hero__top { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; }
+	.op-back { display: inline-flex; align-items: center; gap: 6px; font-size: 0.8125rem; color: var(--op-muted); text-decoration: none; font-weight: 500; }
+	.op-back:hover { color: var(--op-burgundy); }
+	.op-print-btn { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; background: var(--op-card); color: var(--op-ink-soft); border: 1px solid var(--op-rule-strong); border-radius: var(--op-radius-sm); font-family: inherit; font-size: 0.8125rem; font-weight: 500; letter-spacing: 0.02em; cursor: pointer; }
+	.op-print-btn:hover { background: var(--op-cream); color: var(--op-burgundy); border-color: var(--op-burgundy); }
+
+	.op-highlights { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 22px; }
+	@media (max-width: 960px) { .op-highlights { grid-template-columns: repeat(2, 1fr); } }
+	.op-highlight-card { display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; background: var(--op-cream); border: 1px solid var(--op-rule); border-radius: var(--op-radius-sm); }
+	.op-highlight-card__eyebrow { font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--op-burgundy); }
+	.op-highlight-card__value { font-family: 'DM Serif Display', Georgia, serif; font-weight: 400; font-size: 1.1rem; line-height: 1.2; color: var(--op-ink); }
+	.op-highlight-card__value--num { font-feature-settings: 'tnum' 1; }
+	.op-highlight-card__note { font-size: 0.8125rem; color: var(--op-muted); }
+	.op-highlight-card__meta { font-size: 0.75rem; color: var(--op-muted-soft); margin-top: auto; padding-top: 4px; }
+	.op-highlight-card__address { font-style: normal; font-size: 0.8125rem; line-height: 1.5; color: var(--op-ink-soft); }
+
+	.op-hero__grid { display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: end; padding-bottom: 22px; border-bottom: 1px solid var(--op-rule); margin-bottom: 24px; }
+	@media (max-width: 720px) { .op-hero__grid { grid-template-columns: 1fr; } }
+	.op-hero__main { display: flex; flex-direction: column; gap: 8px; }
+	.op-hero__eyebrow { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+	.op-hero__sep { color: var(--op-muted-soft); }
+	.op-hero__date { font-size: 0.75rem; color: var(--op-muted); font-style: italic; }
+	.op-hero__title { margin: 0; font-family: 'DM Serif Display', Georgia, serif; font-weight: 400; line-height: 0.96; display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; }
+	.op-hero__label { font-size: clamp(1.5rem, 3vw, 2.25rem); color: var(--op-ink-soft); letter-spacing: -0.02em; }
+	.op-hero__num { font-size: clamp(3.5rem, 8vw, 6rem); color: var(--op-burgundy); letter-spacing: -0.04em; font-feature-settings: 'tnum' 1; font-style: italic; }
+	.op-hero__sub { margin: 0; font-size: 0.9375rem; color: var(--op-muted); }
+	.op-hero__sub em { font-style: italic; color: var(--op-ink-soft); }
+	.op-mode-chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: var(--op-radius-pill); font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; border: 1px solid currentColor; background: var(--mode-bg, transparent); color: var(--mode-color, var(--op-muted)); }
+	.op-mode-chip[data-mode='entrega'] { --mode-color: #b16518; --mode-bg: rgba(212, 148, 63, 0.12); }
+	.op-mode-chip[data-mode='retirada'] { --mode-color: #3e6b3a; --mode-bg: rgba(62, 107, 58, 0.12); }
+
+	.op-hero__status { background: var(--tone-bg, var(--op-cream)); border: 1px solid var(--tone-color, var(--op-rule)); border-radius: var(--op-radius); padding: 16px 20px; display: flex; flex-direction: column; gap: 6px; min-width: 220px; }
+	.op-hero__status[data-tone='amber'] { --tone-bg: var(--tone-amber-bg); --tone-color: var(--tone-amber); }
+	.op-hero__status[data-tone='yellow'] { --tone-bg: var(--tone-yellow-bg); --tone-color: var(--tone-yellow); }
+	.op-hero__status[data-tone='green'] { --tone-bg: var(--tone-green-bg); --tone-color: var(--tone-green); }
+	.op-hero__status[data-tone='blue'] { --tone-bg: var(--tone-blue-bg); --tone-color: var(--tone-blue); }
+	.op-hero__status[data-tone='purple'] { --tone-bg: var(--tone-purple-bg); --tone-color: var(--tone-purple); }
+	.op-hero__status[data-tone='copper'] { --tone-bg: var(--tone-copper-bg); --tone-color: var(--tone-copper); }
+	.op-hero__status[data-tone='plum'] { --tone-bg: var(--tone-plum-bg); --tone-color: var(--tone-plum); }
+	.op-hero__status-label { font-size: 0.6875rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--tone-color, var(--op-muted)); font-weight: 600; opacity: 0.8; }
+	.op-hero__status-value { font-family: 'DM Serif Display', Georgia, serif; font-size: 1.625rem; line-height: 1; color: var(--tone-color, var(--op-ink)); display: inline-flex; align-items: center; gap: 10px; }
+	.op-hero__status-icon { font-size: 1.5rem; font-family: system-ui; }
+	.op-hero__status-meta { font-size: 0.8125rem; color: var(--op-ink-soft); }
+	.op-hero__status-meta strong { color: var(--op-ink); font-weight: 600; }
+
+	/* ── Flow ── */
+	.op-flow { display: flex; align-items: center; gap: 4px; padding: 4px 0; flex-wrap: nowrap; overflow-x: auto; }
+	.op-flow__cancelled { display: inline-flex; align-items: center; gap: 12px; padding: 12px 18px; background: var(--tone-ruby-bg); color: var(--tone-ruby); border-radius: var(--op-radius); font-weight: 600; font-size: 0.9375rem; }
+	.op-flow__cancelled-icon { font-size: 1.5rem; }
+	.op-flow__step { display: flex; flex-direction: column; align-items: center; gap: 6px; flex-shrink: 0; min-width: 80px; }
+	.op-flow__node { width: 36px; height: 36px; border-radius: 50%; background: var(--op-card); border: 2px solid var(--op-rule); display: flex; align-items: center; justify-content: center; font-size: 1rem; color: var(--op-muted-soft); }
+	.op-flow__step--done .op-flow__node { background: var(--tone-color, var(--op-burgundy)); border-color: var(--tone-color, var(--op-burgundy)); color: var(--op-cream); }
+	.op-flow__step--current .op-flow__node { background: var(--tone-color, var(--op-burgundy)); border-color: var(--tone-color, var(--op-burgundy)); color: var(--op-cream); box-shadow: 0 0 0 6px rgba(107, 29, 42, 0.12); transform: scale(1.08); }
+	.op-flow__step[data-tone='amber'] { --tone-color: var(--tone-amber); }
+	.op-flow__step[data-tone='yellow'] { --tone-color: var(--tone-yellow); }
+	.op-flow__step[data-tone='green'] { --tone-color: var(--tone-green); }
+	.op-flow__step[data-tone='blue'] { --tone-color: var(--tone-blue); }
+	.op-flow__step[data-tone='purple'] { --tone-color: var(--tone-purple); }
+	.op-flow__step[data-tone='copper'] { --tone-color: var(--tone-copper); }
+	.op-flow__step[data-tone='plum'] { --tone-color: var(--tone-plum); }
+	.op-flow__step[data-tone='sage'] { --tone-color: var(--tone-sage); }
+	.op-flow__label { font-size: 0.75rem; color: var(--op-muted); text-align: center; white-space: nowrap; font-weight: 500; }
+	.op-flow__step--done .op-flow__label, .op-flow__step--current .op-flow__label { color: var(--op-ink); font-weight: 600; }
+	.op-flow__line { flex: 1; height: 2px; background: var(--op-rule); margin-bottom: 22px; min-width: 30px; }
+	.op-flow__line--done { background: var(--op-copper); }
+
+	/* ── Card / painéis genéricos ── */
+	.op-card { background: var(--op-card); border: 1px solid var(--op-rule); border-radius: var(--op-radius); padding: 22px 24px; display: flex; flex-direction: column; gap: 14px; }
+	.op-card__eyebrow { font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--op-burgundy); }
+	.op-card__title { margin: 0; font-family: 'DM Serif Display', Georgia, serif; font-weight: 400; font-size: 1.375rem; line-height: 1.15; letter-spacing: -0.01em; color: var(--op-ink); }
+
+	.op-actions { background: var(--op-card); border: 1px solid var(--op-rule); border-radius: var(--op-radius); padding: 20px 24px 24px; display: flex; flex-direction: column; gap: 16px; }
+	.op-actions__head { display: flex; flex-direction: column; gap: 4px; }
+	.op-actions__title { margin: 0; font-family: 'DM Serif Display', Georgia, serif; font-weight: 400; font-size: 1.625rem; color: var(--op-ink); letter-spacing: -0.01em; }
+	.op-actions__commit { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
+	.op-actions__buttons { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
+	.op-action { display: flex; align-items: center; gap: 12px; padding: 14px 16px; background: var(--op-card); border: 1px solid var(--op-rule-strong); border-radius: var(--op-radius-sm); cursor: pointer; font-family: inherit; text-align: left; width: 100%; }
+	.op-action:disabled { opacity: 0.5; cursor: not-allowed; }
+	.op-action__icon { width: 36px; height: 36px; border-radius: 50%; background: var(--tone-bg, var(--op-cream)); color: var(--tone-color, var(--op-ink)); display: flex; align-items: center; justify-content: center; font-size: 1.125rem; flex-shrink: 0; }
+	.op-action[data-tone='ruby'] { --tone-bg: var(--tone-ruby-bg); --tone-color: var(--tone-ruby); }
+	.op-action__label { display: flex; flex-direction: column; gap: 2px; }
+	.op-action__title { font-weight: 600; color: var(--op-ink); font-size: 0.9375rem; }
+	.op-action__hint { font-size: 0.75rem; color: var(--op-muted); }
+
+	/* ── Faturamento / Sentus (real, order-detail.component.ts) ── */
+	.op-sentus__checklist { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px 24px; }
+	@media (max-width: 720px) { .op-sentus__checklist { grid-template-columns: 1fr; } }
+	.op-sentus__check { display: flex; align-items: baseline; gap: 8px; padding: 6px 0; border-bottom: 1px dashed var(--op-rule); font-size: 0.875rem; }
+	.op-sentus__check-icon { color: var(--tone-sage); font-weight: 700; width: 16px; flex-shrink: 0; }
+	.op-sentus__check--fail .op-sentus__check-icon { color: var(--tone-ruby); }
+	.op-sentus__check-label { flex: 0 0 auto; color: var(--op-ink-soft); font-weight: 500; }
+	.op-sentus__check-detail { flex: 1 1 auto; text-align: right; color: var(--op-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+	.op-sentus__check--fail .op-sentus__check-detail { color: var(--tone-ruby); }
+	.op-sentus__status { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 12px 14px; background: var(--op-cream); border: 1px solid var(--op-rule-strong); border-radius: var(--op-radius-sm); }
+	.op-sentus__status-label { font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--op-muted); }
+	.op-sentus__status-value { font-weight: 600; color: var(--op-ink); padding: 2px 10px; border-radius: var(--op-radius-pill); background: var(--tone-purple-bg); }
+	.op-sentus__status-value[data-sentus-status='enviado'] { background: var(--tone-sage-bg); color: var(--tone-sage); }
+	.op-sentus__status-value[data-sentus-status='erro'], .op-sentus__status-value[data-sentus-status='requer_revisao'] { background: var(--tone-ruby-bg); color: var(--tone-ruby); }
+	.op-sentus__status-value[data-sentus-status='enviando'] { background: var(--tone-amber-bg); color: var(--tone-amber); }
+	.op-sentus__status-error, .op-sentus__status-ref { font-size: 0.8125rem; color: var(--op-muted); }
+	.op-sentus__status-error { color: var(--tone-ruby); }
+	.op-sentus__dev-note { margin: 0; font-size: 0.75rem; font-style: italic; color: var(--op-muted); }
+	.op-btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: var(--op-radius-sm); font-family: inherit; font-size: 0.875rem; font-weight: 500; cursor: pointer; border: 1px solid transparent; text-decoration: none; }
+	.op-btn--primary { background: var(--op-burgundy); color: var(--op-cream); }
+	.op-btn--ghost { background: var(--op-card); color: var(--op-ink-soft); border-color: var(--op-rule-strong); }
+	.op-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+	/* ── Câmara Fria — tabela reaproveitada só como base visual da melhoria proposta abaixo ── */
+	.op-camara { background: var(--op-card); border: 1px solid var(--op-rule); border-radius: var(--op-radius); padding: 22px 24px; display: flex; flex-direction: column; gap: 14px; }
+	.op-camara__head { display: flex; flex-direction: column; gap: 4px; }
+	.op-camara__hint { margin: 0; font-size: 0.8125rem; color: var(--op-muted); }
+	.op-camara__table-wrap { overflow-x: auto; }
+	.op-camara__table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+	.op-camara__table th { text-align: left; font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--op-muted); padding: 8px 12px; border-bottom: 2px solid var(--op-rule-strong); white-space: nowrap; }
+	.op-camara__table td { padding: 10px 12px; border-bottom: 1px solid var(--op-rule); vertical-align: middle; }
+	.op-camara__row--conferido { background: rgba(29, 158, 117, 0.05); }
+	.op-camara__code { font-feature-settings: 'tnum' 1; color: var(--op-ink-soft); white-space: nowrap; }
+	.op-camara__nome { display: block; font-weight: 500; color: var(--op-ink); }
+	.op-camara__input { width: 90px; padding: 6px 8px; border: 1px solid var(--op-rule-strong); border-radius: var(--op-radius-sm); font-family: inherit; font-size: 0.875rem; }
+	.op-camara__input:focus-visible { outline: none; border-color: var(--op-burgundy); box-shadow: 0 0 0 3px rgba(107, 29, 42, 0.15); }
+	.op-camara__confirm { padding: 6px 14px; border-radius: var(--op-radius-sm); background: var(--op-burgundy); color: var(--op-cream); border: 1px solid var(--op-burgundy); font-family: inherit; font-size: 0.8125rem; font-weight: 500; cursor: pointer; white-space: nowrap; }
+	.op-camara__confirm:hover:not(:disabled) { background: var(--op-burgundy-dark); }
+	.op-camara__confirm--undo { background: transparent; color: var(--op-ink-soft); border-color: var(--op-rule-strong); }
+	.op-camara__confirm--undo:hover:not(:disabled) { background: var(--op-cream); color: var(--tone-ruby); border-color: var(--tone-ruby); }
+	.op-camara__actions { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+	.op-camara__remove { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; padding: 0; border-radius: var(--op-radius-sm); background: transparent; border: 1px solid var(--op-rule-strong); color: var(--op-muted); cursor: pointer; font-size: 0.875rem; line-height: 1; }
+	.op-camara__remove:hover:not(:disabled) { background: var(--tone-ruby-bg); border-color: var(--tone-ruby); color: var(--tone-ruby); }
+	.op-camara__qty { display: inline-flex; align-items: center; gap: 4px; }
+	.op-camara__qty-btn { width: 24px; height: 24px; padding: 0; border-radius: var(--op-radius-sm); border: 1px solid var(--op-rule-strong); background: var(--op-card); color: var(--op-ink-soft); cursor: pointer; font-size: 0.9375rem; line-height: 1; }
+	.op-camara__qty-btn:hover:not(:disabled) { background: var(--op-cream); border-color: var(--op-burgundy); color: var(--op-burgundy); }
+	.op-camara__qty-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+	.op-camara__qty-input { width: 48px; padding: 4px 4px; text-align: center; border: 1px solid var(--op-rule-strong); border-radius: var(--op-radius-sm); font-family: inherit; font-size: 0.875rem; }
+	.op-camara__qty-label { display: block; margin-top: 2px; font-size: 0.6875rem; color: var(--op-muted); text-transform: lowercase; }
+	.op-camara__add-btn { align-self: flex-start; margin-top: 4px; padding: 8px 14px; border-radius: var(--op-radius-sm); background: transparent; border: 1px dashed var(--op-rule-strong); color: var(--op-ink-soft); font-family: inherit; font-size: 0.8125rem; font-weight: 500; cursor: pointer; }
+	.op-camara__add-btn:hover { background: var(--op-cream); border-color: var(--op-burgundy); color: var(--op-burgundy); }
+	.op-camara__row--draft { background: var(--op-cream); }
+	.op-camara__draft { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 14px; padding: 6px 0; }
+	.op-camara__draft-search { position: relative; flex: 1 1 260px; min-width: 220px; }
+	.op-camara__draft-input { width: 100%; padding: 8px 12px; border: 1px solid var(--op-rule-strong); border-radius: var(--op-radius-sm); font-family: inherit; font-size: 0.875rem; }
+	.op-camara__draft-input:focus-visible { outline: none; border-color: var(--op-burgundy); box-shadow: 0 0 0 3px rgba(107, 29, 42, 0.15); }
+	.op-camara__draft-options { position: relative; z-index: 5; margin: 6px 0 0; padding: 4px; list-style: none; background: var(--op-card); border: 1px solid var(--op-rule-strong); border-radius: var(--op-radius-sm); box-shadow: var(--op-shadow-sm); max-height: 240px; overflow-y: auto; }
+	.op-camara__draft-options li { margin: 0; }
+	.op-camara__draft-options button { display: flex; align-items: baseline; gap: 8px; width: 100%; padding: 8px 10px; border: none; background: transparent; text-align: left; font-family: inherit; font-size: 0.8125rem; color: var(--op-ink); cursor: pointer; border-radius: 6px; }
+	.op-camara__draft-options button:hover { background: var(--op-cream); }
+	.op-camara__draft-option-ref { font-feature-settings: 'tnum' 1; color: var(--op-muted); flex-shrink: 0; }
+	.op-camara__footer { display: flex; flex-wrap: wrap; align-items: baseline; gap: 18px; padding-top: 12px; font-size: 0.8125rem; color: var(--op-ink-soft); }
+	.op-camara__footer strong { color: var(--op-ink); font-feature-settings: 'tnum' 1; }
+	.op-camara__diff--neg strong { color: var(--tone-ruby); }
+	.op-camara__footer-total { margin-left: auto; font-size: 0.9375rem; color: var(--op-burgundy); }
+	.op-camara__peso-display { display: inline-flex; align-items: center; gap: 8px; }
+	.op-camara__corrigir { background: none; border: none; padding: 0; color: var(--op-burgundy); font-size: 0.75rem; font-weight: 600; cursor: pointer; text-decoration: underline; }
+	.op-camara__substituir { background: none; border: none; padding: 0; color: var(--tone-purple, #534ab7); font-size: 0.75rem; font-weight: 600; cursor: pointer; text-decoration: underline; }
+	.op-camara__reconferir { padding: 6px 14px; border-radius: var(--op-radius-sm); background: var(--tone-sage, #1d9e75); color: #fff; border: 1px solid var(--tone-sage, #1d9e75); font-family: inherit; font-size: 0.8125rem; font-weight: 500; cursor: pointer; white-space: nowrap; }
+	.op-camara__reconferir:hover { opacity: 0.9; }
+	.op-camara__status--pendente-reconf { background: var(--tone-amber-bg, #fdf2dc); color: var(--tone-amber, #ba7517); }
+	.op-camara__nome--destaque { font-weight: 800; }
+	.prop-selo { display: inline-block; margin-left: 6px; padding: 1px 8px; border-radius: 999px; font-size: 0.625rem; font-weight: 800; letter-spacing: 0.03em; text-transform: uppercase; vertical-align: middle; }
+	.prop-selo--substituicao { background: var(--tone-purple-bg, #e5e3f6); color: var(--tone-purple, #534ab7); }
+	.prop-selo--novo { background: var(--tone-sage-bg, #d6e7d3); color: var(--tone-sage, #1d9e75); }
+
+	/* ── Estados âmbar/atenção da melhoria proposta ── */
+	.prop-attention-row { display: flex; align-items: flex-start; gap: 12px; padding: 12px 14px; border-radius: var(--op-radius-sm); background: var(--tone-amber-bg, #fdf2dc); border: 1px solid var(--tone-amber, #ba7517); }
+	.prop-attention-icon { font-size: 1.75rem; line-height: 1; color: var(--tone-amber, #ba7517); flex-shrink: 0; }
+	.prop-attention-text { font-size: 0.875rem; color: #7a4d0f; font-weight: 600; line-height: 1.5; }
+	.prop-attention-text small { display: block; font-weight: 400; font-size: 0.75rem; color: #92671f; margin-top: 2px; }
+	.prop-removidos-banner { padding: 10px 14px; border-radius: var(--op-radius-sm); background: var(--tone-ruby-bg, #f4d6d8); color: var(--tone-ruby, #e24b4a); font-size: 0.8125rem; font-weight: 700; }
+	.prop-invalida-banner { padding: 10px 14px; border-radius: var(--op-radius-sm); background: var(--tone-ruby-bg, #f4d6d8); color: var(--tone-ruby, #e24b4a); font-size: 0.8125rem; font-weight: 600; }
+
+	/* ── Controle de impressão (etiqueta corrigida) ── */
+	.prop-etiqueta-status { display: inline-block; padding: 4px 12px; border-radius: var(--op-radius-pill); font-size: 0.75rem; font-weight: 700; }
+	.prop-etiqueta-status--valida { background: var(--tone-sage-bg, #d6e7d3); color: var(--tone-sage, #1d9e75); }
+	.prop-etiqueta-status--pendente { background: var(--tone-ruby-bg, #f4d6d8); color: var(--tone-ruby, #e24b4a); }
+	.prop-etiqueta-status--gerada { background: var(--tone-amber-bg, #fdf2dc); color: var(--tone-amber, #ba7517); }
+	.prop-etiqueta-status--impressa, .prop-etiqueta-status--reimpressa { background: var(--tone-sage-bg, #d6e7d3); color: var(--tone-sage, #1d9e75); }
+
+	/* ── Modal largo + páginas de etiqueta (reaproveitado de 07-camara-fria.html) ── */
+	.cf-modal--wide { max-width: 780px; }
+	.cf-modal-pages { display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 12px 0; background: #e7e2d8; border-radius: var(--op-radius-sm, 8px); }
+	.cf-modal-hint { margin: 10px 0 0; font-size: 0.8125rem; color: var(--op-muted, #78716c); }
+	.epd-page { width: 460px; background: #fff; border: 2px solid #1c1917; box-shadow: 0 2px 8px rgba(0,0,0,0.15); padding: 10px 14px; display: flex; flex-direction: column; gap: 5px; font-family: 'DM Sans', Arial, sans-serif; color: #000; box-sizing: border-box; }
+	.epd-page__corrigida-banner { background: #1c1917; color: #fff; text-align: center; padding: 5px 8px; font-size: 0.8125rem; font-weight: 800; letter-spacing: 0.02em; }
+	.epd-page__header { display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 4px; }
+	.epd-page__pedido { font-size: 0.9rem; font-weight: 800; }
+	.epd-page__volume { font-size: 0.8rem; font-weight: 700; }
+	.epd-page__entrega { margin: 0; font-size: 0.6rem; font-weight: 600; }
+	.epd-page__cliente { display: flex; flex-direction: column; gap: 1px; }
+	.epd-page__cliente-nome { font-size: 1.4rem; font-weight: 800; letter-spacing: -0.01em; line-height: 1; }
+	.epd-page__cliente-codigo { font-size: 0.55rem; color: #333; }
+	.epd-page__cidade { margin: 0; font-size: 0.95rem; font-weight: 800; }
+	.epd-page__logistica { display: flex; gap: 10px; font-size: 0.55rem; border-top: 1px solid #000; border-bottom: 1px solid #000; padding: 3px 0; }
+	.epd-page__itens { width: 100%; border-collapse: collapse; font-size: 0.6rem; }
+	.epd-page__itens th { text-align: left; border-bottom: 1px solid #000; padding: 2px 4px; font-size: 0.56rem; }
+	.epd-page__itens td { padding: 2px 4px; vertical-align: top; }
+	.epd-page__itens td.prop-td-destaque { font-weight: 800; }
+	.epd-page__footer { border-top: 2px solid #000; padding-top: 4px; font-size: 0.58rem; }
+	.epd-page__footer p { margin: 0 0 2px; }
+	.epd-page__footer .prop-correcao-meta { font-weight: 700; }
+	.epd-page__peso-geral { font-weight: 800; }
+
+	/* ── Melhoria proposta (não existe no código real — ver documentação) ── */
+	.cf-proposal { border: 1.5px dashed var(--tone-blue, #378add); background: var(--tone-blue-bg, #dceaf5); border-radius: var(--op-radius); padding: 4px; }
+	.cf-proposal__inner { background: var(--op-card); border-radius: calc(var(--op-radius) - 4px); }
+	.cf-proposal__badge { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 12px 16px; background: var(--tone-blue-bg, #dceaf5); border-radius: calc(var(--op-radius) - 4px) calc(var(--op-radius) - 4px) 0 0; color: var(--tone-blue, #378add); font-weight: 700; font-size: 0.8125rem; }
+	.cf-proposal__badge span.cf-proposal__badge-text { font-weight: 400; color: var(--op-ink-soft); }
+	.cf-alterado-banner { padding: 10px 14px; border-radius: var(--op-radius-sm); background: var(--tone-amber-bg, #fdf2dc); color: var(--tone-amber, #ba7517); font-size: 0.8125rem; font-weight: 600; }
+	.op-camara__status--alterado { background: var(--tone-amber-bg, #fdf2dc); color: var(--tone-amber, #ba7517); }
+	.op-camara__row--alterado { background: rgba(186, 117, 23, 0.08) !important; }
+	.op-camara__row--alterado td:first-child { box-shadow: inset 3px 0 0 var(--tone-amber, #ba7517); }
+	.op-camara__locked-note { margin: 0; padding: 10px 12px; font-size: 0.8125rem; color: var(--op-muted); font-style: italic; background: var(--op-cream); border-radius: var(--op-radius-sm); }
+	.prop-historico { border-top: 1px dashed var(--op-rule); padding-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+	.prop-historico__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+	.prop-historico__list li { display: flex; align-items: baseline; gap: 8px; font-size: 0.8125rem; color: var(--op-ink-soft); padding: 6px 10px; background: var(--op-cream); border-radius: var(--op-radius-sm); }
+	.prop-historico__list li strong { color: var(--op-ink); font-weight: 600; }
+	.prop-historico__time { margin-left: auto; color: var(--op-muted); font-size: 0.75rem; white-space: nowrap; }
+
+	/* ── Complementos deste protótipo (captions por botão) ── */
+	.cf-hint { display: block; margin-top: 6px; font-size: 0.75rem; font-style: italic; color: var(--op-muted, #78716c); }
+	.cf-hint strong { font-style: normal; color: var(--op-ink-soft, #44403c); }
+	.cf-note { margin: 6px 0 0; font-size: 0.8125rem; color: var(--op-ink-soft, #44403c); }
+	.cf-note strong { color: var(--tone-ruby, #e24b4a); }
+	.cf-note--ok strong { color: var(--tone-sage, #1d9e75); }
+
+	/* ── Documentação (fora da tela operacional) ── */
+	.cf-docs { margin-top: 8px; border: 1px solid var(--op-rule, #e7ddd1); border-radius: var(--op-radius, 14px); background: var(--op-card, #fff); }
+	.cf-docs summary { cursor: pointer; padding: 16px 20px; font-family: 'DM Serif Display', Georgia, serif; font-size: 1.125rem; color: var(--op-ink, #1c1917); list-style: none; display: flex; align-items: center; gap: 8px; }
+	.cf-docs summary::-webkit-details-marker { display: none; }
+	.cf-docs summary::before { content: '▸'; color: var(--op-burgundy, #6b1d2a); transition: transform 140ms ease; }
+	.cf-docs[open] summary::before { transform: rotate(90deg); }
+	.cf-docs__body { padding: 0 20px 20px; display: flex; flex-direction: column; gap: 18px; font-size: 0.875rem; color: var(--op-ink-soft, #44403c); line-height: 1.6; }
+	.cf-docs__body h4 { margin: 0 0 6px; font-size: 0.8125rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--op-burgundy, #6b1d2a); }
+	.cf-docs__body ul { margin: 0; padding-left: 20px; }
+	.cf-docs__body li { margin-bottom: 4px; }
+	.cf-tag { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 0.6875rem; font-weight: 700; margin-right: 6px; }
+	.cf-tag--real { background: var(--tone-sage-bg, #d6e7d3); color: var(--tone-sage, #1d9e75); }
+	.cf-tag--mock { background: var(--tone-amber-bg, #fdf2dc); color: var(--tone-amber, #ba7517); }
+	.cf-tag--planned { background: var(--tone-ruby-bg, #f4d6d8); color: var(--tone-ruby, #e24b4a); }
+	.cf-tag--proposal { background: var(--tone-blue-bg, #dceaf5); color: var(--tone-blue, #378add); }
+	.cf-tag--none { background: #e7e2d8; color: #57534e; }
+	.cf-flow { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; font-size: 0.875rem; }
+	.cf-flow__step { padding: 8px 14px; border: 1px solid var(--op-rule-strong, #d6c9b6); border-radius: var(--op-radius-sm, 8px); background: var(--op-cream, #fdf6ec); font-weight: 600; color: var(--op-ink, #1c1917); }
+	.cf-flow__arrow { padding-left: 20px; color: var(--op-muted, #78716c); }
+
+	/* ── Ferramentas de demonstração (exclusivas do protótipo) ── */
+	.cf-tools-warning { margin: 0 0 4px; padding: 10px 14px; border-radius: var(--op-radius-sm, 8px); background: var(--tone-ruby-bg, #f4d6d8); color: var(--tone-ruby, #e24b4a); font-size: 0.8125rem; font-weight: 600; }
+	.cf-tools-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+	.cf-tools-select { padding: 9px 12px; border: 1px solid var(--op-rule-strong, #d6c9b6); border-radius: 8px; font-family: inherit; font-size: 0.875rem; color: var(--op-ink, #1c1917); background: #fff; }
+	.cf-radio-group { display: inline-flex; border: 1px solid var(--op-rule-strong, #d6c9b6); border-radius: var(--op-radius-pill, 999px); overflow: hidden; }
+	.cf-radio-btn { padding: 7px 16px; background: var(--op-cream, #fdf6ec); border: none; font-family: inherit; font-size: 0.8125rem; font-weight: 500; color: var(--op-ink-soft, #44403c); cursor: pointer; }
+	.cf-radio-btn + .cf-radio-btn { border-left: 1px solid var(--op-rule-strong, #d6c9b6); }
+	.cf-radio-btn--active { background: var(--op-burgundy, #6b1d2a); color: #fff; }
+
+	/* ── Modais (real: sentus-enviar-dialog.component.ts / confirmar-nota-fiscal-dialog.component.ts) ── */
+	.cf-overlay { position: fixed; inset: 0; background: rgba(28, 25, 23, 0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+	.cf-overlay[hidden] { display: none; }
+	.cf-modal { background: #fff; border-radius: var(--op-radius, 14px); box-shadow: 0 20px 50px -12px rgba(28,25,23,0.4); width: 100%; max-width: 460px; max-height: 86vh; overflow-y: auto; padding: 22px 24px; }
+	.cf-modal h2 { margin: 0 0 4px; font-family: 'DM Serif Display', Georgia, serif; font-weight: 400; font-size: 1.25rem; color: var(--op-ink, #1c1917); }
+	.cf-modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; flex-wrap: wrap; }
+	.sed-warning { margin: 0 0 14px; padding: 10px 12px; border-radius: 8px; background: #fdf2dc; border: 1px solid #ba7517; color: #7a4d0f; font-size: 0.8125rem; line-height: 1.5; }
+	.sed-summary { margin: 0; display: flex; flex-direction: column; gap: 8px; }
+	.sed-summary div { display: flex; justify-content: space-between; gap: 12px; padding-bottom: 6px; border-bottom: 1px dashed #d6c9b6; font-size: 0.9375rem; }
+	.sed-summary dt { color: #78716c; font-weight: 500; }
+	.sed-summary dd { margin: 0; font-weight: 600; color: #1c1917; }
+	.cnf-hint { margin: 0 0 6px; font-size: 0.8125rem; color: #78716c; line-height: 1.5; }
+	.cnf-row { display: flex; gap: 12px; }
+	.cnf-field { flex: 1 1 auto; display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+	.cnf-field--small { flex: 0 0 130px; }
+	.cnf-label { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #78716c; }
+	.cnf-input { padding: 9px 12px; border: 1px solid #d6c9b6; border-radius: 8px; font-family: inherit; font-size: 0.9375rem; color: #1c1917; background: #fff; width: 100%; }
+	.cnf-input:focus-visible { outline: none; border-color: #6b1d2a; box-shadow: 0 0 0 3px rgba(107, 29, 42, 0.15); }
+
+	.cf-toast-stack { position: fixed; right: 20px; bottom: 20px; z-index: 2000; display: flex; flex-direction: column; gap: 8px; }
+	.cf-toast { background: var(--op-burgundy, #6b1d2a); color: #fff; padding: 10px 16px; border-radius: 8px; font-size: 0.8125rem; box-shadow: 0 8px 24px -8px rgba(0,0,0,0.4); opacity: 0; transform: translateY(8px); transition: all 200ms ease; max-width: 320px; }
+	.cf-toast.is-visible { opacity: 1; transform: translateY(0); }
+	.cf-toast--success { background: var(--tone-sage, #1d9e75); }
+	.cf-toast--error { background: var(--tone-ruby, #e24b4a); }
 </style>
 </head>
-<body data-current="faturamento">
-<div class="proto-page">
-	<header class="proto-banner">
-		<span class="proto-banner__tag">Handoff · Faturamento</span>
-		<a href="index.html">← Voltar ao índice</a>
-	</header>
-	<main class="proto-main">
-		<div class="container" style="padding-top:16px;">
-			<div class="future-note">Recriado a partir da seção "Faturamento e integração com Sentus" de <code>order-detail.component.ts</code> — worktree <code>rafael-lab</code>. Checklist, rótulos de status Sentus e nota de desenvolvimento copiados literalmente do componente real.</div>
+<body>
+<div class="layout-container">
+	<nav class="sidenav">
+		<div class="sidenav-brand">
+			<span class="brand-name">ZFood</span>
+			<span class="brand-badge">Admin</span>
+			<button class="collapse-button" aria-label="Fechar menu"><span class="material-symbols-outlined">chevron_left</span></button>
 		</div>
+		<ul class="nav-list">
+			<li><a class="nav-item nav-external" href="01-catalogo.html"><span class="material-symbols-outlined">storefront</span><span>Ver Catálogo</span></a></li>
+			<hr class="nav-divider" />
+			<li><a class="nav-item" href="04-dashboard-admin.html"><span class="material-symbols-outlined">dashboard</span><span>Dashboard</span></a></li>
+			<li><a class="nav-item active" href="05-kanban.html"><span class="material-symbols-outlined">receipt_long</span><span>Pedidos</span></a></li>
+			<li><a class="nav-item" href="06-cadastro-financeiro.html"><span class="material-symbols-outlined">account_balance</span><span>Cadastros Financeiros</span></a></li>
+			<li><a class="nav-item" href="#"><span class="material-symbols-outlined">people</span><span>Usuários</span></a></li>
+			<li><a class="nav-item" href="#"><span class="material-symbols-outlined">inventory_2</span><span>Produtos</span></a></li>
+			<li><a class="nav-item" href="#"><span class="material-symbols-outlined">category</span><span>Categorias</span></a></li>
+			<li><a class="nav-item" href="#"><span class="material-symbols-outlined">sync</span><span>Sincronização</span></a></li>
+			<li><a class="nav-item" href="#"><span class="material-symbols-outlined">settings</span><span>Configurações</span></a></li>
+		</ul>
+	</nav>
 
-		<div class="op-detail">
-			<a href="05-kanban.html" style="font-size:0.8rem; color:var(--zf-warm-gray); text-decoration:none;">← Voltar ao Quadro</a>
-			<h1 class="op-detail__title zf-serif">Pedido #14 <span class="badge badge-copper">Faturamento</span></h1>
-			<p class="muted small" style="margin-bottom: 20px;">Cliente Teste Limite Credito · R$ 900,00 · 26 itens</p>
+	<div class="content">
+		<header class="toolbar">
+			<button class="menu-button" aria-label="Abrir menu"><span class="material-symbols-outlined">menu</span></button>
+			<span class="toolbar-title">Painel Administrativo</span>
+			<span class="spacer"></span>
+			<span class="admin-name">Administrador ZFOODs</span>
+			<button class="logout-btn" aria-label="Sair"><span class="material-symbols-outlined">logout</span></button>
+		</header>
 
-			<section class="op-card">
-				<span class="op-card__eyebrow">Faturamento</span>
-				<h3 class="op-card__title">Faturamento e integração com Sentus</h3>
+		<main class="main-content">
+			<div class="op-root op-detail">
 
-				<ul class="op-sentus__checklist">
-					<li class="op-sentus__check"><span class="op-sentus__check-icon">✓</span><span class="op-sentus__check-label">Cliente</span><span class="op-sentus__check-detail">Cliente Teste Limite Credito</span></li>
-					<li class="op-sentus__check"><span class="op-sentus__check-icon">✓</span><span class="op-sentus__check-label">Código do cliente no Sentus</span><span class="op-sentus__check-detail">888001</span></li>
-					<li class="op-sentus__check"><span class="op-sentus__check-icon">✓</span><span class="op-sentus__check-label">Itens do pedido</span><span class="op-sentus__check-detail">26 itens</span></li>
-					<li class="op-sentus__check"><span class="op-sentus__check-icon">✓</span><span class="op-sentus__check-label">Quantidades</span><span class="op-sentus__check-detail">26 peças/unidades no total</span></li>
-					<li class="op-sentus__check"><span class="op-sentus__check-icon">✓</span><span class="op-sentus__check-label">Pesos reais</span><span class="op-sentus__check-detail">26 de 26 informados</span></li>
-					<li class="op-sentus__check"><span class="op-sentus__check-icon">✓</span><span class="op-sentus__check-label">Preços</span><span class="op-sentus__check-detail">Todos válidos</span></li>
-					<li class="op-sentus__check"><span class="op-sentus__check-icon">✓</span><span class="op-sentus__check-label">Valor total</span><span class="op-sentus__check-detail">R$ 900,00</span></li>
-					<li class="op-sentus__check"><span class="op-sentus__check-icon">✓</span><span class="op-sentus__check-label">Forma de pagamento</span><span class="op-sentus__check-detail">Pix</span></li>
-					<li class="op-sentus__check"><span class="op-sentus__check-icon">✓</span><span class="op-sentus__check-label">Data de entrega</span><span class="op-sentus__check-detail">21 de julho de 2026</span></li>
-				</ul>
+				<header class="op-hero" id="opHero" data-status="faturamento">
+					<div class="op-hero__top">
+						<a class="op-back" href="05-kanban.html"><span aria-hidden="true">←</span><span>Pedidos</span></a>
+						<button type="button" class="op-print-btn"><span aria-hidden="true">⎙</span><span>Imprimir</span></button>
+					</div>
 
-				<div class="op-sentus__status">
-					<span class="op-sentus__status-label">Status da integração</span>
-					<span class="op-sentus__status-value" data-sentus-status="nao_enviado">Não enviado</span>
+					<div class="op-highlights">
+						<article class="op-highlight-card">
+							<span class="op-highlight-card__eyebrow">Pedido</span>
+							<strong class="op-highlight-card__value">Ref. Catálogo Nº 16</strong>
+							<span class="op-highlight-card__note" id="opRefSentus">Nº Sentus: aguardando integração</span>
+							<span class="op-highlight-card__meta">Pedido em 17/07/2026</span>
+						</article>
+						<article class="op-highlight-card">
+							<span class="op-highlight-card__eyebrow">Cliente</span>
+							<strong class="op-highlight-card__value op-highlight-card__value--num">33871</strong>
+							<strong class="op-highlight-card__value">Cliente Teste Limite Credito</strong>
+							<span class="op-highlight-card__note">Contato: Marcos Villela</span>
+							<span class="op-highlight-card__meta">(51) 3555-2200 · financeiro@limitecredito.com.br</span>
+						</article>
+						<article class="op-highlight-card">
+							<span class="op-highlight-card__eyebrow">Dia da entrega</span>
+							<strong class="op-highlight-card__weekday" style="font-size:0.8125rem;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:var(--op-ink-soft);">Sexta-feira</strong>
+							<strong class="op-highlight-card__value" style="font-size:1.375rem;color:var(--op-burgundy);">24 de julho</strong>
+							<address class="op-highlight-card__address">Av. Industrial, 1450<br />Distrito Sul — Canoas/RS<br />CEP 92000-000</address>
+						</article>
+						<article class="op-highlight-card">
+							<span class="op-highlight-card__eyebrow">Forma de pagamento</span>
+							<strong class="op-highlight-card__value" id="opFormaPagamentoLabel">Cartão</strong>
+							<span class="op-highlight-card__note" id="opFormaPagamentoNote">Cartão de crédito/débito</span>
+						</article>
+					</div>
+
+					<div class="op-hero__grid">
+						<div class="op-hero__main">
+							<div class="op-hero__eyebrow">
+								<span class="op-eyebrow">Ticket de Operação</span>
+								<span class="op-hero__sep">·</span>
+								<span class="op-hero__date">17 de julho de 2026</span>
+								<span class="op-hero__sep">·</span>
+								<span class="op-mode-chip" data-mode="entrega"><span aria-hidden="true">⇨</span> Entrega</span>
+							</div>
+							<h1 class="op-hero__title"><span class="op-hero__label">Pedido</span><span class="op-hero__num">№16</span></h1>
+							<p class="op-hero__sub">Aberto às 11:05 · <em>2d atrás</em></p>
+						</div>
+						<aside class="op-hero__status" id="opHeroStatus" data-tone="purple">
+							<span class="op-hero__status-label">Status atual</span>
+							<span class="op-hero__status-value"><span class="op-hero__status-icon" id="opHeroStatusIcon" aria-hidden="true">▤</span> <span id="opHeroStatusLabel">Faturamento</span></span>
+							<span class="op-hero__status-meta"><strong>3</strong> itens · <strong>R$ 539,40</strong></span>
+						</aside>
+					</div>
+
+					<div id="opFlowWrap">
+						<div class="op-flow" id="opFlow" role="list">
+							<div class="op-flow__step" data-status="pendente" data-tone="amber"><div class="op-flow__node">◷</div><span class="op-flow__label">Pendente</span></div>
+							<div class="op-flow__line"></div>
+							<div class="op-flow__step" data-status="cadastro_financeiro" data-tone="yellow"><div class="op-flow__node">◈</div><span class="op-flow__label">Cadastro Financeiro</span></div>
+							<div class="op-flow__line"></div>
+							<div class="op-flow__step" data-status="confirmado" data-tone="green"><div class="op-flow__node">✓</div><span class="op-flow__label">Pedido Confirmado</span></div>
+							<div class="op-flow__line"></div>
+							<div class="op-flow__step" data-status="em_separacao" data-tone="blue"><div class="op-flow__node">⚒</div><span class="op-flow__label">Em Separação</span></div>
+							<div class="op-flow__line"></div>
+							<div class="op-flow__step" data-status="faturamento" data-tone="purple"><div class="op-flow__node">▤</div><span class="op-flow__label">Faturamento</span></div>
+							<div class="op-flow__line"></div>
+							<div class="op-flow__step" data-status="aguardando_pagamento" data-tone="copper"><div class="op-flow__node">⧗</div><span class="op-flow__label">Aguardando Pagamento</span></div>
+							<div class="op-flow__line"></div>
+							<div class="op-flow__step" data-status="em_rota" data-tone="plum"><div class="op-flow__node">⤳</div><span class="op-flow__label">Em Rota</span></div>
+							<div class="op-flow__line"></div>
+							<div class="op-flow__step" data-status="entregue" data-tone="sage"><div class="op-flow__node">★</div><span class="op-flow__label">Entregue</span></div>
+						</div>
+					</div>
+				</header>
+
+				<!-- Painel real: order-detail.component.ts linhas 637-705 ("Faturamento e integração com Sentus") -->
+				<section class="op-actions op-sentus" id="painelFaturamento" aria-label="Faturamento e integração com Sentus">
+					<div class="op-actions__head">
+						<span class="op-eyebrow">Faturamento</span>
+						<h2 class="op-actions__title">Faturamento e integração com Sentus</h2>
+					</div>
+
+					<ul class="op-sentus__checklist" id="checklistFaturamento"></ul>
+
+					<div class="op-sentus__status">
+						<span class="op-sentus__status-label">Status da integração</span>
+						<span class="op-sentus__status-value" id="sentusStatusValue" data-sentus-status="nao_enviado">Não enviado</span>
+						<span class="op-sentus__status-error" id="sentusStatusError" hidden></span>
+						<span class="op-sentus__status-ref" id="sentusStatusRef" hidden></span>
+						<span class="op-sentus__status-ref" id="notaFiscalRef" hidden></span>
+					</div>
+
+					<div class="op-actions__commit">
+						<button type="button" class="op-btn op-btn--primary op-btn--large" id="btnEnviarSentus">Enviar pedido para o Sentus</button>
+						<button type="button" class="op-btn op-btn--ghost" id="btnConfirmarNF" hidden>Confirmar nota fiscal emitida</button>
+					</div>
+
+					<p class="op-sentus__dev-note">Modo desenvolvimento — o envio acima é uma simulação local; nenhuma chamada real é feita ao Sentus enquanto o endpoint/credenciais de produção não forem configurados pelo Weslei.</p>
+
+					<span class="cf-hint"><strong>Enviar pedido para o Sentus</strong> → habilitado só quando os 11 itens bloqueantes do checklist estiverem "ok". Abre um resumo de confirmação; ao confirmar, a integração passa por "Enviando…" e resolve em "Enviado" ou "Erro". A partir de "Erro" o mesmo botão permite reenviar.</span>
+					<span class="cf-hint"><strong>Confirmar nota fiscal emitida</strong> → só aparece depois que a integração estiver "Enviado". Abre um formulário manual (número, série, chave, data/hora, valor). Ao confirmar, o pedido avança automaticamente: Boleto → "Em Rota" direto; PIX/Cartão → "Aguardando Pagamento".</span>
+				</section>
+
+				<!-- ═══════════════ MELHORIA PROPOSTA (PROTÓTIPO HTML) — NÃO EXISTE NO CÓDIGO REAL DO FATURAMENTO ═══════════════
+				     Ver seção "Melhorias propostas (protótipo)" na documentação para o motivo e o status
+				     de cada item. Esta seção inteira é 🟡 Implementado apenas no protótipo HTML / 🔵 proposta. -->
+				<section class="cf-proposal" id="painelProposta">
+					<div class="cf-proposal__badge">
+						🔵 Melhoria proposta (Protótipo HTML) — <span class="cf-proposal__badge-text">esta seção não existe na tela real de Faturamento hoje. Ver "Observações das funcionalidades" para detalhes.</span>
+					</div>
+					<div class="cf-proposal__inner op-camara" aria-label="Revisão do pedido no Faturamento (proposta)">
+						<header class="op-camara__head">
+							<span class="op-card__eyebrow">Proposta de evolução</span>
+							<h3 class="op-card__title">Revisão do pedido — igual à tela da Câmara Fria</h3>
+							<p class="op-camara__hint">Mostra exatamente o que chegou conferido da Câmara Fria. A edição fica bloqueada até você clicar em "Habilitar edição" — nenhuma alteração acontece sem essa etapa.</p>
+						</header>
+
+						<div id="propAttentionRow" class="prop-attention-row" hidden>
+							<span class="prop-attention-icon" aria-hidden="true">⚠</span>
+							<span class="prop-attention-text">Pedido alterado no Faturamento
+								<small id="propAttentionDetalhe"></small>
+							</span>
+						</div>
+						<div id="propRemovidosBanner" class="prop-removidos-banner" hidden>⚠ PEDIDO ALTERADO — UM ITEM FOI REMOVIDO NO FATURAMENTO</div>
+						<div id="propInvalidaBanner" class="prop-invalida-banner" hidden>Etiqueta anterior inválida. Gere uma nova etiqueta antes de enviar o pedido ao Sentus.</div>
+						<div id="propSentusBloqueioNote" class="cf-note" hidden>🔵 Enquanto essa pendência existir, o botão real <strong>"Enviar pedido para o Sentus"</strong> (painel acima) permanece bloqueado, mesmo com o checklist completo — essa regra adicional é a melhoria proposta desta seção, não existe no código real.</div>
+
+						<div class="op-actions__commit" style="justify-content:space-between;">
+							<button type="button" class="op-btn op-btn--ghost" id="btnToggleEdicao">🔓 Habilitar edição</button>
+							<button type="button" class="op-btn op-btn--ghost" id="btnVoltarSeparacao">↩ Voltar pedido para Em Separação</button>
+						</div>
+						<span class="cf-hint"><strong>Habilitar edição</strong> → a tabela chega travada, mostrando exatamente os dados conferidos na Câmara Fria; só depois de habilitar (e preencher o motivo) os controles de correção aparecem. <strong>Voltar para Em Separação</strong> → pede confirmação antes de devolver o pedido para uma nova conferência completa.</span>
+
+						<div id="propMotivoWrap" hidden>
+							<label class="cnf-field" style="max-width:520px;">
+								<span class="cnf-label">Motivo da alteração <em style="font-style:italic; text-transform:none; font-weight:400;">(obrigatório para editar)</em></span>
+								<input type="text" class="cnf-input" id="propMotivo" placeholder="Ex.: divergência de peso, produto substituído, erro de separação, solicitação do cliente" />
+							</label>
+						</div>
+
+						<div class="op-camara__table-wrap">
+							<table class="op-camara__table">
+								<thead>
+									<tr><th>Código</th><th>Produto</th><th>Peças</th><th>Peso aprox.</th><th>Peso real</th><th>Status</th><th>Ações</th></tr>
+								</thead>
+								<tbody id="propostaTbody"></tbody>
+								<tfoot>
+									<tr>
+										<td colspan="7">
+											<div class="op-camara__footer">
+												<span><strong id="propFooterItens">3</strong> itens</span>
+												<span><strong id="propFooterPecas">24</strong> peças</span>
+												<span>Peso aprox.: <strong id="propFooterPesoAprox">—</strong></span>
+												<span>Peso real: <strong id="propFooterPesoReal">—</strong></span>
+												<span id="propFooterDiferencaWrap">Diferença: <strong id="propFooterDiferenca">—</strong></span>
+												<span class="op-camara__footer-total">Total do pedido: <strong>R$ 539,40</strong></span>
+											</div>
+										</td>
+									</tr>
+								</tfoot>
+							</table>
+						</div>
+						<span class="cf-hint"><strong>Corrigir peso real</strong> → reabre o campo daquele item para digitar um novo valor. <strong>+ / −</strong> → altera a quantidade de peças/unidades. <strong>⇄ Substituir</strong> → troca o produto da linha por outro do catálogo. <strong>🗑 Remover</strong> → exige motivo obrigatório. <strong>✓ Reconferir</strong> → aparece em qualquer item alterado/adicionado/substituído e confirma que ele foi conferido de novo depois da correção. Qualquer alteração recalcula peças, peso aproximado, peso real e diferença na hora.</span>
+
+						<div class="op-camara__head" style="margin-top:22px;">
+							<span class="op-card__eyebrow">Etiqueta corrigida</span>
+							<h3 class="op-card__title">Etiqueta térmica após correção no Faturamento</h3>
+							<p class="op-camara__hint">A etiqueta impressa na Câmara Fria fica inválida assim que qualquer item é alterado, substituído, removido ou adicionado aqui. É preciso gerar e imprimir uma etiqueta corrigida antes de liberar o envio ao Sentus.</p>
+						</div>
+						<div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin:10px 0;">
+							<span>Status da etiqueta: <span id="propEtiquetaStatus" class="prop-etiqueta-status prop-etiqueta-status--valida">✓ Etiqueta válida</span></span>
+						</div>
+						<div class="op-actions__commit" style="justify-content:flex-start; gap:10px;">
+							<button type="button" class="op-btn op-btn--ghost" id="btnVisualizarEtiquetaCorrigida">👁 Visualizar etiqueta corrigida</button>
+							<button type="button" class="op-btn op-btn--primary" id="btnGerarEtiquetaCorrigida" disabled>🖨 Gerar e imprimir etiqueta corrigida</button>
+							<button type="button" class="op-btn op-btn--ghost" id="btnReimprimirEtiquetaCorrigida" hidden>🔁 Reimprimir etiqueta corrigida</button>
+						</div>
+						<span class="cf-hint"><strong>Visualizar</strong> → abre a pré-visualização a qualquer momento, sem alterar nada. <strong>Gerar e imprimir</strong> → só habilita quando existe correção pendente; grava "Etiqueta corrigida gerada" e "Etiqueta corrigida impressa" no histórico. <strong>Reimprimir</strong> → some até existir uma etiqueta corrigida já impressa; reaproveita o campo "Motivo da alteração" preenchido acima.</span>
+
+						<div class="prop-historico">
+							<h4 class="op-card__eyebrow" style="margin:0;">Histórico desta demonstração</h4>
+							<ul id="propHistoricoList" class="prop-historico__list"></ul>
+						</div>
+					</div>
+				</section>
+
+				<!-- Painel real: order-detail.component.ts linhas 443-527 ("Avançar pedido") — só a opção Cancelado se aplica a esta etapa -->
+				<section class="op-actions" id="painelAvancar" aria-label="Avançar status do pedido">
+					<div class="op-actions__head">
+						<span class="op-eyebrow">Próximo passo</span>
+						<h2 class="op-actions__title">Avançar pedido</h2>
+					</div>
+					<div class="op-actions__buttons">
+						<button type="button" class="op-action" data-tone="ruby" id="btnCancelarPedido">
+							<span class="op-action__icon" aria-hidden="true">⊘</span>
+							<span class="op-action__label">
+								<span class="op-action__title">Cancelado</span>
+								<span class="op-action__hint">Cancelar este pedido</span>
+							</span>
+						</button>
+					</div>
+				</section>
+
+			</div>
+
+			<!-- ═══════════════ DOCUMENTAÇÃO — fora da interface operacional ═══════════════ -->
+			<details class="cf-docs">
+				<summary>Observações das funcionalidades – Faturamento</summary>
+				<div class="cf-docs__body">
+					<div>
+						<h4>Objetivo da etapa</h4>
+						<p>Revisar o pedido já conferido pela Câmara Fria, enviá-lo ao Sentus para emissão da nota fiscal e, depois de emitida, registrar os dados da NF para liberar o pedido para entrega/pagamento.</p>
+					</div>
+					<div>
+						<h4>Quem utiliza</h4>
+						<p>A equipe de faturamento/financeiro, com acesso ao painel administrativo. Não é uma tela voltada ao cliente.</p>
+					</div>
+					<div>
+						<h4>O que chega da Câmara Fria</h4>
+						<p>Itens ativos com peso real e preço final, quantidades, valor total, forma de pagamento, data de entrega, endereço e observação do cliente — nada é recalculado aqui, só revisado no checklist.</p>
+					</div>
+					<div>
+						<h4>Checklist (13 itens reais — 11 bloqueantes, 2 informativos)</h4>
+						<p>Bloqueantes: Cliente, Código do cliente no Sentus, Itens do pedido, Quantidades, Pesos reais, Preços, Valor total, Forma de pagamento, Data de entrega, Endereço, Dados fiscais necessários. Informativos (não bloqueiam o envio): Observações, Condição de pagamento.</p>
+					</div>
+					<div>
+						<h4>Regra de envio ao Sentus</h4>
+						<p>Habilitado só quando todos os itens bloqueantes do checklist estão "ok" e a integração não está "Enviando…" nem já "Enviado". Cada tentativa é uma simulação local (edge function <code>sentus-faturamento</code>) — nenhuma chamada real acontece hoje.</p>
+					</div>
+					<div>
+						<h4>Regra de reenvio</h4>
+						<p>Permitido a partir de "Erro" (o mesmo botão de envio reaparece habilitado). Bloqueado a partir de "Enviado" — não é possível enviar duas vezes com sucesso (evita duplicar o pedido no Sentus).</p>
+					</div>
+					<div>
+						<h4>Regra de confirmação da nota fiscal</h4>
+						<p>100% manual nesta fase — só aparece depois de "Enviado". O formulário exige número, série, data/hora de emissão e valor faturado maior que zero; a chave de acesso e a observação são opcionais.</p>
+					</div>
+					<div>
+						<h4>Regra das formas de pagamento</h4>
+						<p>Depois da nota fiscal confirmada: <strong>Boleto</strong> avança direto para "Em Rota" (o boleto já foi aprovado antes, na Câmara Fria/Cadastro Financeiro). <strong>PIX</strong> e <strong>Cartão</strong> avançam para "Aguardando Pagamento", já que a confirmação do pagamento acontece depois da entrega ser preparada.</p>
+					</div>
+					<div>
+						<h4>Observação interna do financeiro</h4>
+						<p><span class="cf-tag cf-tag--none">❌ Não implementado</span> A coluna <code>pedidos.observacao_interna_financeiro</code> já existe no banco (criada na etapa de limite de crédito), mas <strong>ainda não é lida nem exibida nesta tela</strong> — é uma lacuna real do sistema atual, documentada em <code>plan/fase4-integracao-sentus-faturamento.md</code>, não uma funcionalidade pronta. Este protótipo não a representa para não sugerir que já funciona.</p>
+					</div>
+					<div>
+						<h4>Retorno do número do pedido no Sentus</h4>
+						<p><span class="cf-tag cf-tag--none">❌ Não implementado</span> Hoje só existe o campo <code>sentus_id_referencia</code> (texto livre) — o formato real de resposta da API do Sentus para <code>POST /pdv/venda/novavenda</code> ainda não foi confirmado (documentado como pendência explícita).</p>
+					</div>
+					<div>
+						<h4>Quais botões são reais e quais interações são simulação do protótipo</h4>
+						<p>Os dois botões operacionais (Enviar para o Sentus, Confirmar nota fiscal) e todas as regras de bloqueio/checklist reproduzem exatamente o componente real. É <strong>simulação exclusiva deste protótipo</strong>: o resultado do envio (sucesso ou erro) é escolhido manualmente no painel de ferramentas abaixo em vez de vir de uma chamada real; os dados não são salvos em nenhum banco; e não há chamada real a nenhuma API (Supabase ou Sentus) — igual ao sistema real hoje, que também roda 100% em modo desenvolvimento.</p>
+					</div>
+					<div>
+						<h4>Ferramentas exclusivas do protótipo</h4>
+						<p>"Reiniciar demonstração" e "Restaurar estado inicial" (painel "Ferramentas de demonstração" abaixo) existem apenas para permitir repetir os testes quantas vezes forem necessárias. Essas funções <strong>não existem no sistema real</strong> e não devem ser implementadas em produção sem uma regra administrativa explícita e auditoria apropriada.</p>
+					</div>
+					<div>
+						<h4>O que já está implementado no código</h4>
+						<ul>
+							<li><span class="cf-tag cf-tag--real">✅ Real</span> Checklist de 13 itens, painel de status da integração, botão de envio com diálogo de confirmação</li>
+							<li><span class="cf-tag cf-tag--real">✅ Real</span> Confirmação manual da nota fiscal com roteamento automático por forma de pagamento</li>
+							<li><span class="cf-tag cf-tag--real">✅ Real</span> Bloqueio de reenvio duplicado e liberação de reenvio a partir de erro</li>
+						</ul>
+					</div>
+					<div>
+						<h4>O que é mockado apenas para esta demonstração</h4>
+						<ul>
+							<li><span class="cf-tag cf-tag--mock">🟡 Protótipo</span> Todos os dados deste pedido (cliente, itens, valores) — não vêm de um banco real</li>
+							<li><span class="cf-tag cf-tag--mock">🟡 Protótipo</span> O resultado do envio ao Sentus (sucesso/erro) é escolhido manualmente nas ferramentas de demonstração</li>
+						</ul>
+					</div>
+					<div>
+						<h4>O que ainda é apenas planejado (não implementado)</h4>
+						<ul>
+							<li><span class="cf-tag cf-tag--none">❌ Não implementado</span> Chamada real a <code>POST /pdv/venda/novavenda</code> (endpoint/credenciais/modelo de NF ainda não confirmados com o Sentus)</li>
+							<li><span class="cf-tag cf-tag--none">❌ Não implementado</span> Leitura de <code>produtos.sentus_id</code> no payload (ajuste de código pendente)</li>
+							<li><span class="cf-tag cf-tag--none">❌ Não implementado</span> Mapeamento forma de pagamento → ID do Sentus</li>
+							<li><span class="cf-tag cf-tag--none">❌ Não implementado</span> Automação da confirmação de NF via consulta periódica (<code>GET /pdv/pedido/acomp/&#123;id&#125;</code>)</li>
+							<li><span class="cf-tag cf-tag--none">❌ Não implementado</span> Exibição da observação interna do financeiro nesta tela</li>
+						</ul>
+					</div>
+					<div>
+						<h4>Legenda de status usada nesta tela</h4>
+						<p>
+							<span class="cf-tag cf-tag--real">✅ Real</span> existe e funciona assim no código atual —
+							<span class="cf-tag cf-tag--mock">🟡 Protótipo</span> só existe aqui, como demonstração —
+							<span class="cf-tag cf-tag--proposal">🔵 Proposta</span> ideia de melhoria de usabilidade identificada durante a criação deste protótipo, nunca discutida com o time de desenvolvimento —
+							<span class="cf-tag cf-tag--none">❌ Não implementado</span> não existe hoje no código real (com ou sem plano futuro documentado pelo time).
+						</p>
+					</div>
+					<div>
+						<h4>Melhorias propostas durante a criação dos protótipos (⚠️ não fazem parte do código real)</h4>
+						<p>Os itens abaixo <strong>não foram pedidos nem aprovados pelo time de desenvolvimento</strong> — são ideias de usabilidade que surgiram construindo estes protótipos HTML, implementadas aqui só como demonstração de como poderiam funcionar. Todos ficam na seção "Revisão do pedido — igual à tela da Câmara Fria", claramente demarcada em azul tracejado dentro da tela.</p>
+						<ul>
+							<li><span class="cf-tag cf-tag--proposal">🔵 Proposta</span> <span class="cf-tag cf-tag--mock">🟡 Protótipo</span> Visualizar o pedido completo (tabela de itens) direto no Faturamento, no mesmo padrão visual da Câmara Fria — hoje o Faturamento só mostra o checklist resumido, não a tabela de itens.</li>
+							<li><span class="cf-tag cf-tag--proposal">🔵 Proposta</span> <span class="cf-tag cf-tag--mock">🟡 Protótipo</span> Botão "Voltar pedido para Em Separação" — hoje a única forma de corrigir algo é cancelar o pedido ou editar direto no banco; não existe transição de volta de <code>faturamento</code> para <code>em_separacao</code> em nenhum lugar do código.</li>
+							<li><span class="cf-tag cf-tag--proposal">🔵 Proposta</span> <span class="cf-tag cf-tag--mock">🟡 Protótipo</span> Corrigir peso real sem sair do Faturamento — hoje só é possível na Câmara Fria.</li>
+							<li><span class="cf-tag cf-tag--proposal">🔵 Proposta</span> <span class="cf-tag cf-tag--mock">🟡 Protótipo</span> Adicionar produto ao pedido no Faturamento (mesma busca por código/nome e diálogo de item duplicado da Câmara Fria).</li>
+							<li><span class="cf-tag cf-tag--proposal">🔵 Proposta</span> <span class="cf-tag cf-tag--mock">🟡 Protótipo</span> Remover produto no Faturamento (mesmo diálogo de motivo obrigatório da Câmara Fria).</li>
+							<li><span class="cf-tag cf-tag--proposal">🔵 Proposta</span> <span class="cf-tag cf-tag--mock">🟡 Protótipo</span> Alterar quantidade de peças/unidades no Faturamento.</li>
+							<li><span class="cf-tag cf-tag--proposal">🔵 Proposta</span> <span class="cf-tag cf-tag--mock">🟡 Protótipo</span> Recalcular automaticamente itens/peças/peso aproximado/peso real/diferença após qualquer uma das alterações acima — o "Total do pedido" (R$) continua fixo, seguindo o mesmo comportamento real da Câmara Fria (o valor do pedido nunca é recalculado a partir dos itens em nenhuma tela hoje).</li>
+							<li><span class="cf-tag cf-tag--proposal">🔵 Proposta</span> <span class="cf-tag cf-tag--mock">🟡 Protótipo</span> Tabela travada por padrão (só leitura) mostrando exatamente o que chegou da Câmara Fria — nenhuma edição fica disponível antes do usuário clicar em "Habilitar edição", para garantir que quem está no Faturamento veja os dados originais antes de decidir mexer neles.</li>
+							<li><span class="cf-tag cf-tag--proposal">🔵 Proposta</span> <span class="cf-tag cf-tag--mock">🟡 Protótipo</span> Campo obrigatório "Motivo da alteração" — nenhuma correção de peso, quantidade, inclusão ou remoção é aceita sem um motivo preenchido primeiro.</li>
+							<li><span class="cf-tag cf-tag--proposal">🔵 Proposta</span> <span class="cf-tag cf-tag--mock">🟡 Protótipo</span> Destaque visual (linha e selo âmbar "Alterado no Faturamento" + faixa de aviso no topo da tabela) sempre que algo for editado após a conferência da Câmara Fria, para deixar claro que o pedido já não reflete 100% a conferência original.</li>
+							<li><span class="cf-tag cf-tag--proposal">🔵 Proposta</span> <span class="cf-tag cf-tag--mock">🟡 Protótipo</span> Confirmação antes de "Voltar para Em Separação" — abre um diálogo explicando que o pedido perde o status de Faturamento e exige nova conferência completa, em vez de agir direto no clique.</li>
+							<li><span class="cf-tag cf-tag--proposal">🔵 Proposta</span> <span class="cf-tag cf-tag--mock">🟡 Protótipo</span> Linha do tempo/histórico da demonstração ("Conferido na Câmara Fria" → "Alterado no Faturamento" com motivo → "Retornado para Separação") — não existe nenhum registro equivalente no código real hoje; a auditoria real mais próxima é o histórico de status do pedido, que não guarda motivo de correção de item.</li>
+							<li><span class="cf-tag cf-tag--proposal">🔵 Proposta</span> <span class="cf-tag cf-tag--mock">🟡 Protótipo</span> Substituir produto (⇄) sem remover e recriar a linha — troca código/nome/peso mantendo o histórico de "substituiu X", com selo "Substituído" e nome anterior riscado.</li>
+							<li><span class="cf-tag cf-tag--proposal">🔵 Proposta</span> <span class="cf-tag cf-tag--mock">🟡 Protótipo</span> Aviso grande e persistente ("PEDIDO ALTERADO — UM ITEM FOI REMOVIDO NO FATURAMENTO") sempre que houver ao menos uma remoção registrada, além do já existente destaque por linha alterada.</li>
+							<li><span class="cf-tag cf-tag--proposal">🔵 Proposta</span> <span class="cf-tag cf-tag--mock">🟡 Protótipo</span> Etiqueta corrigida (Visualizar / Gerar e imprimir / Reimprimir) com pré-visualização própria, banner preto "ETIQUETA CORRIGIDA — SUBSTITUI A ETIQUETA ANTERIOR" e status de etiqueta (válida/pendente/gerada/impressa/reimpressa) — hoje não existe nenhuma etiqueta específica para correções feitas no Faturamento.</li>
+							<li><span class="cf-tag cf-tag--proposal">🔵 Proposta</span> <span class="cf-tag cf-tag--mock">🟡 Protótipo</span> Invalidação automática da etiqueta anterior assim que qualquer item é alterado, adicionado, substituído ou removido — registrada no histórico como "Etiqueta anterior invalidada" e sinalizada por uma faixa de aviso própria.</li>
+							<li><span class="cf-tag cf-tag--proposal">🔵 Proposta</span> <span class="cf-tag cf-tag--mock">🟡 Protótipo</span> Reconferência por item — cada item alterado, adicionado ou substituído fica marcado "pendente de reconferência" até alguém clicar em "✓ Reconferir"; o item some da contagem de pendências e passa a exibir "Reconferido no Faturamento".</li>
+							<li><span class="cf-tag cf-tag--proposal">🔵 Proposta</span> <span class="cf-tag cf-tag--mock">🟡 Protótipo</span> Bloqueio condicional do botão real "Enviar pedido para o Sentus" — além do checklist real, passa a exigir também que não existam itens pendentes de reconferência e que a etiqueta corrigida já tenha sido impressa (ou reimpressa).</li>
+						</ul>
+						<p>Antes de qualquer implementação real, essas propostas precisariam de decisão de produto (por que corrigir peso no Faturamento em vez de sempre voltar à Câmara Fria?), definição de regra de auditoria (quem pode corrigir, fica registrado onde, o motivo é realmente suficiente) e validação com quem usa a tela hoje.</p>
+					</div>
+					<div>
+						<h4>Decisões operacionais aprovadas (para esta evolução do protótipo)</h4>
+						<ul>
+							<li>Uma correção feita direto no Faturamento (sem devolver o pedido para "Em Separação") deixa o pedido com um selo geral de alerta, além do destaque por item.</li>
+							<li>Cada item alterado, adicionado ou substituído entra automaticamente em estado "pendente de reconferência" e precisa de uma reconferência explícita antes do envio ao Sentus.</li>
+							<li>Substituir produto reaproveita a mesma linha do pedido (mesmo id), preservando o nome do produto anterior para fins de histórico e conferência visual.</li>
+							<li>Remover um item exibe um aviso grande e persistente enquanto existir ao menos uma remoção registrada nesta demonstração.</li>
+							<li>Qualquer alteração, adição, substituição ou remoção invalida a etiqueta térmica impressa na Câmara Fria — não existe meio-termo: ou a etiqueta é válida, ou precisa ser corrigida.</li>
+							<li>A etiqueta corrigida é gerada e impressa em uma única ação ("Gerar e imprimir"), registrando dois eventos de histórico distintos ("Etiqueta corrigida gerada" e "Etiqueta corrigida impressa").</li>
+							<li>Reimprimir a etiqueta corrigida exige o mesmo campo "Motivo da alteração" já usado para editar a tabela — não existe um segundo campo de motivo separado.</li>
+							<li>O botão real "Enviar pedido para o Sentus" só é liberado quando o checklist real está completo <strong>e</strong> não há itens pendentes de reconferência <strong>e</strong> a etiqueta corrigida (quando necessária) já foi impressa.</li>
+							<li>Nada disso substitui o fluxo real de devolver o pedido para "Em Separação" — é uma alternativa para correções pequenas, mantendo o pedido no Faturamento.</li>
+						</ul>
+					</div>
 				</div>
+			</details>
 
-				<div class="op-actions__commit">
-					<button class="op-btn--primary" data-toast="Envio ao Sentus simulado — nenhuma chamada real é feita">Enviar pedido para o Sentus</button>
-					<button class="op-btn--ghost" data-open-modal="modal-nf">Confirmar nota fiscal emitida</button>
+			<details class="cf-docs">
+				<summary>Fluxo resumido do Faturamento</summary>
+				<div class="cf-docs__body">
+					<div class="cf-flow">
+						<div class="cf-flow__step">Câmara Fria conclui a conferência</div>
+						<div class="cf-flow__arrow">↓</div>
+						<div class="cf-flow__step">Checklist revisado</div>
+						<div class="cf-flow__arrow">↓</div>
+						<div class="cf-flow__step">Enviar para o Sentus</div>
+						<div class="cf-flow__arrow">↓</div>
+						<div class="cf-flow__step">Enviando…</div>
+						<div class="cf-flow__arrow">↓</div>
+						<div class="cf-flow__step">Enviado (ou Erro → reenviar)</div>
+						<div class="cf-flow__arrow">↓</div>
+						<div class="cf-flow__step">Confirmar nota fiscal</div>
+						<div class="cf-flow__arrow">↓</div>
+						<div class="cf-flow__step">Boleto → Em Rota · PIX/Cartão → Aguardando Pagamento</div>
+					</div>
 				</div>
+			</details>
 
-				<p class="op-sentus__dev-note">Modo desenvolvimento — o envio acima é uma simulação local; nenhuma chamada real é feita ao Sentus.</p>
-			</section>
-		</div>
-	</main>
+			<details class="cf-docs" id="toolsPanel">
+				<summary>Ferramentas de demonstração (exclusivo do protótipo)</summary>
+				<div class="cf-docs__body">
+					<p class="cf-tools-warning">Função exclusiva do protótipo. Não existe no sistema de produção.</p>
+
+					<div>
+						<h4>Restaurar estado inicial</h4>
+						<p>Devolve o pedido para "Faturamento" com a integração "Não enviado", nenhuma nota fiscal registrada e a seção "Revisão do pedido" (melhoria proposta) zerada: tabela travada, sem alterações, etiqueta "válida" e histórico reiniciado.</p>
+						<div class="cf-tools-row">
+							<button type="button" class="op-btn op-btn--ghost" id="btnRestaurarInicial">Restaurar estado inicial</button>
+						</div>
+					</div>
+
+					<div>
+						<h4>Correção, substituição, remoção e etiqueta corrigida</h4>
+						<p>Essas ações não têm um botão de demonstração separado — elas são as próprias interações da seção "Revisão do pedido — igual à tela da Câmara Fria" acima. Para testar: 1) clique em "Habilitar edição" e preencha o motivo; 2) use "✎ Corrigir", "+/−", "⇄ Substituir" ou "🗑 Remover" em qualquer item; 3) clique em "✓ Reconferir" nos itens que ficarem pendentes; 4) use "🖨 Gerar e imprimir etiqueta corrigida" e, depois, "🔁 Reimprimir etiqueta corrigida"; 5) observe o botão real "Enviar pedido para o Sentus" (painel acima) permanecer bloqueado até essas pendências serem resolvidas.</p>
+					</div>
+
+					<div>
+						<h4>Resultado simulado do próximo envio</h4>
+						<p>Define se o próximo clique em "Enviar pedido para o Sentus" resolve como sucesso ou erro — no sistema real, isso depende do ambiente/edge function, nunca de uma escolha manual.</p>
+						<div class="cf-tools-row">
+							<div class="cf-radio-group" id="simularResultadoGroup">
+								<button type="button" class="cf-radio-btn cf-radio-btn--active" data-valor="sucesso">Simular sucesso do Sentus</button>
+								<button type="button" class="cf-radio-btn" data-valor="erro">Simular erro do Sentus</button>
+							</div>
+						</div>
+					</div>
+
+					<div>
+						<h4>Forma de pagamento do pedido</h4>
+						<p>Altera a forma de pagamento deste pedido de demonstração, para testar as duas regras de roteamento depois da nota fiscal confirmada.</p>
+						<div class="cf-tools-row">
+							<div class="cf-radio-group" id="formaPagamentoGroup">
+								<button type="button" class="cf-radio-btn" data-valor="pix">PIX</button>
+								<button type="button" class="cf-radio-btn cf-radio-btn--active" data-valor="cartao">Cartão</button>
+								<button type="button" class="cf-radio-btn" data-valor="boleto">Boleto</button>
+							</div>
+						</div>
+					</div>
+
+					<div>
+						<h4>Reiniciar demonstração</h4>
+						<p>Restaura os dados mockados originais do pedido e move a linha do tempo para a etapa escolhida abaixo.</p>
+						<div class="cf-tools-row">
+							<label for="selectReiniciarStatus" class="cnf-label" style="text-transform:none; letter-spacing:normal; font-weight:500;">Voltar pedido para:</label>
+							<select class="cf-tools-select" id="selectReiniciarStatus">
+								<option value="pendente">Pendente</option>
+								<option value="cadastro_financeiro">Cadastro Financeiro</option>
+								<option value="confirmado">Pedido Confirmado</option>
+								<option value="em_separacao">Em Separação</option>
+								<option value="faturamento" selected>Faturamento</option>
+								<option value="aguardando_pagamento">Aguardando Pagamento</option>
+								<option value="em_rota">Em Rota</option>
+							</select>
+							<button type="button" class="op-btn op-btn--primary" id="btnReiniciarDemo">Reiniciar demonstração</button>
+						</div>
+					</div>
+				</div>
+			</details>
+
+		</main>
+	</div>
 </div>
 
-<div class="modal-overlay" id="modal-nf">
-	<div class="modal">
-		<div class="modal__header"><h3 style="margin:0;">Confirmar nota fiscal emitida</h3><button class="btn-icon-only btn-ghost" data-close-modal="modal-nf">✕</button></div>
-		<div class="modal__body" style="display:flex; flex-direction:column; gap:12px;">
-			<div class="field"><label>Número da NF</label><input type="text" placeholder="Ex.: 000123" /></div>
-			<div class="field"><label>Série</label><input type="text" placeholder="Ex.: 1" /></div>
-			<div class="field"><label>Chave de acesso (opcional)</label><input type="text" placeholder="44 dígitos" /></div>
-			<div class="field"><label>Valor faturado</label><input type="text" placeholder="R$ 900,00" /></div>
-		</div>
-		<div class="modal__footer">
-			<button class="btn btn-ghost" data-close-modal="modal-nf">Cancelar</button>
-			<button class="btn btn-primary" data-close-modal="modal-nf" data-toast="Nota fiscal registrada (simulado)">Confirmar</button>
+<!-- ═══════════════ MODAIS (funcionalidade real simulada em JS local) ═══════════════ -->
+
+<div class="cf-overlay" id="overlayEnvio" hidden>
+	<div class="cf-modal" role="dialog" aria-modal="true">
+		<h2 id="envioTitulo">Enviar pedido para o Sentus?</h2>
+		<p class="sed-warning">Esta operação roda em <strong>modo desenvolvimento</strong> — nenhum dado real será transmitido a nenhum sistema externo. É uma simulação para validar o fluxo e o payload.</p>
+		<dl class="sed-summary" id="envioResumo"></dl>
+		<div class="cf-modal-actions">
+			<button type="button" class="op-btn op-btn--ghost" id="envioCancelar">Cancelar</button>
+			<button type="button" class="op-btn op-btn--primary" id="envioConfirmar">Confirmar envio (simulado)</button>
 		</div>
 	</div>
 </div>
-<script src="assets/app.js"></script>
+
+<div class="cf-overlay" id="overlayNF" hidden>
+	<div class="cf-modal" role="dialog" aria-modal="true">
+		<h2 id="nfTitulo">Confirmar nota fiscal</h2>
+		<p class="cnf-hint">Informe os dados da nota fiscal emitida no Sentus/Datachamp. Isso move o pedido para "Aguardando Pagamento" (ou "Em Rota" para boleto).</p>
+		<div class="cnf-row">
+			<label class="cnf-field"><span class="cnf-label">Número da NF</span><input type="text" class="cnf-input" id="nfNumero" /></label>
+			<label class="cnf-field cnf-field--small"><span class="cnf-label">Série</span><input type="text" class="cnf-input" id="nfSerie" /></label>
+		</div>
+		<label class="cnf-field"><span class="cnf-label">Chave de acesso</span><input type="text" class="cnf-input" id="nfChave" maxlength="44" placeholder="44 dígitos" /></label>
+		<div class="cnf-row">
+			<label class="cnf-field"><span class="cnf-label">Data e hora da emissão</span><input type="datetime-local" class="cnf-input" id="nfData" /></label>
+			<label class="cnf-field cnf-field--small"><span class="cnf-label">Valor final faturado</span><input type="number" class="cnf-input" id="nfValor" step="0.01" min="0" /></label>
+		</div>
+		<label class="cnf-field"><span class="cnf-label">Observação <em>(opcional)</em></span><input type="text" class="cnf-input" id="nfObs" /></label>
+		<div class="cf-modal-actions">
+			<button type="button" class="op-btn op-btn--ghost" id="nfCancelar">Cancelar</button>
+			<button type="button" class="op-btn op-btn--primary" id="nfConfirmar" disabled>Confirmar nota e avançar pedido</button>
+		</div>
+	</div>
+</div>
+
+<div class="cf-overlay" id="overlayRemover" hidden>
+	<div class="cf-modal" role="dialog" aria-modal="true">
+		<h2 id="removerTitulo">Remover produto</h2>
+		<p class="cnf-hint" id="removerTexto"></p>
+		<label class="cnf-field">
+			<span class="cnf-label">Motivo da remoção</span>
+			<select class="cnf-input" id="removerMotivo">
+				<option value="" disabled selected>Selecione um motivo</option>
+				<option>Produto sem estoque</option>
+				<option>Substituição autorizada</option>
+				<option>Erro no pedido</option>
+				<option>Cliente desistiu do item</option>
+				<option>Outro</option>
+			</select>
+		</label>
+		<label class="cnf-field" id="removerOutroWrap" hidden>
+			<span class="cnf-label">Descreva o motivo</span>
+			<input type="text" class="cnf-input" id="removerMotivoOutro" placeholder="Ex.: cliente trocou por outro item por telefone" />
+		</label>
+		<div class="cf-modal-actions">
+			<button type="button" class="op-btn op-btn--ghost" id="removerCancelar">Cancelar</button>
+			<button type="button" class="op-btn op-btn--primary" id="removerConfirmar" disabled>Remover item</button>
+		</div>
+	</div>
+</div>
+
+<div class="cf-overlay" id="overlayDuplicado" hidden>
+	<div class="cf-modal" role="dialog" aria-modal="true">
+		<h2>Produto já está no pedido</h2>
+		<p class="cnf-hint"><strong id="duplicadoNome"></strong> já está na composição deste pedido, com <span id="duplicadoQtd"></span>.</p>
+		<p class="cnf-hint">O que você quer fazer?</p>
+		<div class="cf-modal-actions">
+			<button type="button" class="op-btn op-btn--ghost" id="duplicadoCancelar">Cancelar</button>
+			<button type="button" class="op-btn op-btn--ghost" id="duplicadoNovaLinha">Manter como nova linha</button>
+			<button type="button" class="op-btn op-btn--primary" id="duplicadoAumentar">Aumentar quantidade</button>
+		</div>
+	</div>
+</div>
+
+<div class="cf-overlay" id="overlayVoltarSeparacao" hidden>
+	<div class="cf-modal" role="dialog" aria-modal="true">
+		<h2>Voltar pedido para Em Separação?</h2>
+		<p class="cnf-hint">O pedido №16 vai perder o status de "Faturamento" e voltar para "Em Separação", exigindo uma <strong>nova conferência completa</strong> antes de poder ser faturado novamente. Esta ação fica registrada no histórico da demonstração.</p>
+		<div class="cf-modal-actions">
+			<button type="button" class="op-btn op-btn--ghost" id="voltarSeparacaoCancelar">Cancelar</button>
+			<button type="button" class="op-btn op-btn--primary" id="voltarSeparacaoConfirmar">Confirmar retorno</button>
+		</div>
+	</div>
+</div>
+
+<div class="cf-overlay" id="overlaySubstituir" hidden>
+	<div class="cf-modal" role="dialog" aria-modal="true">
+		<h2 id="substituirTitulo">Substituir produto</h2>
+		<p class="cnf-hint">Busque o produto que vai entrar no lugar do item atual. O item mantém a mesma linha do pedido, mas passa a exigir nova conferência e uma etiqueta corrigida.</p>
+		<label class="cnf-field">
+			<span class="cnf-label">Buscar por código ou nome</span>
+			<input type="text" class="cnf-input" id="substituirBuscaInput" placeholder="Ex.: 00789 ou Linguiça" />
+		</label>
+		<ul class="op-camara__draft-options" id="substituirResultados" style="position:static;"></ul>
+		<div class="cf-modal-actions">
+			<button type="button" class="op-btn op-btn--ghost" id="substituirCancelar">Cancelar</button>
+		</div>
+	</div>
+</div>
+
+<div class="cf-overlay" id="overlayEtiquetaCorrigida" hidden>
+	<div class="cf-modal cf-modal--wide" role="dialog" aria-modal="true">
+		<h2>Etiqueta corrigida — Pedido №16</h2>
+		<p class="cnf-hint">🔵 Melhoria proposta (Protótipo HTML) — pré-visualização estática, escala reduzida, do mesmo layout de <code>etiqueta-preview-dialog.component.ts</code>, com o aviso de correção acrescentado no topo.</p>
+		<div class="cf-modal-pages">
+			<article class="epd-page">
+				<div class="epd-page__corrigida-banner">⚠ ETIQUETA CORRIGIDA — SUBSTITUI A ETIQUETA ANTERIOR</div>
+				<header class="epd-page__header">
+					<span class="epd-page__pedido">PEDIDO Nº 16</span>
+					<span class="epd-page__volume">VOLUME 1/1</span>
+				</header>
+				<p class="epd-page__entrega">Entrega: sexta-feira, 24/07/2026</p>
+				<section class="epd-page__cliente">
+					<span class="epd-page__cliente-nome">CLIENTE TESTE LIMITE CREDITO</span>
+					<span class="epd-page__cliente-codigo">Cód. cliente: 33871</span>
+				</section>
+				<p class="epd-page__cidade">CANOAS - RS</p>
+				<div class="epd-page__logistica"><span>Rota: —</span><span>Dia de entrega: sexta-feira</span><span>Volume: 1 de 1</span></div>
+				<table class="epd-page__itens">
+					<thead><tr><th>Cód.</th><th>Produto</th><th>Qtd</th><th>Un</th><th>Peso real</th></tr></thead>
+					<tbody id="etiquetaCorrigidaItens"></tbody>
+				</table>
+				<footer class="epd-page__footer">
+					<p class="prop-correcao-meta" id="etiquetaCorrigidaMeta"></p>
+					<p class="epd-page__peso-geral" id="etiquetaCorrigidaPeso"></p>
+				</footer>
+			</article>
+		</div>
+		<p class="cf-modal-hint">Esta pré-visualização reflete os dados <strong>atuais</strong> da tabela de revisão acima, incluindo qualquer alteração, substituição ou remoção já feita.</p>
+		<div class="cf-modal-actions">
+			<button type="button" class="op-btn op-btn--ghost" id="etiquetaCorrigidaFechar">Fechar</button>
+		</div>
+	</div>
+</div>
+
+<div class="cf-toast-stack" id="toastStack"></div>
+
+<script>
+(function () {
+	'use strict';
+
+	/* ══════════════ Dados mockados (estado do protótipo) ══════════════ */
+	var STATUS_LABELS = {
+		pendente: 'Pendente', cadastro_financeiro: 'Cadastro Financeiro', confirmado: 'Pedido Confirmado',
+		em_separacao: 'Em Separação', faturamento: 'Faturamento', aguardando_pagamento: 'Aguardando Pagamento',
+		em_rota: 'Em Rota', entregue: 'Entregue', cancelado: 'Cancelado'
+	};
+	var STATUS_TONES = {
+		pendente: 'amber', cadastro_financeiro: 'yellow', confirmado: 'green', em_separacao: 'blue',
+		faturamento: 'purple', aguardando_pagamento: 'copper', em_rota: 'plum', entregue: 'sage', cancelado: 'ruby'
+	};
+	var STATUS_ICONS = {
+		pendente: '◷', cadastro_financeiro: '◈', confirmado: '✓', em_separacao: '⚒',
+		faturamento: '▤', aguardando_pagamento: '⧗', em_rota: '⤳', entregue: '★', cancelado: '⊘'
+	};
+	var TIMELINE = ['pendente', 'cadastro_financeiro', 'confirmado', 'em_separacao', 'faturamento', 'aguardando_pagamento', 'em_rota', 'entregue'];
+	var SENTUS_STATUS_LABELS = {
+		nao_enviado: 'Não enviado', pronto_para_envio: 'Pronto para envio', enviando: 'Enviando…',
+		enviado: 'Enviado com sucesso', erro: 'Erro no envio', requer_revisao: 'Requer revisão'
+	};
+	var FORMA_PAGAMENTO_LABELS = { pix: 'PIX', cartao: 'Cartão', boleto: 'Boleto' };
+	var FORMA_PAGAMENTO_NOTES = {
+		pix: 'Pagamento instantâneo via PIX',
+		cartao: 'Cartão de crédito/débito',
+		boleto: 'Boleto bancário (prazo conforme liberação do sistema interno)'
+	};
+
+	var pedido = {
+		numero: 16, valorTotal: 539.40, clienteNome: 'Cliente Teste Limite Credito', clienteCodigo: 33871,
+		documento: '12.345.678/0001-90', tipoDocumento: 'CNPJ', dataEntrega: '24 de julho de 2026',
+		endereco: 'Av. Industrial, 1450 — Canoas/RS', itens: 3, pecas: 24
+	};
+
+	var state = {
+		statusAtual: 'faturamento',
+		sentusStatus: 'nao_enviado',
+		sentusErro: null,
+		sentusRef: null,
+		sentusUltimaTentativa: null,
+		notaFiscal: null,
+		formaPagamento: 'cartao',
+		simularResultado: 'sucesso'
+	};
+
+	/* ══════════════ Toast ══════════════ */
+	function toast(msg, kind) {
+		var stack = document.getElementById('toastStack');
+		var el = document.createElement('div');
+		el.className = 'cf-toast' + (kind ? ' cf-toast--' + kind : '');
+		el.textContent = msg;
+		stack.appendChild(el);
+		requestAnimationFrame(function () { el.classList.add('is-visible'); });
+		setTimeout(function () {
+			el.classList.remove('is-visible');
+			setTimeout(function () { el.remove(); }, 220);
+		}, 3600);
+	}
+
+	function abrirOverlay(id) { document.getElementById(id).hidden = false; }
+	function fecharOverlay(id) { document.getElementById(id).hidden = true; }
+
+	function nowDatetimeLocal() {
+		var d = new Date();
+		d.setSeconds(0, 0);
+		d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+		return d.toISOString().slice(0, 16);
+	}
+	function nowDisplay() {
+		var d = new Date();
+		return ('0' + d.getDate()).slice(-2) + '/' + ('0' + (d.getMonth() + 1)).slice(-2) + '/' + d.getFullYear() +
+			' ' + ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2);
+	}
+
+	/* ══════════════ Checklist (espelha checklistFaturamento() real, 13 itens) ══════════════ */
+	function buildChecklist() {
+		return [
+			{ label: 'Cliente', ok: true, detail: pedido.clienteNome, bloqueante: true },
+			{ label: 'Código do cliente no Sentus', ok: true, detail: String(pedido.clienteCodigo), bloqueante: true },
+			{ label: 'Itens do pedido', ok: true, detail: pedido.itens + ' itens', bloqueante: true },
+			{ label: 'Quantidades', ok: true, detail: pedido.pecas + ' peças/unidades no total', bloqueante: true },
+			{ label: 'Pesos reais', ok: true, detail: pedido.itens + ' de ' + pedido.itens + ' informados', bloqueante: true },
+			{ label: 'Preços', ok: true, detail: 'Todos válidos', bloqueante: true },
+			{ label: 'Valor total', ok: true, detail: 'R$ ' + pedido.valorTotal.toFixed(2), bloqueante: true },
+			{ label: 'Forma de pagamento', ok: true, detail: FORMA_PAGAMENTO_LABELS[state.formaPagamento], bloqueante: true },
+			{ label: 'Data de entrega', ok: true, detail: pedido.dataEntrega, bloqueante: true },
+			{ label: 'Endereço', ok: true, detail: pedido.endereco, bloqueante: true },
+			{ label: 'Observações', ok: true, detail: 'Entregar até 14h', bloqueante: false },
+			{ label: 'Condição de pagamento', ok: true, detail: FORMA_PAGAMENTO_LABELS[state.formaPagamento], bloqueante: false },
+			{ label: 'Dados fiscais necessários', ok: true, detail: pedido.tipoDocumento + ': ' + pedido.documento, bloqueante: true }
+		];
+	}
+	function checklistOk() { return buildChecklist().every(function (i) { return !i.bloqueante || i.ok; }); }
+
+	/* ══════════════ Regras reais (espelham podeEnviarSentus/podeConfirmarNotaFiscal) ══════════════ */
+	function podeEnviarSentus() {
+		return state.statusAtual === 'faturamento' && state.sentusStatus !== 'enviando' && state.sentusStatus !== 'enviado' && checklistOk() && !propBloqueiaSentus();
+	}
+	function podeConfirmarNotaFiscal() {
+		return state.statusAtual === 'faturamento' && state.sentusStatus === 'enviado' && !state.notaFiscal;
+	}
+
+	/* ══════════════ Render ══════════════ */
+	function render() {
+		renderChecklist();
+		renderSentusStatus();
+		renderBotoes();
+		renderFormaPagamento();
+		document.getElementById('painelFaturamento').hidden = state.statusAtual !== 'faturamento';
+		document.getElementById('painelAvancar').hidden = (state.statusAtual === 'cancelado' || state.statusAtual === 'entregue');
+		document.getElementById('painelProposta').hidden = state.statusAtual !== 'faturamento';
+		renderProposta();
+	}
+
+	function renderChecklist() {
+		var ul = document.getElementById('checklistFaturamento');
+		ul.innerHTML = buildChecklist().map(function (item) {
+			var fail = item.bloqueante && !item.ok;
+			return '<li class="op-sentus__check' + (fail ? ' op-sentus__check--fail' : '') + '">' +
+				'<span class="op-sentus__check-icon" aria-hidden="true">' + (item.ok ? '✓' : (item.bloqueante ? '✕' : '•')) + '</span>' +
+				'<span class="op-sentus__check-label">' + item.label + '</span>' +
+				'<span class="op-sentus__check-detail">' + item.detail + '</span>' +
+				'</li>';
+		}).join('');
+	}
+
+	function renderSentusStatus() {
+		var val = document.getElementById('sentusStatusValue');
+		val.setAttribute('data-sentus-status', state.sentusStatus);
+		val.textContent = SENTUS_STATUS_LABELS[state.sentusStatus];
+
+		var err = document.getElementById('sentusStatusError');
+		if (state.sentusStatus === 'erro' && state.sentusErro) {
+			err.hidden = false; err.textContent = state.sentusErro;
+		} else { err.hidden = true; err.textContent = ''; }
+
+		var ref = document.getElementById('sentusStatusRef');
+		if (state.sentusRef) { ref.hidden = false; ref.textContent = 'Ref.: ' + state.sentusRef; } else { ref.hidden = true; }
+
+		var nfRef = document.getElementById('notaFiscalRef');
+		if (state.notaFiscal) {
+			nfRef.hidden = false;
+			nfRef.textContent = 'NF ' + state.notaFiscal.numero + '/' + state.notaFiscal.serie + ' confirmada';
+		} else { nfRef.hidden = true; }
+
+		var opRef = document.getElementById('opRefSentus');
+		opRef.textContent = state.sentusRef ? ('Nº Sentus: ' + state.sentusRef) : 'Nº Sentus: aguardando integração';
+	}
+
+	function renderBotoes() {
+		var btnEnviar = document.getElementById('btnEnviarSentus');
+		btnEnviar.disabled = !podeEnviarSentus();
+		btnEnviar.textContent = state.sentusStatus === 'enviando' ? 'Enviando…' : 'Enviar pedido para o Sentus';
+
+		var btnNF = document.getElementById('btnConfirmarNF');
+		btnNF.hidden = state.sentusStatus !== 'enviado' || !!state.notaFiscal;
+		btnNF.disabled = !podeConfirmarNotaFiscal();
+	}
+
+	function renderFormaPagamento() {
+		document.getElementById('opFormaPagamentoLabel').textContent = FORMA_PAGAMENTO_LABELS[state.formaPagamento];
+		document.getElementById('opFormaPagamentoNote').textContent = FORMA_PAGAMENTO_NOTES[state.formaPagamento];
+		document.querySelectorAll('#formaPagamentoGroup .cf-radio-btn').forEach(function (btn) {
+			btn.classList.toggle('cf-radio-btn--active', btn.getAttribute('data-valor') === state.formaPagamento);
+		});
+	}
+
+	var FLOW_HTML_TEMPLATE = null;
+
+	function updateHeroStatus(status) {
+		state.statusAtual = status;
+		var hero = document.getElementById('opHero');
+		hero.setAttribute('data-status', status);
+
+		var flowWrap = document.getElementById('opFlowWrap');
+		if (status === 'cancelado') {
+			flowWrap.innerHTML = '<div class="op-flow__cancelled"><span class="op-flow__cancelled-icon" aria-hidden="true">⊘</span><span>Pedido cancelado</span></div>';
+		} else {
+			flowWrap.innerHTML = FLOW_HTML_TEMPLATE;
+			var idx = TIMELINE.indexOf(status);
+			var steps = flowWrap.querySelectorAll('.op-flow__step');
+			var lines = flowWrap.querySelectorAll('.op-flow__line');
+			steps.forEach(function (step) {
+				var stepIdx = TIMELINE.indexOf(step.getAttribute('data-status'));
+				step.classList.toggle('op-flow__step--done', stepIdx < idx);
+				step.classList.toggle('op-flow__step--current', stepIdx === idx);
+			});
+			lines.forEach(function (line, i) { line.classList.toggle('op-flow__line--done', i < idx); });
+		}
+
+		var aside = document.getElementById('opHeroStatus');
+		aside.setAttribute('data-tone', STATUS_TONES[status]);
+		document.getElementById('opHeroStatusIcon').textContent = STATUS_ICONS[status];
+		document.getElementById('opHeroStatusLabel').textContent = STATUS_LABELS[status];
+
+		render();
+	}
+
+	/* ══════════════ Ações: envio ao Sentus ══════════════ */
+	function abrirEnvio() {
+		if (!podeEnviarSentus()) return;
+		document.getElementById('envioTitulo').textContent = 'Enviar pedido №' + pedido.numero + ' para o Sentus?';
+		document.getElementById('envioResumo').innerHTML =
+			'<div><dt>Cliente</dt><dd>' + pedido.clienteNome + '</dd></div>' +
+			'<div><dt>Código no Sentus</dt><dd>' + pedido.clienteCodigo + '</dd></div>' +
+			'<div><dt>Itens</dt><dd>' + pedido.itens + '</dd></div>' +
+			'<div><dt>Valor total</dt><dd>R$ ' + pedido.valorTotal.toFixed(2) + '</dd></div>' +
+			'<div><dt>Forma de pagamento</dt><dd>' + FORMA_PAGAMENTO_LABELS[state.formaPagamento] + '</dd></div>';
+		abrirOverlay('overlayEnvio');
+	}
+
+	function confirmarEnvio() {
+		fecharOverlay('overlayEnvio');
+		state.sentusStatus = 'enviando';
+		render();
+		setTimeout(function () {
+			state.sentusUltimaTentativa = nowDisplay();
+			if (state.simularResultado === 'erro') {
+				state.sentusStatus = 'erro';
+				state.sentusErro = 'Erro simulado: falha de comunicação com o Sentus (modo desenvolvimento).';
+				state.sentusRef = null;
+				toast('Erro ao enviar pedido ao Sentus (simulado).', 'error');
+			} else {
+				state.sentusStatus = 'enviado';
+				state.sentusErro = null;
+				state.sentusRef = 'SIM-' + Math.floor(100000 + Math.random() * 900000);
+				toast('Pedido enviado ao Sentus com sucesso (modo desenvolvimento).', 'success');
+			}
+			render();
+		}, 900);
+	}
+
+	/* ══════════════ Ações: confirmar nota fiscal ══════════════ */
+	function abrirNF() {
+		if (!podeConfirmarNotaFiscal()) return;
+		document.getElementById('nfTitulo').textContent = 'Confirmar nota fiscal — Pedido №' + pedido.numero;
+		document.getElementById('nfNumero').value = '';
+		document.getElementById('nfSerie').value = '';
+		document.getElementById('nfChave').value = '';
+		document.getElementById('nfData').value = nowDatetimeLocal();
+		document.getElementById('nfValor').value = pedido.valorTotal.toFixed(2);
+		document.getElementById('nfObs').value = '';
+		validarFormNF();
+		abrirOverlay('overlayNF');
+	}
+
+	function validarFormNF() {
+		var numero = document.getElementById('nfNumero').value.trim();
+		var serie = document.getElementById('nfSerie').value.trim();
+		var data = document.getElementById('nfData').value;
+		var valor = Number(document.getElementById('nfValor').value);
+		document.getElementById('nfConfirmar').disabled = !(numero && serie && data && valor > 0);
+	}
+
+	function confirmarNF() {
+		var numero = document.getElementById('nfNumero').value.trim();
+		var serie = document.getElementById('nfSerie').value.trim();
+		var chave = document.getElementById('nfChave').value.trim();
+		var data = document.getElementById('nfData').value;
+		var valor = Number(document.getElementById('nfValor').value);
+		if (!(numero && serie && data && valor > 0)) return;
+
+		state.notaFiscal = { numero: numero, serie: serie, chave: chave, data: data, valor: valor, obs: document.getElementById('nfObs').value.trim() };
+		fecharOverlay('overlayNF');
+
+		var proximo = state.formaPagamento === 'boleto' ? 'em_rota' : 'aguardando_pagamento';
+		updateHeroStatus(proximo);
+		toast('Nota fiscal nº ' + numero + ' confirmada. Pedido avançado para "' + STATUS_LABELS[proximo] + '".', 'success');
+	}
+
+	/* ══════════════ Ferramentas de demonstração ══════════════ */
+	function resetPropostaState() {
+		propState.itens = pristineItensProposta();
+		propState.nextId = 4;
+		propState.editingPesoId = null;
+		propState.pesoDrafts = {};
+		propState.novaLinhaAtiva = false;
+		propState.novaLinhaSelecionado = null;
+		propState.novaLinhaQty = 1;
+		propState.editMode = false;
+		propState.motivo = '';
+		propState.alterado = false;
+		propState.etiquetaStatus = 'valida';
+		propState.itensRemovidosLog = [];
+		propState.historico = [{ tipo: 'origem', texto: 'Conferido na Câmara Fria', detalhe: 'Todos os itens pesados e conferidos antes de chegar ao Faturamento.' }];
+		var motivoEl = document.getElementById('propMotivo');
+		if (motivoEl) motivoEl.value = '';
+	}
+
+	function restaurarInicial() {
+		state.sentusStatus = 'nao_enviado';
+		state.sentusErro = null;
+		state.sentusRef = null;
+		state.sentusUltimaTentativa = null;
+		state.notaFiscal = null;
+		resetPropostaState();
+		updateHeroStatus('faturamento');
+		toast('Função exclusiva do protótipo. Não existe no sistema de produção.');
+	}
+
+	function reiniciarDemo(targetStatus) {
+		state.sentusStatus = 'nao_enviado';
+		state.sentusErro = null;
+		state.sentusRef = null;
+		state.notaFiscal = null;
+		resetPropostaState();
+		var idxFaturamento = TIMELINE.indexOf('faturamento');
+		var idxTarget = TIMELINE.indexOf(targetStatus);
+		if (idxTarget > idxFaturamento) {
+			state.sentusStatus = 'enviado';
+			state.sentusRef = 'SIM-482913';
+			state.notaFiscal = { numero: '4821', serie: '1', chave: '', data: nowDatetimeLocal(), valor: pedido.valorTotal, obs: '' };
+		}
+		updateHeroStatus(targetStatus);
+		toast('Função exclusiva do protótipo. Não existe no sistema de produção.');
+	}
+
+	/* ══════════════════════════════════════════════════════════════════════════
+	   MELHORIA PROPOSTA — não existe no código real do Faturamento.
+	   Reaproveita o mesmo padrão de tabela/busca/remoção da Câmara Fria
+	   (07-camara-fria.html) só para demonstrar a ideia de usabilidade.
+	   ══════════════════════════════════════════════════════════════════════════ */
+	var CATALOGO_PROPOSTA = [
+		{ codigo: '00789', nome: 'Linguiça Toscana', pesoUnit: 1.0, unidLabel: 'peças' },
+		{ codigo: '00790', nome: 'Linguiça Calabresa', pesoUnit: 0.9, unidLabel: 'peças' },
+		{ codigo: '00456', nome: 'Frango Inteiro', pesoUnit: 1.2, unidLabel: 'peças' },
+		{ codigo: '01121', nome: 'Costela Suína', pesoUnit: 1.5, unidLabel: 'peças' },
+		{ codigo: '01200', nome: 'Queijo Coalho', pesoUnit: null, unidLabel: 'unidades' }
+	];
+
+	function pristineItensProposta() {
+		return [
+			{ id: 'fp1', codigo: '00123', nome: 'Picanha Bovina', qty: 2, unidLabel: 'peças', pesoUnit: 0.85, pesoReal: 1.850, alterado: false, status: 'conferido', reconferido: false, substituiu: null },
+			{ id: 'fp2', codigo: '00789', nome: 'Linguiça Toscana', qty: 10, unidLabel: 'peças', pesoUnit: 1.0, pesoReal: 10.200, alterado: false, status: 'conferido', reconferido: false, substituiu: null },
+			{ id: 'fp3', codigo: '01120', nome: 'Espetinho Misto', qty: 12, unidLabel: 'unidades', pesoUnit: null, pesoReal: 0.500, alterado: false, status: 'conferido', reconferido: false, substituiu: null }
+		];
+	}
+
+	var propState = {
+		itens: pristineItensProposta(),
+		nextId: 4,
+		editingPesoId: null,
+		pesoDrafts: {},
+		novaLinhaAtiva: false,
+		novaLinhaBusca: '',
+		novaLinhaSelecionado: null,
+		novaLinhaQty: 1,
+		editMode: false,
+		motivo: '',
+		alterado: false,
+		etiquetaStatus: 'valida',
+		itensRemovidosLog: [],
+		historico: [{ tipo: 'origem', texto: 'Conferido na Câmara Fria', detalhe: 'Todos os itens pesados e conferidos antes de chegar ao Faturamento.' }]
+	};
+	var removerAlvoId = null;
+	var substituirAlvoId = null;
+	var pendingDuplicado = null;
+
+	function propHistoricoAdd(tipo, texto, detalhe) {
+		propState.historico.push({ tipo: tipo, texto: texto, detalhe: detalhe || '', hora: nowDisplay() });
+	}
+
+	function propPodeEditar() { return propState.editMode && propState.motivo.trim().length > 0; }
+
+	function itemPrecisaReconferir(item) { return item.status !== 'conferido' && !item.reconferido; }
+
+	function propBloqueiaSentus() {
+		return propState.itens.some(itemPrecisaReconferir) || propState.etiquetaStatus === 'pendente' || propState.etiquetaStatus === 'gerada';
+	}
+
+	function propMarcarAlterado() {
+		propState.alterado = true;
+		if (propState.etiquetaStatus === 'valida') {
+			propState.etiquetaStatus = 'pendente';
+			propHistoricoAdd('etiqueta', 'Etiqueta anterior invalidada', 'Qualquer alteração no Faturamento invalida a etiqueta impressa na Câmara Fria — é preciso gerar uma etiqueta corrigida.');
+		}
+	}
+
+	function propPesoAprox(item) { return item.pesoUnit != null ? item.pesoUnit * item.qty : null; }
+	function fmt3(n) { return n == null ? '—' : n.toLocaleString('pt-BR', { minimumFractionDigits: 3, maximumFractionDigits: 3 }); }
+
+	function propTotals() {
+		var aprox = 0, hasAprox = false, real = 0, hasReal = false, pecas = 0;
+		propState.itens.forEach(function (i) {
+			pecas += i.qty;
+			var pa = propPesoAprox(i);
+			if (pa != null) { aprox += pa; hasAprox = true; }
+			if (i.pesoReal != null) { real += i.pesoReal; hasReal = true; }
+		});
+		return { itens: propState.itens.length, pecas: pecas, aprox: hasAprox ? aprox : null, real: hasReal ? real : null, diferenca: (hasAprox && hasReal) ? (real - aprox) : null };
+	}
+
+	function renderPropostaRow(item) {
+		var pa = propPesoAprox(item);
+		var podeEditar = propPodeEditar();
+		var pesoRealCell;
+		if (propState.editingPesoId === item.id) {
+			var draft = propState.pesoDrafts[item.id] != null ? propState.pesoDrafts[item.id] : String(item.pesoReal);
+			pesoRealCell = '<div class="op-camara__peso-display">' +
+				'<input type="number" class="op-camara__input" step="0.001" min="0" id="peso-prop-' + item.id + '" value="' + draft + '" data-action="peso-input" data-id="' + item.id + '" />' +
+				'<button type="button" class="op-camara__confirm" data-action="salvar-peso" data-id="' + item.id + '">Salvar</button>' +
+				'<button type="button" class="op-camara__confirm op-camara__confirm--undo" data-action="cancelar-peso" data-id="' + item.id + '">Cancelar</button>' +
+				'</div>';
+		} else if (podeEditar) {
+			pesoRealCell = '<div class="op-camara__peso-display"><span>' + fmt3(item.pesoReal) + ' kg</span>' +
+				'<button type="button" class="op-camara__corrigir" data-action="corrigir-peso" data-id="' + item.id + '">✎ Corrigir</button></div>';
+		} else {
+			pesoRealCell = '<span>' + fmt3(item.pesoReal) + ' kg</span>';
+		}
+
+		var qtyCell = podeEditar
+			? '<div class="op-camara__qty">' +
+				'<button type="button" class="op-camara__qty-btn" data-action="prop-dec-qty" data-id="' + item.id + '" ' + (item.qty <= 1 ? 'disabled' : '') + '>−</button>' +
+				'<input type="number" class="op-camara__qty-input" min="1" value="' + item.qty + '" data-action="prop-qty-input" data-id="' + item.id + '" />' +
+				'<button type="button" class="op-camara__qty-btn" data-action="prop-inc-qty" data-id="' + item.id + '">+</button>' +
+				'</div>'
+			: '<span>' + item.qty + '</span>';
+
+		var precisaReconf = itemPrecisaReconferir(item);
+		var statusCell;
+		if (item.status === 'conferido') {
+			statusCell = '<span class="op-camara__status op-camara__status--ok">✓ Conferido na Câmara Fria</span>';
+		} else if (item.reconferido) {
+			statusCell = '<span class="op-camara__status op-camara__status--ok">✓ Reconferido no Faturamento</span>';
+		} else {
+			var label = item.status === 'adicionado' ? '+ Adicionado no Faturamento'
+				: item.status === 'substituido' ? '⇄ Substituído no Faturamento'
+				: '✎ Alterado no Faturamento';
+			statusCell = '<span class="op-camara__status op-camara__status--pendente-reconf">' + label + '</span>';
+		}
+
+		var acoesCell = '';
+		if (podeEditar) {
+			acoesCell += '<button type="button" class="op-camara__substituir" data-action="prop-substituir" data-id="' + item.id + '">⇄ Substituir</button> ' +
+				'<button type="button" class="op-camara__remove" data-action="prop-remover" data-id="' + item.id + '" title="Remover item">🗑</button>';
+		}
+		if (precisaReconf) {
+			acoesCell += ' <button type="button" class="op-camara__reconferir" data-action="prop-reconferir" data-id="' + item.id + '">✓ Reconferir</button>';
+		}
+		if (!acoesCell) acoesCell = '<span style="color:var(--op-muted-soft);">—</span>';
+
+		var nomeCell = '<span class="op-camara__nome' + (item.status !== 'conferido' ? ' op-camara__nome--destaque' : '') + '">' + item.nome + '</span>';
+		if (item.status === 'substituido' && item.substituiu) {
+			nomeCell += '<br><small style="text-decoration:line-through; color:var(--op-muted);">' + item.substituiu + '</small><span class="prop-selo prop-selo--substituicao">Substituído</span>';
+		} else if (item.status === 'adicionado') {
+			nomeCell += ' <span class="prop-selo prop-selo--novo">Novo</span>';
+		}
+
+		return '<tr class="op-camara__row ' + (item.status !== 'conferido' ? 'op-camara__row--alterado' : 'op-camara__row--conferido') + '">' +
+			'<td class="op-camara__code">' + item.codigo + '</td>' +
+			'<td>' + nomeCell + '</td>' +
+			'<td>' + qtyCell + '<span class="op-camara__qty-label">' + item.unidLabel + '</span></td>' +
+			'<td>' + (pa != null ? fmt3(pa) + ' kg' : '—') + '</td>' +
+			'<td>' + pesoRealCell + '</td>' +
+			'<td>' + statusCell + '</td>' +
+			'<td>' + acoesCell + '</td>' +
+			'</tr>';
+	}
+
+	function renderPropostaDraftRow() {
+		if (!propPodeEditar()) return '';
+		if (!propState.novaLinhaAtiva) {
+			return '<tr><td colspan="7"><button type="button" class="op-camara__add-btn" id="btnAdicionarProdutoProp">+ Adicionar produto</button></td></tr>';
+		}
+		var buscaTrim = propState.novaLinhaBusca.trim().toLowerCase();
+		var resultados = buscaTrim.length >= 2 ? CATALOGO_PROPOSTA.filter(function (p) {
+			return p.codigo.toLowerCase().indexOf(buscaTrim) !== -1 || p.nome.toLowerCase().indexOf(buscaTrim) !== -1;
+		}) : [];
+		var resultadosHtml = '';
+		if (resultados.length > 0) {
+			resultadosHtml = '<ul class="op-camara__draft-options">' + resultados.map(function (p) {
+				return '<li><button type="button" data-action="prop-selecionar" data-codigo="' + p.codigo + '"><span class="op-camara__draft-option-ref">' + p.codigo + '</span><span>' + p.nome + '</span></button></li>';
+			}).join('') + '</ul>';
+		} else if (buscaTrim.length >= 2) {
+			resultadosHtml = '<p class="op-camara__draft-empty" style="position:relative; margin-top:6px;">Nenhum produto ativo encontrado.</p>';
+		}
+		var selecionadoHtml = '';
+		if (propState.novaLinhaSelecionado) {
+			var p2 = propState.novaLinhaSelecionado;
+			selecionadoHtml = '<div class="op-camara__draft-selected" style="display:flex; align-items:center; gap:14px; margin-top:10px;">' +
+				'<span>' + p2.codigo + ' — ' + p2.nome + '</span>' +
+				'<div class="op-camara__qty"><button type="button" class="op-camara__qty-btn" id="propDraftQtyDec" ' + (propState.novaLinhaQty <= 1 ? 'disabled' : '') + '>−</button>' +
+				'<input type="number" class="op-camara__qty-input" min="1" value="' + propState.novaLinhaQty + '" id="propDraftQtyInput" />' +
+				'<button type="button" class="op-camara__qty-btn" id="propDraftQtyInc">+</button></div>' +
+				'<button type="button" class="op-camara__confirm" id="btnConfirmarNovaLinhaProp">Adicionar</button>' +
+				'</div>';
+		}
+		return '<tr class="op-camara__row op-camara__row--draft"><td colspan="7"><div class="op-camara__draft">' +
+			'<div class="op-camara__draft-search">' +
+			'<input type="text" class="op-camara__draft-input" id="draftBuscaInputProp" placeholder="Buscar por código ou nome do produto…" value="' + propState.novaLinhaBusca.replace(/"/g, '&quot;') + '" />' +
+			resultadosHtml + '</div>' + selecionadoHtml +
+			'<button type="button" class="op-camara__confirm op-camara__confirm--undo" id="btnCancelarNovaLinhaProp">Cancelar</button>' +
+			'</div></td></tr>';
+	}
+
+	function renderProposta() {
+		var tbody = document.getElementById('propostaTbody');
+		if (!tbody) return;
+
+		var lockedRow = !propPodeEditar()
+			? '<tr><td colspan="7"><p class="op-camara__locked-note">🔒 Tabela travada — dados exatamente como chegaram da Câmara Fria. Clique em "Habilitar edição" e informe o motivo da alteração para corrigir peso, quantidade, adicionar ou remover produto.</p></td></tr>'
+			: '';
+		tbody.innerHTML = lockedRow + propState.itens.map(renderPropostaRow).join('') + renderPropostaDraftRow();
+
+		var t = propTotals();
+		document.getElementById('propFooterItens').textContent = t.itens;
+		document.getElementById('propFooterPecas').textContent = t.pecas;
+		document.getElementById('propFooterPesoAprox').textContent = t.aprox != null ? fmt3(t.aprox) + ' kg' : '—';
+		document.getElementById('propFooterPesoReal').textContent = t.real != null ? fmt3(t.real) + ' kg' : '—';
+		var diffEl = document.getElementById('propFooterDiferenca');
+		var diffWrap = document.getElementById('propFooterDiferencaWrap');
+		diffEl.textContent = t.diferenca != null ? fmt3(t.diferenca) + ' kg' : '—';
+		diffWrap.classList.toggle('op-camara__diff--neg', t.diferenca != null && t.diferenca < 0);
+
+		var pendentesReconf = propState.itens.filter(itemPrecisaReconferir).length;
+		document.getElementById('propAttentionRow').hidden = !propState.alterado;
+		document.getElementById('propAttentionDetalhe').textContent = pendentesReconf > 0
+			? ('— ' + pendentesReconf + (pendentesReconf === 1 ? ' item pendente de reconferência' : ' itens pendentes de reconferência'))
+			: '';
+		document.getElementById('propRemovidosBanner').hidden = propState.itensRemovidosLog.length === 0;
+		document.getElementById('propInvalidaBanner').hidden = !(propState.etiquetaStatus === 'pendente' || propState.etiquetaStatus === 'gerada');
+		document.getElementById('propSentusBloqueioNote').hidden = !propBloqueiaSentus();
+
+		var etiquetaLabelMap = {
+			valida: '✓ Etiqueta válida', pendente: '⚠ Etiqueta pendente de correção', gerada: '📄 Etiqueta corrigida gerada',
+			impressa: '🖨 Etiqueta corrigida impressa', reimpressa: '🔁 Etiqueta corrigida reimpressa'
+		};
+		var etiquetaEl = document.getElementById('propEtiquetaStatus');
+		etiquetaEl.textContent = etiquetaLabelMap[propState.etiquetaStatus];
+		etiquetaEl.className = 'prop-etiqueta-status prop-etiqueta-status--' + propState.etiquetaStatus;
+		document.getElementById('btnVisualizarEtiquetaCorrigida').disabled = propState.etiquetaStatus === 'valida';
+		document.getElementById('btnGerarEtiquetaCorrigida').disabled = !(propState.etiquetaStatus === 'pendente' || propState.etiquetaStatus === 'gerada');
+		document.getElementById('btnReimprimirEtiquetaCorrigida').hidden = !(propState.etiquetaStatus === 'impressa' || propState.etiquetaStatus === 'reimpressa');
+
+		var toggleBtn = document.getElementById('btnToggleEdicao');
+		toggleBtn.textContent = propState.editMode ? '🔒 Bloquear edição' : '🔓 Habilitar edição';
+		document.getElementById('propMotivoWrap').hidden = !propState.editMode;
+
+		renderBotoes();
+
+		var historicoUl = document.getElementById('propHistoricoList');
+		historicoUl.innerHTML = propState.historico.map(function (h) {
+			return '<li><strong>' + h.texto + '</strong>' + (h.detalhe ? ' — ' + h.detalhe : '') + (h.hora ? '<span class="prop-historico__time">' + h.hora + '</span>' : '') + '</li>';
+		}).join('');
+
+		if (propState.editingPesoId) {
+			var el = document.getElementById('peso-prop-' + propState.editingPesoId);
+			if (el) el.focus();
+		}
+	}
+
+	function corrigirPeso(id) {
+		if (!propPodeEditar()) return;
+		var item = propState.itens.find(function (i) { return i.id === id; });
+		if (!item) return;
+		propState.editingPesoId = id;
+		propState.pesoDrafts[id] = String(item.pesoReal);
+		renderProposta();
+	}
+
+	function salvarPeso(id) {
+		var item = propState.itens.find(function (i) { return i.id === id; });
+		if (!item) return;
+		var raw = (propState.pesoDrafts[id] || '').trim().replace(',', '.');
+		var peso = Number(raw);
+		if (!raw || !isFinite(peso) || peso < 0) { toast('Informe um peso real válido.'); return; }
+		item.pesoReal = peso;
+		item.alterado = true;
+		if (item.status === 'conferido') item.status = 'alterado';
+		item.reconferido = false;
+		propState.editingPesoId = null;
+		propMarcarAlterado();
+		propHistoricoAdd('alterado', 'Alterado no Faturamento', 'Peso de "' + item.nome + '" corrigido para ' + fmt3(peso) + ' kg — motivo: ' + propState.motivo.trim());
+		toast('Peso de ' + item.nome + ' corrigido para ' + fmt3(peso) + ' kg.', 'success');
+		renderProposta();
+	}
+
+	function cancelarPeso() {
+		propState.editingPesoId = null;
+		renderProposta();
+	}
+
+	function propAlterarQtd(id, delta) {
+		if (!propPodeEditar()) return;
+		var item = propState.itens.find(function (i) { return i.id === id; });
+		if (!item) return;
+		var nova = Math.max(1, item.qty + delta);
+		if (nova === item.qty) return;
+		item.qty = nova;
+		item.alterado = true;
+		if (item.status === 'conferido') item.status = 'alterado';
+		item.reconferido = false;
+		propMarcarAlterado();
+		propHistoricoAdd('alterado', 'Alterado no Faturamento', 'Quantidade de "' + item.nome + '" alterada para ' + nova + ' — motivo: ' + propState.motivo.trim());
+		renderProposta();
+	}
+
+	function propSetQtd(id, valor) {
+		if (!propPodeEditar()) return;
+		var item = propState.itens.find(function (i) { return i.id === id; });
+		if (!item) return;
+		var nova = Math.max(1, parseInt(valor, 10) || 1);
+		if (nova === item.qty) return;
+		item.qty = nova;
+		item.alterado = true;
+		if (item.status === 'conferido') item.status = 'alterado';
+		item.reconferido = false;
+		propMarcarAlterado();
+		propHistoricoAdd('alterado', 'Alterado no Faturamento', 'Quantidade de "' + item.nome + '" alterada para ' + nova + ' — motivo: ' + propState.motivo.trim());
+		renderProposta();
+	}
+
+	function propIniciarNovaLinha() {
+		if (!propPodeEditar()) return;
+		propState.novaLinhaAtiva = true;
+		propState.novaLinhaBusca = '';
+		propState.novaLinhaSelecionado = null;
+		propState.novaLinhaQty = 1;
+		renderProposta();
+		setTimeout(function () { var el = document.getElementById('draftBuscaInputProp'); if (el) el.focus(); }, 0);
+	}
+
+	function propCancelarNovaLinha() {
+		propState.novaLinhaAtiva = false;
+		propState.novaLinhaSelecionado = null;
+		renderProposta();
+	}
+
+	function propSelecionarProduto(codigo) {
+		var produto = CATALOGO_PROPOSTA.find(function (p) { return p.codigo === codigo; });
+		if (!produto) return;
+		var existente = propState.itens.find(function (i) { return i.codigo === codigo; });
+		if (existente) {
+			pendingDuplicado = { produto: produto, existente: existente };
+			document.getElementById('duplicadoNome').textContent = existente.nome;
+			document.getElementById('duplicadoQtd').textContent = existente.qty + (existente.qty === 1 ? ' peça' : ' peças');
+			abrirOverlay('overlayDuplicado');
+			return;
+		}
+		propState.novaLinhaSelecionado = produto;
+		propState.novaLinhaQty = 1;
+		renderProposta();
+	}
+
+	function propConfirmarNovaLinha() {
+		var p = propState.novaLinhaSelecionado;
+		if (!p) return;
+		propState.itens.push({ id: 'fp' + propState.nextId++, codigo: p.codigo, nome: p.nome, qty: propState.novaLinhaQty, unidLabel: p.unidLabel, pesoUnit: p.pesoUnit, pesoReal: p.pesoUnit != null ? p.pesoUnit * propState.novaLinhaQty : 0, alterado: true, status: 'adicionado', reconferido: false, substituiu: null });
+		propState.novaLinhaAtiva = false;
+		propState.novaLinhaSelecionado = null;
+		propMarcarAlterado();
+		propHistoricoAdd('alterado', 'Alterado no Faturamento', '"' + p.nome + '" incluído no pedido — motivo: ' + propState.motivo.trim());
+		toast(p.nome + ' adicionado ao pedido.', 'success');
+		renderProposta();
+	}
+
+	function propAbrirRemover(id) {
+		if (!propPodeEditar()) return;
+		var item = propState.itens.find(function (i) { return i.id === id; });
+		if (!item) return;
+		removerAlvoId = id;
+		document.getElementById('removerTitulo').textContent = 'Remover ' + item.nome;
+		document.getElementById('removerTexto').textContent = item.qty + (item.qty === 1 ? ' peça será removida' : ' peças serão removidas') + ' da composição do pedido.';
+		document.getElementById('removerMotivo').value = '';
+		document.getElementById('removerMotivoOutro').value = '';
+		document.getElementById('removerOutroWrap').hidden = true;
+		document.getElementById('removerConfirmar').disabled = true;
+		abrirOverlay('overlayRemover');
+	}
+
+	function propAbrirSubstituir(id) {
+		if (!propPodeEditar()) return;
+		var item = propState.itens.find(function (i) { return i.id === id; });
+		if (!item) return;
+		substituirAlvoId = id;
+		document.getElementById('substituirTitulo').textContent = 'Substituir ' + item.nome;
+		document.getElementById('substituirBuscaInput').value = '';
+		renderSubstituirResultados('');
+		abrirOverlay('overlaySubstituir');
+		setTimeout(function () { var el = document.getElementById('substituirBuscaInput'); if (el) el.focus(); }, 0);
+	}
+
+	function renderSubstituirResultados(busca) {
+		var ul = document.getElementById('substituirResultados');
+		var trim = busca.trim().toLowerCase();
+		var itemAtual = propState.itens.find(function (i) { return i.id === substituirAlvoId; });
+		var resultados = trim.length >= 2 ? CATALOGO_PROPOSTA.filter(function (p) {
+			return (p.codigo.toLowerCase().indexOf(trim) !== -1 || p.nome.toLowerCase().indexOf(trim) !== -1) && (!itemAtual || p.codigo !== itemAtual.codigo);
+		}) : [];
+		ul.innerHTML = resultados.length > 0
+			? resultados.map(function (p) {
+				return '<li><button type="button" data-action="substituir-selecionar" data-codigo="' + p.codigo + '"><span class="op-camara__draft-option-ref">' + p.codigo + '</span><span>' + p.nome + '</span></button></li>';
+			}).join('')
+			: (trim.length >= 2 ? '<li class="op-camara__draft-empty" style="position:static;">Nenhum produto ativo encontrado.</li>' : '');
+	}
+
+	function propConfirmarSubstituicao(codigo) {
+		var produto = CATALOGO_PROPOSTA.find(function (p) { return p.codigo === codigo; });
+		var item = propState.itens.find(function (i) { return i.id === substituirAlvoId; });
+		if (!produto || !item) return;
+		var nomeAnterior = item.nome;
+		item.codigo = produto.codigo;
+		item.nome = produto.nome;
+		item.unidLabel = produto.unidLabel;
+		item.pesoUnit = produto.pesoUnit;
+		item.pesoReal = produto.pesoUnit != null ? produto.pesoUnit * item.qty : item.pesoReal;
+		item.alterado = true;
+		item.status = 'substituido';
+		item.substituiu = nomeAnterior;
+		item.reconferido = false;
+		fecharOverlay('overlaySubstituir');
+		substituirAlvoId = null;
+		propMarcarAlterado();
+		propHistoricoAdd('substituido', 'Produto substituído', '"' + nomeAnterior + '" substituído por "' + produto.nome + '" — motivo: ' + propState.motivo.trim());
+		toast(nomeAnterior + ' substituído por ' + produto.nome + '.', 'success');
+		renderProposta();
+	}
+
+	function propReconferir(id) {
+		var item = propState.itens.find(function (i) { return i.id === id; });
+		if (!item || !itemPrecisaReconferir(item)) return;
+		item.reconferido = true;
+		propHistoricoAdd('reconferido', 'Item reconferido', '"' + item.nome + '" reconferido no Faturamento após a correção.');
+		toast(item.nome + ' reconferido.', 'success');
+		renderProposta();
+	}
+
+	function propRenderEtiquetaCorrigidaPreview() {
+		var t = propTotals();
+		var itensHtml = propState.itens.map(function (item) {
+			return '<tr' + (item.status !== 'conferido' ? ' class="prop-td-destaque"' : '') + '>' +
+				'<td>' + item.codigo + '</td><td' + (item.status !== 'conferido' ? ' class="prop-td-destaque"' : '') + '>' + item.nome + '</td>' +
+				'<td>' + item.qty + '</td><td>' + item.unidLabel + '</td><td>' + fmt3(item.pesoReal) + ' kg</td></tr>';
+		}).join('');
+		document.getElementById('etiquetaCorrigidaItens').innerHTML = itensHtml;
+		document.getElementById('etiquetaCorrigidaMeta').textContent = 'Correção registrada em ' + nowDisplay() + ' — motivo: ' + (propState.motivo.trim() || '—');
+		document.getElementById('etiquetaCorrigidaPeso').textContent = 'Peso total do pedido: ' + (t.real != null ? fmt3(t.real) + ' kg' : '—');
+	}
+
+	function propAbrirEtiquetaCorrigida() {
+		propRenderEtiquetaCorrigidaPreview();
+		abrirOverlay('overlayEtiquetaCorrigida');
+	}
+
+	function propGerarEtiquetaCorrigida() {
+		if (!(propState.etiquetaStatus === 'pendente' || propState.etiquetaStatus === 'gerada')) return;
+		propState.etiquetaStatus = 'gerada';
+		propHistoricoAdd('etiqueta', 'Etiqueta corrigida gerada', 'Nova etiqueta térmica gerada com os dados corrigidos do pedido.');
+		propState.etiquetaStatus = 'impressa';
+		propHistoricoAdd('etiqueta', 'Etiqueta corrigida impressa', 'Etiqueta corrigida enviada para impressão (simulação de impressão do navegador).');
+		toast('Etiqueta corrigida gerada e impressa.', 'success');
+		renderProposta();
+	}
+
+	function propReimprimirEtiquetaCorrigida() {
+		if (!(propState.etiquetaStatus === 'impressa' || propState.etiquetaStatus === 'reimpressa')) return;
+		if (!propState.motivo.trim()) { toast('Informe o motivo da alteração (campo acima) antes de reimprimir.'); return; }
+		propState.etiquetaStatus = 'reimpressa';
+		propHistoricoAdd('etiqueta', 'Etiqueta corrigida impressa', 'Etiqueta corrigida reimpressa — motivo: ' + propState.motivo.trim());
+		toast('Etiqueta corrigida reimpressa.', 'success');
+		renderProposta();
+	}
+
+	function voltarParaSeparacao() {
+		state.sentusStatus = 'nao_enviado';
+		state.sentusErro = null;
+		state.sentusRef = null;
+		state.notaFiscal = null;
+		propHistoricoAdd('retorno', 'Retornado para Separação', 'Pedido devolvido para nova conferência completa.');
+		updateHeroStatus('em_separacao');
+		toast('Pedido №' + pedido.numero + ' devolvido para "Em Separação" para nova conferência. Continue em 07-camara-fria.html.', 'success');
+	}
+
+	/* ══════════════ Listeners ══════════════ */
+	document.addEventListener('DOMContentLoaded', function () {
+		FLOW_HTML_TEMPLATE = document.getElementById('opFlow').outerHTML;
+		render();
+
+		document.getElementById('btnEnviarSentus').addEventListener('click', abrirEnvio);
+		document.getElementById('envioCancelar').addEventListener('click', function () { fecharOverlay('overlayEnvio'); });
+		document.getElementById('envioConfirmar').addEventListener('click', confirmarEnvio);
+
+		document.getElementById('btnConfirmarNF').addEventListener('click', abrirNF);
+		document.getElementById('nfCancelar').addEventListener('click', function () { fecharOverlay('overlayNF'); });
+		document.getElementById('nfConfirmar').addEventListener('click', confirmarNF);
+		['nfNumero', 'nfSerie', 'nfData', 'nfValor'].forEach(function (id) {
+			document.getElementById(id).addEventListener('input', validarFormNF);
+		});
+
+		document.getElementById('btnCancelarPedido').addEventListener('click', function () {
+			updateHeroStatus('cancelado');
+			toast('Pedido №' + pedido.numero + ' cancelado.', 'error');
+		});
+
+		document.getElementById('btnRestaurarInicial').addEventListener('click', restaurarInicial);
+
+		document.getElementById('simularResultadoGroup').addEventListener('click', function (e) {
+			var btn = e.target.closest('.cf-radio-btn');
+			if (!btn) return;
+			state.simularResultado = btn.getAttribute('data-valor');
+			this.querySelectorAll('.cf-radio-btn').forEach(function (b) { b.classList.toggle('cf-radio-btn--active', b === btn); });
+		});
+
+		document.getElementById('formaPagamentoGroup').addEventListener('click', function (e) {
+			var btn = e.target.closest('.cf-radio-btn');
+			if (!btn) return;
+			state.formaPagamento = btn.getAttribute('data-valor');
+			render();
+		});
+
+		document.getElementById('btnReiniciarDemo').addEventListener('click', function () {
+			var status = document.getElementById('selectReiniciarStatus').value;
+			reiniciarDemo(status);
+			document.getElementById('toolsPanel').open = true;
+		});
+
+		/* ── Melhoria proposta: tabela de revisão do pedido ── */
+		document.getElementById('btnVoltarSeparacao').addEventListener('click', function () {
+			abrirOverlay('overlayVoltarSeparacao');
+		});
+		document.getElementById('voltarSeparacaoCancelar').addEventListener('click', function () {
+			fecharOverlay('overlayVoltarSeparacao');
+		});
+		document.getElementById('voltarSeparacaoConfirmar').addEventListener('click', function () {
+			fecharOverlay('overlayVoltarSeparacao');
+			voltarParaSeparacao();
+		});
+
+		document.getElementById('btnToggleEdicao').addEventListener('click', function () {
+			propState.editMode = !propState.editMode;
+			if (!propState.editMode) {
+				propState.editingPesoId = null;
+				propState.novaLinhaAtiva = false;
+				propState.novaLinhaSelecionado = null;
+			}
+			renderProposta();
+			if (propState.editMode) {
+				setTimeout(function () { var el = document.getElementById('propMotivo'); if (el) el.focus(); }, 0);
+			}
+		});
+		document.getElementById('propMotivo').addEventListener('input', function () {
+			propState.motivo = this.value;
+			renderProposta();
+		});
+
+		document.getElementById('propostaTbody').addEventListener('click', function (e) {
+			var btn = e.target.closest('button');
+			if (!btn) return;
+			var action = btn.getAttribute('data-action');
+			var id = btn.getAttribute('data-id');
+			if (action === 'corrigir-peso') corrigirPeso(id);
+			else if (action === 'salvar-peso') salvarPeso(id);
+			else if (action === 'cancelar-peso') cancelarPeso();
+			else if (action === 'prop-inc-qty') propAlterarQtd(id, 1);
+			else if (action === 'prop-dec-qty') propAlterarQtd(id, -1);
+			else if (action === 'prop-remover') propAbrirRemover(id);
+			else if (action === 'prop-substituir') propAbrirSubstituir(id);
+			else if (action === 'prop-reconferir') propReconferir(id);
+			else if (action === 'prop-selecionar') propSelecionarProduto(btn.getAttribute('data-codigo'));
+			else if (btn.id === 'btnAdicionarProdutoProp') propIniciarNovaLinha();
+			else if (btn.id === 'btnCancelarNovaLinhaProp') propCancelarNovaLinha();
+			else if (btn.id === 'btnConfirmarNovaLinhaProp') propConfirmarNovaLinha();
+			else if (btn.id === 'propDraftQtyInc') { propState.novaLinhaQty++; renderProposta(); }
+			else if (btn.id === 'propDraftQtyDec') { propState.novaLinhaQty = Math.max(1, propState.novaLinhaQty - 1); renderProposta(); }
+		});
+
+		document.getElementById('propostaTbody').addEventListener('input', function (e) {
+			var el = e.target;
+			var action = el.getAttribute('data-action');
+			if (action === 'peso-input') {
+				propState.pesoDrafts[el.getAttribute('data-id')] = el.value;
+			} else if (action === 'prop-qty-input') {
+				propSetQtd(el.getAttribute('data-id'), el.value);
+			} else if (el.id === 'draftBuscaInputProp') {
+				propState.novaLinhaBusca = el.value;
+				var pos = el.selectionStart;
+				renderProposta();
+				var el2 = document.getElementById('draftBuscaInputProp');
+				if (el2) { el2.focus(); el2.setSelectionRange(pos, pos); }
+			} else if (el.id === 'propDraftQtyInput') {
+				propState.novaLinhaQty = Math.max(1, parseInt(el.value, 10) || 1);
+			}
+		});
+
+		/* ── Modal: produto duplicado ── */
+		document.getElementById('duplicadoCancelar').addEventListener('click', function () { fecharOverlay('overlayDuplicado'); pendingDuplicado = null; });
+		document.getElementById('duplicadoNovaLinha').addEventListener('click', function () {
+			var p = pendingDuplicado.produto;
+			fecharOverlay('overlayDuplicado');
+			pendingDuplicado = null;
+			propState.novaLinhaSelecionado = p;
+			propState.novaLinhaQty = 1;
+			renderProposta();
+		});
+		document.getElementById('duplicadoAumentar').addEventListener('click', function () {
+			var existente = pendingDuplicado.existente;
+			existente.qty += propState.novaLinhaQty || 1;
+			existente.alterado = true;
+			if (existente.status === 'conferido') existente.status = 'alterado';
+			existente.reconferido = false;
+			fecharOverlay('overlayDuplicado');
+			pendingDuplicado = null;
+			propState.novaLinhaAtiva = false;
+			propState.novaLinhaSelecionado = null;
+			propMarcarAlterado();
+			propHistoricoAdd('alterado', 'Alterado no Faturamento', 'Quantidade de "' + existente.nome + '" aumentada para ' + existente.qty + ' — motivo: ' + propState.motivo.trim());
+			toast('Quantidade de ' + existente.nome + ' aumentada.', 'success');
+			renderProposta();
+		});
+
+		/* ── Modal: remover produto ── */
+		document.getElementById('removerMotivo').addEventListener('change', function () {
+			var outro = this.value === 'Outro';
+			document.getElementById('removerOutroWrap').hidden = !outro;
+			document.getElementById('removerConfirmar').disabled = outro ? !document.getElementById('removerMotivoOutro').value.trim() : !this.value;
+		});
+		document.getElementById('removerMotivoOutro').addEventListener('input', function () {
+			document.getElementById('removerConfirmar').disabled = !this.value.trim();
+		});
+		document.getElementById('removerCancelar').addEventListener('click', function () { fecharOverlay('overlayRemover'); removerAlvoId = null; });
+		document.getElementById('removerConfirmar').addEventListener('click', function () {
+			if (!removerAlvoId) return;
+			var idx = propState.itens.findIndex(function (i) { return i.id === removerAlvoId; });
+			if (idx === -1) return;
+			var removido = propState.itens[idx];
+			var motivoSelect = document.getElementById('removerMotivo').value;
+			var motivoRemocao = motivoSelect === 'Outro' ? document.getElementById('removerMotivoOutro').value.trim() : motivoSelect;
+			propState.itens.splice(idx, 1);
+			propState.itensRemovidosLog.push({ codigo: removido.codigo, nome: removido.nome, motivo: motivoRemocao, hora: nowDisplay() });
+			fecharOverlay('overlayRemover');
+			removerAlvoId = null;
+			propMarcarAlterado();
+			propHistoricoAdd('removido', 'Removido no Faturamento', '"' + removido.nome + '" removido do pedido — motivo: ' + motivoRemocao);
+			toast(removido.nome + ' removido do pedido.', 'success');
+			renderProposta();
+		});
+
+		/* ── Modal: substituir produto ── */
+		document.getElementById('substituirBuscaInput').addEventListener('input', function () {
+			renderSubstituirResultados(this.value);
+		});
+		document.getElementById('substituirResultados').addEventListener('click', function (e) {
+			var btn = e.target.closest('button');
+			if (!btn) return;
+			propConfirmarSubstituicao(btn.getAttribute('data-codigo'));
+		});
+		document.getElementById('substituirCancelar').addEventListener('click', function () {
+			fecharOverlay('overlaySubstituir');
+			substituirAlvoId = null;
+		});
+
+		/* ── Etiqueta corrigida ── */
+		document.getElementById('btnVisualizarEtiquetaCorrigida').addEventListener('click', propAbrirEtiquetaCorrigida);
+		document.getElementById('btnGerarEtiquetaCorrigida').addEventListener('click', propGerarEtiquetaCorrigida);
+		document.getElementById('btnReimprimirEtiquetaCorrigida').addEventListener('click', propReimprimirEtiquetaCorrigida);
+		document.getElementById('etiquetaCorrigidaFechar').addEventListener('click', function () { fecharOverlay('overlayEtiquetaCorrigida'); });
+
+		var allOverlayIds = ['overlayEnvio', 'overlayNF', 'overlayRemover', 'overlayDuplicado', 'overlayVoltarSeparacao', 'overlaySubstituir', 'overlayEtiquetaCorrigida'];
+		allOverlayIds.forEach(function (id) {
+			document.getElementById(id).addEventListener('click', function (e) {
+				if (e.target === this) fecharOverlay(id);
+			});
+		});
+		document.addEventListener('keydown', function (e) {
+			if (e.key === 'Escape') {
+				allOverlayIds.forEach(fecharOverlay);
+			}
+		});
+	});
+})();
+</script>
 </body>
 </html>

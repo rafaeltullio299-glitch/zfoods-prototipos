@@ -739,7 +739,8 @@ body {
   padding: 0;
   border: none;
   border-radius: 50%;
-  cursor: pointer;
+  cursor: grab;
+  touch-action: none; /* deixa o gesto de arraste (mouse e toque) sob nosso controle */
   pointer-events: auto;
   background: transparent;
   transition: transform 320ms var(--zf-ease), opacity 220ms ease;
@@ -747,6 +748,30 @@ body {
 
 .consultor-fab:hover {
   transform: translateY(-3px);
+}
+
+/* ---------------- Arraste (demo) ---------------- */
+
+.consultor-fab.is-dragging {
+  cursor: grabbing;
+  /* Sem transição enquanto arrasta: o botão precisa seguir o ponteiro
+     instantaneamente (left/top não têm transition por padrão, então isso
+     só reforça e também neutraliza o hover translateY durante o gesto). */
+  transition: none;
+}
+
+.consultor-fab.is-dragging:hover {
+  transform: none;
+}
+
+.consultor-fab.is-dragging .consultor-fab__pulse {
+  animation: none;
+  opacity: 0;
+}
+
+.consultor-fab.is-settling {
+  /* Só durante o encaixe (snap) na lateral, após soltar. */
+  transition: left 260ms var(--zf-ease-soft), top 260ms var(--zf-ease-soft);
 }
 
 .consultor-fab:focus-visible {
@@ -863,6 +888,15 @@ body {
   opacity: 1;
   visibility: visible;
   transition: transform var(--zf-dur) var(--zf-ease), opacity 260ms var(--zf-ease-soft);
+}
+
+/* Quando o FAB foi arrastado e encaixado à esquerda, o card abre daquele
+   lado também, em vez de continuar preso à direita (desktop/tablet — no
+   bottom sheet mobile a largura já é 100%, então o lado não importa). */
+.consultor-widget.is-left .consultor-card {
+  right: auto;
+  left: 28px;
+  transform-origin: bottom left;
 }
 
 .consultor-card__grabber {
@@ -1138,6 +1172,10 @@ body {
     width: 340px;
     right: 20px;
     bottom: 20px;
+  }
+  .consultor-widget.is-left .consultor-card {
+    right: auto;
+    left: 20px;
   }
 }
 

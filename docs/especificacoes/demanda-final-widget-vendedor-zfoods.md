@@ -135,6 +135,23 @@ Regras de implementação:
 - A mensagem final é sempre passada por `encodeURIComponent` antes de compor a URL `wa.me`.
 - O link continua abrindo em nova aba (`target="_blank" rel="noopener noreferrer"`), preservando o estado do catálogo/carrinho ao voltar do WhatsApp — isso não muda com a mensagem contextual.
 
+### Botão flutuante e arrastável
+
+O botão flutuante (FAB) do widget **não fica preso permanentemente em uma única posição da tela**. O cliente pode arrastá-lo para outro ponto quando ele estiver atrapalhando a visualização do catálogo, produto, carrinho ou checkout. Este comportamento não existe no protótipo estático (`docs/prototipos/consultor-widget`), que tem o botão sempre fixo — é um requisito novo, não coberto pela referência visual, a ser implementado do zero no componente Angular.
+
+Regras de comportamento:
+
+- Funcionar com **mouse no desktop** e **toque no mobile/tablet**.
+- O botão nunca pode ser solto **fora da área visível da tela**.
+- Ao soltar, o botão deve **encaixar (snap) na lateral esquerda ou direita mais próxima** do ponto onde foi solto.
+- **Diferenciar clique de arraste**: um clique simples (sem deslocamento, ou deslocamento abaixo de um limiar mínimo) abre o card do vendedor; um arraste (deslocamento acima do limiar) apenas reposiciona o botão e **não** abre o card.
+- A posição escolhida pelo cliente é **preservada durante a navegação** entre catálogo, produto, carrinho e checkout — não reinicia a cada troca de rota.
+- A posição é salva em **`localStorage`** (por dispositivo/navegador), para ser mantida também em **acessos futuros no mesmo dispositivo** — não depende de login, nem é sincronizada entre dispositivos.
+- Se o **tamanho ou orientação da tela mudar** (ex.: rotação do celular, redimensionamento da janela) e a posição salva ficar fora da área visível, o botão é **reposicionado automaticamente** para dentro dos limites da tela.
+- O botão, em qualquer posição, **nunca pode bloquear CTAs essenciais**: "Adicionar ao carrinho", abrir o carrinho, avançar no checkout, finalizar pedido — validar visualmente em todas as combinações de posição e tela (isso complementa, e não substitui, o cuidado de posicionamento já previsto para a posição padrão do widget).
+- A **mensagem contextual do WhatsApp** (subseção anterior) continua funcionando normalmente, **independentemente da posição** em que o botão estiver — a posição é uma característica puramente visual e não interfere na lógica de identificação de contexto/mensagem.
+- Continua sendo **o mesmo componente único** (`consultant-widget`) — o arraste é mais uma responsabilidade interna dele, não um componente ou modo separado.
+
 - Cuidado de posicionamento/z-index no checkout: o widget nunca pode cobrir o botão de finalizar compra ou qualquer ação principal de compra — validar visualmente em todas as telas onde aparece.
 - Identidade visual: reaproveitar a paleta e a tipografia já validadas no protótipo (`docs/prototipos/consultor-widget.css`), mas usando os tokens reais do projeto (`src/material-theme.scss`) em vez de redefini-los.
 
@@ -190,6 +207,14 @@ Em todos os cenários de fallback, o backend responde no **mesmo formato** — o
 13. No catálogo, no carrinho e no checkout, a mensagem identifica corretamente a origem do contato.
 14. Nenhum dado sensível (CPF, CNPJ, limite de crédito, conteúdo do carrinho) é incluído na mensagem.
 15. O contexto é obtido automaticamente pelo componente, sem o cliente precisar selecionar ou digitar de qual tela está vindo.
+16. Usuário consegue arrastar o botão do vendedor no desktop.
+17. Usuário consegue arrastar o botão por toque no mobile.
+18. O botão não pode ser arrastado para fora da tela.
+19. Clique normal continua abrindo o widget.
+20. Arrastar não abre o widget acidentalmente.
+21. A posição é preservada durante a navegação.
+22. O botão nunca bloqueia ações essenciais do catálogo ou checkout.
+23. A mensagem contextual do WhatsApp continua identificando corretamente a página de origem.
 
 ## 10. Arquivos/protótipos de referência
 
@@ -207,3 +232,5 @@ Em todos os cenários de fallback, o backend responde no **mesmo formato** — o
 - [ ] Padrão de upload de foto já usado hoje para produtos, para reaproveitar exatamente o mesmo fluxo no cadastro de vendedores.
 - [ ] Nome definitivo do bucket de fotos (sugestão: `consultant-photos`) e limites de tamanho/tipo de arquivo.
 - [ ] Confirmar se o campo "cargo" deve ser sempre fixo ("Consultor Comercial ZFOODS") ou editável por vendedor no cadastro.
+- [ ] Definir o limiar (distância em pixels e/ou tempo) usado para diferenciar clique de arraste no botão flutuante.
+- [ ] Confirmar a margem de segurança do "encaixe" nas laterais (padding em relação à borda da tela), considerando áreas seguras de dispositivos com notch/home indicator (iOS) e a barra inferior fixa de navegação no mobile, quando existir.

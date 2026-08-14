@@ -26,9 +26,12 @@
 	.src-top-vendas { background: var(--zf-info-bg); color: var(--zf-info); }
 	.src-rafael-lab { background: var(--zf-success-bg); color: var(--zf-success); }
 	.src-planejado { background: var(--zf-warning-bg); color: var(--zf-warning); }
-	.proto-card__footer { display: flex; align-items: center; justify-content: flex-start; margin-top: 4px; }
-	.proto-card__btn { display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; border-radius: 999px; background: var(--zf-burgundy); color: #fff; font-size: 0.8rem; font-weight: 700; }
+	.src-prototipo { background: var(--zf-cream-dark); color: var(--zf-copper); }
+	.proto-card__footer { display: flex; align-items: center; justify-content: flex-start; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+	.proto-card__btn { display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; border-radius: 999px; background: var(--zf-burgundy); color: #fff; font-size: 0.8rem; font-weight: 700; text-decoration: none; }
 	.proto-card:hover .proto-card__btn { background: var(--zf-burgundy-dark); }
+	.proto-card__link-secondary { font-size: 0.78rem; font-weight: 600; color: var(--zf-burgundy); text-decoration: underline; text-underline-offset: 2px; }
+	.proto-card__link-secondary:hover { color: var(--zf-burgundy-dark); }
 	.hub-footer { background: var(--zf-charcoal); color: #D8CFC2; padding: 32px 0; font-size: 0.82rem; }
 	.hub-footer a { color: #F5EBD9; }
 	.legend { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 28px; font-size: 0.78rem; }
@@ -88,6 +91,16 @@
 						<span class="proto-card__source src-top-vendas">111-top-vendas</span>
 						<div class="proto-card__footer"><span class="proto-card__btn">Abrir protótipo →</span></div>
 					</a>
+					<div class="card proto-card">
+						<div class="proto-card__top"><div class="proto-card__icon">💬</div></div>
+						<h3>Widget do Vendedor / WhatsApp</h3>
+						<p>Atendimento personalizado com foto e primeiro nome do vendedor, contato pelo WhatsApp e identificação do contexto da página em que o cliente iniciou o atendimento.</p>
+						<span class="proto-card__source src-prototipo">Protótipo</span>
+						<div class="proto-card__footer">
+							<a class="proto-card__btn" href="docs/prototipos/consultor-widget/">Abrir protótipo →</a>
+							<a class="proto-card__link-secondary" href="docs/especificacoes/demanda-final-widget-vendedor-zfoods.md">Ver especificação técnica</a>
+						</div>
+					</div>
 				</div>
 
 				<div class="hub-section-title"><span>🛠️</span><h2>Área Administrativa</h2></div>
